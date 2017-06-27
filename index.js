@@ -1,6 +1,7 @@
 const DcsClient=require("./dcs_client");
 const DcsController=require("./dcs_controller");
 const Recorder=require("./recorder");
+const config=require("./dcs_config.json");
 let child_process=require("child_process");
 var recorder=new Recorder();
 var client=new DcsClient({recorder:recorder});
@@ -36,6 +37,7 @@ var isRaspberrypi=child_process.execSync("uname -a").toString().match(/raspberry
 if(isRaspberrypi){
     const wakeup=require("./wakeup/wakeup.js");
     wakeup.on("wakeup",function(){
+        child_process.exec(config.play_cmd+" -t wav '"+__dirname+"nihao.wav'");
         console.log("!!!!!!!!!!!!!!!!!!");
         //recorder.stop();
         controller.startRecognize();
