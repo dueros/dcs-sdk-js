@@ -47,7 +47,6 @@ sudo make install
 
 
 ## shell版
-  * avs_test.sh是 avs协议的demo入口
   * dcs_test.sh是 avs协议的demo入口
 
 
