@@ -26,7 +26,7 @@ function init(_audioStream){
     init_promise=new Promise(function(resolve,reject){
         wakeup_status="stop";
         audioStream=_audioStream;
-        wakeup_process=spawn(__dirname+"/NEW_WAKEUP",[],{
+        wakeup_process=spawn(__dirname+"/NEW_WAKE",[],{
             cwd:__dirname
         });
         wakeup_process.on("close",function(){

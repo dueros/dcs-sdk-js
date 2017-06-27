@@ -37,8 +37,9 @@ var isRaspberrypi=child_process.execSync("uname -a").toString().match(/raspberry
 if(isRaspberrypi){
     const wakeup=require("./wakeup/wakeup.js");
     wakeup.on("wakeup",function(){
-        child_process.exec(config.play_cmd+" -t wav '"+__dirname+"nihao.wav'");
-        console.log("!!!!!!!!!!!!!!!!!!");
+        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
+        child_process.exec(cmd);
+        console.log(cmd+"!!!!!!!!!!!!!!!!!!");
         //recorder.stop();
         controller.startRecognize();
     });
