@@ -67,6 +67,17 @@ npm install
 
 ## 修改配置
 
+树莓派+录音套件，请执行
+
+```shell
+cp dcs_config.json.pi dcs_config.json
+```
+
+mac环境下，请执行
+```shell
+cp dcs_config.json.mac dcs_config.json
+```
+
 修改dcs_config.json中的access_token（oauth登录信息）
 
 
@@ -77,7 +88,7 @@ npm install
 访问地址[https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect](https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect)
 
 ### 入口
-  * cd $CODE_ROOT; dcs_test.js
+  * cd $CODE_ROOT; node index.js
 
 进入后，按回车开始听音
 

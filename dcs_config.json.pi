@@ -10,12 +10,12 @@
     "schema":"http://",
     "protocol":"http",
     
-    "rec_env":{},
-    "play_env":{},
+    "rec_env":{"AUDIODEV":"hw:1,0"},
+    "play_env":{"AUDIODEV":"hw:0,0"},
 
-    "rec_cmd":"/usr/local/bin/rec",
-    "play_cmd":"/usr/local/bin/play",
-    "sox_cmd":"/usr/local/bin/sox",
+    "rec_cmd":"/usr/bin/rec",
+    "play_cmd":"/usr/bin/play",
+    "sox_cmd":"/usr/bin/sox",
     
     "oauth_token":"23.6838f84f87b7add3f93863fb584183ac.2592000.1500435781.1370625812-9552442"
 }
