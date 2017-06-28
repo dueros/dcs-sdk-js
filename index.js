@@ -2,10 +2,10 @@ const DcsClient=require("./dcs_client");
 const DcsController=require("./dcs_controller");
 const Recorder=require("./recorder");
 const config=require("./dcs_config.json");
-let child_process=require("child_process");
+const child_process=require("child_process");
+const fs = require('fs');
 var recorder=new Recorder();
 var client=new DcsClient({recorder:recorder});
-let fs = require('fs');
 
 let controller=new DcsController();
 
@@ -36,11 +36,30 @@ process.stdin.on("keypress",()=>{
 var isRaspberrypi=child_process.execSync("uname -a").toString().match(/raspberrypi/);
 if(isRaspberrypi){
     const wakeup=require("./wakeup/wakeup.js");
-    wakeup.on("wakeup",function(){
+    wakeup.on("wakeup",function(wakeupInfo){
+        console.log(wakeupInfo);
+        //wakeupInfo.wakeword_frame_len;
+        var buf=recorder.getLatestBuffers(wakeupInfo.wakeword_frame_len*8+20);
+        fs.writeFile("wake.pcm",buf);
         var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
         child_process.exec(cmd);
         console.log(cmd+"!!!!!!!!!!!!!!!!!!");
         //recorder.stop();
+        //声音采样率16k，每ms 16个sample，每个sample 2个字节(16bit)
+        /*
+        controller.startRecognize({
+            wakeWordPcm:buf,
+            initiator:{
+                "payload": {
+                    "wakeWordIndices": {
+                        "startIndexInSamples": 16*20,
+                        "endIndexInSamples": 16*(wakeupInfo.wakeword_frame_len*8+20)
+                    }   
+                },
+                type:"WAKEWORD"
+            }
+        });
+        */
         controller.startRecognize();
     });
 

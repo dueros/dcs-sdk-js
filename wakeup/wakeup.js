@@ -81,7 +81,18 @@ function onMessage(msg){
     if(_status==4){
         emitter.emit("wakeup",resultObj);
     }*/
-    emitter.emit("wakeup",msg);
+    if(msg){
+        var msgData=msg.getAll();
+        for(k in msgData){
+            if(msgData.hasOwnProperty(k)){
+                msgData[k]=msgData[k].toString("utf-8");
+            }
+        }
+        if(msgData.wakeword_frame_len){
+            msgData.wakeword_frame_len=parseInt(msgData.wakeword_frame_len);
+        }
+    }
+    emitter.emit("wakeup",msgData);
 }
 function onData(data) {
     var msg=new WakeupMessage();

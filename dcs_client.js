@@ -32,6 +32,9 @@ class RecorderWrapper extends Readable {
     super(options);
     this._source = options.recorder;
     // Every time there's data, push it into the internal buffer.
+    if(options.beforePcm){
+        this.push(options.beforePcm);
+    }
     var onData=this.onData= function (chunk){
       // if push() returns false, then stop reading from source
       if (!this.push(chunk))
@@ -156,13 +159,14 @@ DcsClient.prototype.processEventRequest=function (r){
     });
     rWrap.pipe(d1);
 }
-DcsClient.prototype.startRecognize=function(eventData){
+DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     if(this._isRecognizing){
         console.log("is recognizing");
         return;
     }
     var self=this;
     var rec_stream=this.rec_stream=new RecorderWrapper({
+        "beforePcm":wakeWordPcm,
         "recorder":this.recorder.start().out()
     });
     var r =this.request = request({

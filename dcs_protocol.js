@@ -33,8 +33,8 @@ function createEvent(namespace,name, context){
     }
     return eventData;
 }
-function createRecognizeEvent(){
-    return {
+function createRecognizeEvent(options){
+    var ev={
         "requestId":"wp"+new Date().getTime(),
         "deviceInterface": [
             {
@@ -65,7 +65,11 @@ function createRecognizeEvent(){
                 "format" : "AUDIO_L16_RATE_16000_CHANNELS_1"
             }
         },
+    };
+    if(options.initiator){
+        ev.event.payload.initiator=options.initiator;
     }
+    return ev;
 }
 
 

@@ -70,6 +70,17 @@ DcsController.prototype.getContext=function(){
     if(audioContext){
         context.push(audioContext);
     }
+
+    context.push({
+        "header": {
+            "namespace": "ai.dueros.device_interface.voice_output",
+            "name": "ListenState"
+        },
+        "payload": {
+            "wakeword":"小度小度"
+        }
+    });
+
     return context;
     //TODO get all alerts
     //TODO get audio player
@@ -131,10 +142,10 @@ DcsController.prototype.stopPlay=function(directive){
     this.ttsManager.stop();
 };
 
-DcsController.prototype.startRecognize=function(directive){
+DcsController.prototype.startRecognize=function(options){
     this.stopPlay();
     if(this.client){
-        return this.client.startRecognize(DcsProtocol.createRecognizeEvent());
+        return this.client.startRecognize(DcsProtocol.createRecognizeEvent(options),options.wakeWordPcm);
     }
     return false;
 };
