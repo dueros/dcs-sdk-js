@@ -33,7 +33,11 @@ class RecorderWrapper extends Readable {
     this._source = options.recorder;
     // Every time there's data, push it into the internal buffer.
     if(options.beforePcm){
-        this.push(options.beforePcm);
+      if (!this.push(options.beforePcm)){
+        throw new Error("push error");
+      }
+        //console.log("push ret:"+ret);
+        //console.log("push length:"+options.beforePcm.length);
     }
     var onData=this.onData= function (chunk){
       // if push() returns false, then stop reading from source
@@ -166,6 +170,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     }
     var self=this;
     var rec_stream=this.rec_stream=new RecorderWrapper({
+        "highWaterMark":200000,
         "beforePcm":wakeWordPcm,
         "recorder":this.recorder.start().out()
     });
