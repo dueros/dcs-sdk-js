@@ -19,6 +19,7 @@ const DcsProtocol=require("./dcs_protocol");
 const DataStreamPlayer=require("./data_stream_player");
 const AudioManager=require("./audio_manager");
 const AlertManager=require("./alert_manager");
+const VoiceInputManager=require("./voice_input_manager");
 const TTSManager=require("./tts_manager");
 const SynchronousPromise=require("synchronous-promise").SynchronousPromise;
 const directive_handlers={
@@ -40,6 +41,9 @@ const directive_handlers={
   }
 }
      */
+    "ai.dueros.device_interface.voice_input":function(directive){
+        return this.voiceInputManager.handleDirective(directive,this);
+    },
     "ai.dueros.device_interface.voice_output":function(directive){
         return this.ttsManager.handleDirective(directive,this);
     },
@@ -52,6 +56,7 @@ function DcsController(options){
     this.alertManager=new AlertManager();
     this.audioManager=new AudioManager();
     this.ttsManager=new TTSManager();
+    this.voiceInputManager=new VoiceInputManager();
     this.audioManager.on("stop",()=>{
         this.emit("event",DcsProtocol.createEvent("AudioPlayer","PlaybackStopped",this.getContext()));
     });
@@ -86,15 +91,11 @@ DcsController.prototype.getContext=function(){
         context.push(audioContext);
     }
 
-    context.push({
-        "header": {
-            "namespace": "ai.dueros.device_interface.voice_output",
-            "name": "ListenState"
-        },
-        "payload": {
-            "wakeword":"小度小度"
-        }
-    });
+    var voiceInputContext=this.voiceInputManager.getContext();
+    if(voiceInputContext){
+        context.push(voiceInputContext);
+    }
+
 
     return context;
     //TODO get all alerts

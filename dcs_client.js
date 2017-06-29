@@ -30,11 +30,6 @@ function DcsClient(options){
     this.downstream.on("directive",(response)=>{
         //"namespace": "ai.dueros.device_interface.voice_input",
         //"name": "StopListen",
-        if(response.directive.header.name=="StopListen"){
-            console.log("stop capture!!");
-            this.stopRecognize();
-            //this.recorder.stop();
-        }
         this.emit("directive",response);
     });
     this.downstream.on("content",(content_id,readable)=>{
