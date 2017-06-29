@@ -145,7 +145,10 @@ DcsController.prototype.stopPlay=function(directive){
 DcsController.prototype.startRecognize=function(options){
     this.stopPlay();
     if(this.client){
-        return this.client.startRecognize(DcsProtocol.createRecognizeEvent(options),options.wakeWordPcm);
+        if(options&&options.wakeWordPcm){
+            var wakeWordPcm=options.wakeWordPcm;
+        }
+        return this.client.startRecognize(DcsProtocol.createRecognizeEvent(options),wakeWordPcm);
     }
     return false;
 };

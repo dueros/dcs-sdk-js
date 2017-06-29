@@ -3,6 +3,7 @@ const util = require('util');
 const request=require("request");
 const config=require("./dcs_config.json");
 const Readable = require('stream').Readable;
+const BufferManager=require("./wakeup/buffermanager").BufferManager;
 let fs = require('fs');
 var Dicer = require('dicer');
 
@@ -28,39 +29,48 @@ function DcsClient(options){
 
 util.inherits(DcsClient, EventEmitter);
 class RecorderWrapper extends Readable {
-  constructor(options) {
-    super(options);
-    this._source = options.recorder;
-    // Every time there's data, push it into the internal buffer.
-    if(options.beforePcm){
-      if (!this.push(options.beforePcm)){
-        throw new Error("push error");
-      }
-        //console.log("push ret:"+ret);
-        //console.log("push length:"+options.beforePcm.length);
+    constructor(options) {
+        super(options);
+        this.buffer_manager=new BufferManager();
+        this._source = options.recorder;
+        // Every time there's data, push it into the internal buffer.
+        if(options.beforePcm){
+            if (!this.push(options.beforePcm)){
+                throw new Error("push error");
+            }
+            this.buffer_manager.add(options.beforePcm);
+            //console.log("push ret:"+ret);
+            //console.log("push length:"+options.beforePcm.length);
+        }else{
+            console.log("no before");
+        }
+        var onData=this.onData= function (chunk){
+            // if push() returns false, then stop reading from source
+            console.log("on record data:"+chunk.length);
+            if (!this.push(chunk)){
+                this._source.removeListener("data",onData);
+            }
+            this.buffer_manager.add(chunk);
+        }.bind(this);
+        this._source.on("data",onData);
+        // When the source ends, push the EOF-signaling `null` chunk
+        this._source.on("end" ,() => {
+            this.push(null);
+            //fs.writeFileSync("recorder.pcm",this.buffer_manager.slice(0));
+        });
     }
-    var onData=this.onData= function (chunk){
-      // if push() returns false, then stop reading from source
-      if (!this.push(chunk))
-        this._source.removeListener("data",onData);
-    }.bind(this);
-    this._source.on("data",onData);
-    // When the source ends, push the EOF-signaling `null` chunk
-    this._source.on("end" ,() => {
-      this.push(null);
-    });
-  }
-  // _read will be called when the stream wants to pull more data in
-  // the advisory size argument is ignored in this case.
-  _read(size) {
-    this._source.read(size);
-  }
-  stopRecording(){
-    this.push(null);
-    this._source.removeListener("data",this.onData);
-    this.onData=null;
-    this._source=null
-  }
+    // _read will be called when the stream wants to pull more data in
+    // the advisory size argument is ignored in this case.
+    _read(size) {
+        this._source.read(size);
+    }
+    stopRecording(){
+        fs.writeFileSync("recorder.pcm",this.buffer_manager.slice(0));
+        this.push(null);
+        this._source.removeListener("data",this.onData);
+        this.onData=null;
+        this._source=null
+    }
 }
 
 DcsClient.prototype.sendEvent=function(eventData){
@@ -168,6 +178,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         console.log("is recognizing");
         return;
     }
+    console.log(JSON.stringify(eventData,null,2));
     var self=this;
     var rec_stream=this.rec_stream=new RecorderWrapper({
         "highWaterMark":200000,
@@ -178,25 +189,25 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         multipart: {
             chunked: true,
             data: [
-                {
-                    'Content-Disposition': 'form-data; name="metadata"',
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    "body": JSON.stringify(eventData)
-                },
-                { 
-                    'Content-Disposition': 'form-data; name="audio"',
-                    'Content-Type': 'application/octet-stream',
-                    "body": rec_stream,
+            {
+                'Content-Disposition': 'form-data; name="metadata"',
+                'Content-Type': 'application/json; charset=UTF-8',
+                "body": JSON.stringify(eventData)
+            },
+            { 
+                'Content-Disposition': 'form-data; name="audio"',
+                'Content-Type': 'application/octet-stream',
+                "body": rec_stream,
                     //"body": fs.createReadStream("test.pcm")
                     //"body": fs.readFileSync("test.pcm")
-                }
+            }
             ]
         },
         method:"post",
-        //preambleCRLF: true,
+            //preambleCRLF: true,
         postambleCRLF: true,
         "url":config.schema+config.ip+config.events_uri ,
-        //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
+            //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
         headers:{
             "Content-Type": "multipart/form-data; boundary="+config.boundary,
             "Host": config.host, 

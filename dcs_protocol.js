@@ -66,7 +66,7 @@ function createRecognizeEvent(options){
             }
         },
     };
-    if(options.initiator){
+    if(options && options.initiator){
         ev.event.payload.initiator=options.initiator;
     }
     return ev;
