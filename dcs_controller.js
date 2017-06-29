@@ -164,7 +164,9 @@ DcsController.prototype.startRecognize=function(options){
         if(options&&options.wakeWordPcm){
             var wakeWordPcm=options.wakeWordPcm;
         }
-        return this.client.startRecognize(DcsProtocol.createRecognizeEvent(options),wakeWordPcm);
+        eventData=DcsProtocol.createRecognizeEvent(options);
+        eventData.clientContext=this.getContext();
+        return this.client.startRecognize(eventData,wakeWordPcm);
     }
     return false;
 };
