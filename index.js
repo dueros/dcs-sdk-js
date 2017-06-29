@@ -41,15 +41,12 @@ if(isRaspberrypi){
         //wakeupInfo.wakeword_frame_len;
         var buf=recorder.getLatestBuffers(wakeupInfo.wakeword_frame_len*8+20);
         fs.writeFile("wake.pcm",buf);
-        ///没有AEC所以不能放提示音
-        //var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
-        //child_process.exec(cmd);
-        //console.log(cmd+"!!!!!!!!!!!!!!!!!!");
         
         
         //recorder.stop();
         //声音采样率16k，每ms 16个sample，每个sample 2个字节(16bit)
         /*
+        //带误唤醒检测的模式
         controller.startRecognize({
             wakeWordPcm:buf,
             initiator:{
@@ -63,7 +60,12 @@ if(isRaspberrypi){
             }
         });
         */
-        controller.startRecognize();
+        ///没有AEC所以不能放提示音的时候录音
+        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
+        child_process.exec(cmd,()=>{
+            console.log(cmd+"!!!!!!!!!!!!!!!!!!");
+            controller.startRecognize();
+        });
     });
 
 
