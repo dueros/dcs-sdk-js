@@ -108,17 +108,24 @@ DcsClient.prototype.sendEvent=function(eventData){
             console.log("event response headers:"+JSON.stringify(response.headers,null,2));
             console.log("event response:"+body);
         });
-        this.processEventRequest(r);
+        var rWrap=this.processEventRequest(r);
+        rWrap.on("error",(error)=>{
+            console.log("event upload error");
+        });
     }
     console.log("sendEvent:"+JSON.stringify(eventData,null,2));
 };
 
 DcsClient.prototype.processEventRequest=function (r){
     let rWrap=new Readable().wrap(r);
+    rWrap.on("error",()=>{
+        console.log("rWrap on error");
+    });
 
     var d1 = new Dicer({"boundary":""});
     d1.on('error',()=>{
         console.log('dicer error, no multi part in events stream!!!!!!!!');
+        rWrap.emit("error",new Error('not multi part'));
     });
     r.on('response', function(response) {
         if(!response.headers['content-type']){
@@ -133,6 +140,9 @@ DcsClient.prototype.processEventRequest=function (r){
             rWrap.unpipe(d1);
             console.log("[ERROR] response error, not multipart");
             rWrap.pipe(process.stderr);
+            process.nextTick(()=>{
+                rWrap.emit("error",new Error('not multi part'));
+            });
         }
     });
 
@@ -182,6 +192,7 @@ DcsClient.prototype.processEventRequest=function (r){
         console.log('End of parts');
     });
     rWrap.pipe(d1);
+    return rWrap;
 }
 DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     if(this._isRecognizing){
@@ -225,7 +236,10 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
             "DeviceSerialNumber": config.device_id
         }
     });
-    this.processEventRequest(r);
+    var rWrap=this.processEventRequest(r);
+    rWrap.on("error",()=>{
+        this.stopRecognize();
+    });
     this._isRecognizing=true;
 };
 
@@ -262,6 +276,7 @@ DownStream.prototype.init=function(){
         }
     });
     this.req.on("error",()=>{
+        console.log('downstream error!!!!!!!!');
         this.init();
     });
     var d = new Dicer({"boundary":""});

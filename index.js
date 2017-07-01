@@ -54,14 +54,14 @@ if(isRaspberrypi){
     wakeup.on("wakeup",function(wakeupInfo){
         console.log(wakeupInfo);
         //wakeupInfo.wakeword_frame_len;
-        var buf=recorder.getLatestBuffers(wakeupInfo.wakeword_frame_len*8+20);
+        var buf=recorder.getLatestBuffers(wakeupInfo.wakeword_frame_len*10);
         fs.writeFile("wake.pcm",buf);
         
         
         //recorder.stop();
         //声音采样率16k，每ms 16个sample，每个sample 2个字节(16bit)
-        /*
         //带误唤醒检测的模式
+        /*
         controller.startRecognize({
             wakeWordPcm:buf,
             initiator:{
