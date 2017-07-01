@@ -15,11 +15,11 @@
 */
 const EventEmitter=require("events");
 const util = require('util');
-const MPlayer = require('mplayer');
+const MPlayer = require('./mplayer/index.js');
 
 function Player(options){
     this.mplayer = new MPlayer(options);
-    ["ready","time","start","play","pause","stop","status"].forEach((eventName)=>{
+    ["ready","time","start","play","pause","stop","status","finished"].forEach((eventName)=>{
         this.mplayer.on(eventName,(...args)=>{
             if(eventName!="time"){
                 console.log("mplayer event "+eventName);
@@ -28,12 +28,7 @@ function Player(options){
                 this.currentStatus=args[0];
                 console.log(JSON.stringify(args));
             }
-            if(eventName=="stop" && this._status!="stopping"){
-                this._status =null;
-                this.emit("finished",...args);
-            }else{
-                this.emit(eventName,...args);
-            }
+            this.emit(eventName,...args);
         });
     });
 }

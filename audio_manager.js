@@ -19,6 +19,7 @@ const util = require('util');
 const Player=require("./player");
 function AudioManager(){
     this.playlist=[];
+    //this.player=new Player({debug:1});
     this.player=new Player();
     this.player.on("stop",()=>{
         this.emit("stop");

@@ -8,8 +8,8 @@
 
     "host":"dueros-h2.baidu.com",
     "ip":"dueros-h2.baidu.com",
-    "schema":"http://",
-    "protocol":"http",
+    "schema":"https://",
+    "protocol":"https",
     
     "rec_env":{"AUDIODEV":"hw:1,0"},
     "play_env":{"AUDIODEV":"hw:0,0"},
