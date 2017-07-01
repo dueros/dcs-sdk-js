@@ -17,21 +17,46 @@
 const EventEmitter=require("events");
 const util = require('util');
 const Player=require("./player");
-function AudioManager(){
+const DcsProtocol=require("./dcs_protocol");
+function AudioManager(controller){
     this.playlist=[];
     //this.player=new Player({debug:1});
     this.player=new Player();
     this.player.on("stop",()=>{
-        this.emit("stop");
+        controller.emit("event",
+                DcsProtocol.createEvent( "ai.dueros.device_interface.audio_player", "PlaybackStopped", controller.getContext(),
+                    {
+                        token:this.last_played_token,
+                        offsetInMilliseconds:this.offset_ms
+                    }
+                    )
+                );
     });
     this.player.on("pause",()=>{
-        this.emit("pause");
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackPaused",controller.getContext(),
+                    {
+                        token:this.last_played_token,
+                        offsetInMilliseconds:this.offset_ms
+                    }));
     });
     this.player.on("play",()=>{
-        this.emit("play");
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackStarted",controller.getContext(),
+                    {
+                        token:this.last_played_token,
+                        offsetInMilliseconds:this.offset_ms
+                    }));
     });
     this.player.on("finished",()=>{
-        this.emit("finished");
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackNearlyFinished",controller.getContext(),
+                    {
+                        token:this.last_played_token,
+                        offsetInMilliseconds:this.offset_ms
+                    }));
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackFinished",controller.getContext(),
+                    {
+                        token:this.last_played_token,
+                        offsetInMilliseconds:this.offset_ms
+                    }));
         this.playNext();
     });
     this.player.on("time",(sec)=>{
