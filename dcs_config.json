@@ -2,6 +2,7 @@
     "boundary":"___dumi_avs_client_wangpeng20___",
     "directive_uri":"/dcs/v1/directives",
     "events_uri":"/dcs/v1/events",
+    "ping_uri":"/dcs/v1/ping",
     "device_id":"wangpeng20_dumi_xxxxxxx",
 
 

@@ -19,6 +19,8 @@ const request=require("request");
 const config=require("./dcs_config.json");
 const Readable = require('stream').Readable;
 const BufferManager=require("./wakeup/buffermanager").BufferManager;
+const http2=require("http2");
+
 let fs = require('fs');
 var Dicer = require('dicer');
 
@@ -267,16 +269,36 @@ DownStream.prototype.init=function(){
     if(this.req){
         this.req.abort();
     }
-    this.req=request.get({
-        "url":config.schema+config.ip+config.directive_uri ,
+    this.req=http2.get({
+        "url":"https://"+config.ip+config.directive_uri ,
+        "host":config.ip,
+        "path":config.directive_uri,
         headers:{
-            "Host": config.host, 
             "Authorization": "Bearer "+config.oauth_token,
             "DeviceSerialNumber": config.device_id
         }
     });
-    this.req.on("error",()=>{
-        console.log('downstream error!!!!!!!!');
+    if(this.pingInterval){
+        clearInterval(this.pingInterval);
+    }
+    this.pingInterval=setInterval(()=>{
+        http2.get({
+            "url":"https://"+config.ip+config.ping_uri ,
+            "host":config.ip,
+            "path":config.ping_uri,
+            headers:{
+                "Authorization": "Bearer "+config.oauth_token,
+                "DeviceSerialNumber": config.device_id
+            }
+        },(response)=>{
+            //console.log(response.statusCode);
+            if(response.statusCode!=200){
+                this.init();
+            }
+        });
+    },5000);
+    this.req.on("error",(e)=>{
+        console.log('downstream error!!!!!!!!'+e.toString());
         this.init();
     });
     var d = new Dicer({"boundary":""});
@@ -293,8 +315,8 @@ DownStream.prototype.init=function(){
         if(matches&&matches[1]){
             d.setBoundary(matches[1]);
         }
+        response.pipe(d);
     });
-    this.req.pipe(d);
     //content-type: multipart/form-data; boundary=___dumi_avs_xuejuntao___
     d.on('part', function(p) {
         console.log("on part");
