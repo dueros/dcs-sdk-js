@@ -17,7 +17,7 @@ const util = require('util');
 const EventEmitter=require("events");
 const DcsProtocol=require("./dcs_protocol");
 const DataStreamPlayer=require("./data_stream_player");
-const AudioManager=require("./audio_manager");
+const AudioPlayerManager=require("./audio_player_manager");
 const AlertManager=require("./alert_manager");
 const VoiceInputManager=require("./voice_input_manager");
 const VoiceOutputManager=require("./voice_output_manager");
@@ -48,13 +48,13 @@ const directive_handlers={
         return this.voiceOutputManager.handleDirective(directive,this);
     },
     "ai.dueros.device_interface.audio_player":function(directive){
-        return this.audioManager.handleDirective(directive,this);
+        return this.audioPlayerManager.handleDirective(directive,this);
     }
 };
 
 function DcsController(options){
     this.alertManager=new AlertManager(this);
-    this.audioManager=new AudioManager(this);
+    this.audioPlayerManager=new AudioPlayerManager(this);
     this.voiceOutputManager=new VoiceOutputManager(this);
     this.voiceInputManager=new VoiceInputManager(this);
     this._contents={};
@@ -63,7 +63,7 @@ function DcsController(options){
 util.inherits(DcsController, EventEmitter);
 
 DcsController.prototype.isPlaying=function(){
-    return (this.audioManager.isPlaying()||this.voiceOutputManager.isPlaying());
+    return (this.audioPlayerManager.isPlaying()||this.voiceOutputManager.isPlaying());
 
 };
 
@@ -73,7 +73,7 @@ DcsController.prototype.getContext=function(){
     if(alertContext){
         context.push(alertContext);
     }
-    var audioContext=this.audioManager.getContext();
+    var audioContext=this.audioPlayerManager.getContext();
     if(audioContext){
         context.push(audioContext);
     }
@@ -146,7 +146,7 @@ DcsController.prototype.handleResponse=function(response){
 
 
 DcsController.prototype.stopPlay=function(directive){
-    this.audioManager.stop();
+    this.audioPlayerManager.stop();
     this.voiceOutputManager.stop();
 };
 

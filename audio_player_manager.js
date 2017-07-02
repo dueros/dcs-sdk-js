@@ -18,7 +18,7 @@ const EventEmitter=require("events");
 const util = require('util');
 const Player=require("./player");
 const DcsProtocol=require("./dcs_protocol");
-function AudioManager(controller){
+function AudioPlayerManager(controller){
     this.playlist=[];
     //this.player=new Player({debug:1});
     this.player=new Player();
@@ -63,7 +63,7 @@ function AudioManager(controller){
         this.offset_ms=sec*1000;
     });
 }
-util.inherits(AudioManager, EventEmitter);
+util.inherits(AudioPlayerManager, EventEmitter);
 var handlers={
     "ClearQueue":function(directive){
         if(directive.payload.clearBehavior=="CLEAR_ENQUEUED"){
@@ -105,7 +105,7 @@ var handlers={
         }
     }
 };
-AudioManager.prototype.playNext=function(){
+AudioPlayerManager.prototype.playNext=function(){
     if(this.playlist.length>0){
         let playitem=this.playlist.shift();
         this.player.openFile(playitem.url);
@@ -113,13 +113,13 @@ AudioManager.prototype.playNext=function(){
         this.player.play();
     }
 };
-AudioManager.prototype.isPlaying=function(){
+AudioPlayerManager.prototype.isPlaying=function(){
     return this.player.isPlaying();
 };
-AudioManager.prototype.stop=function(){
+AudioPlayerManager.prototype.stop=function(){
     return this.player.stop();
 };
-AudioManager.prototype.getContext=function(){
+AudioPlayerManager.prototype.getContext=function(){
     return {
         "header": {
             "namespace": "ai.dueros.device_interface.audio_player",
@@ -133,11 +133,11 @@ AudioManager.prototype.getContext=function(){
     };
 
 };
-AudioManager.prototype.handleDirective=function (directive){
+AudioPlayerManager.prototype.handleDirective=function (directive){
     var name=directive.header.name;
     if(handlers[name]){
         handlers[name].call(this,directive);
     }
 }
 
-module.exports=AudioManager;
+module.exports=AudioPlayerManager;

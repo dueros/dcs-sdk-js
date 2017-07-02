@@ -41,6 +41,7 @@ keypress(process.stdin);
 process.stdin.on("keypress",()=>{
     if(controller.isPlaying()){
         controller.stopPlay();
+        controller.stopRecognize();
         return;
     }
     console.log("keypress!!");
