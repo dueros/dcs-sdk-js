@@ -13,8 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-function createEvent(namespace,name, context){
+function createEvent(namespace,name, context,_payload){
     var payload={};
+    if(_payload){
+        Object.assign(payload,_payload);
+    }
+    /*
     if(namespace=="AudioPlayer"){
         namespace="ai.dueros.device_interface.audio_player";
         context.forEach((c,idx)=>{
@@ -24,18 +28,9 @@ function createEvent(namespace,name, context){
             }
         });
     }
-    
+    */
     var eventData={
         "requestId":"wp"+new Date().getTime(),
-        "deviceInterface": [
-            {
-                "header": {
-                    "namespace": "ai.dueros.device_interface.audio_player",
-                    "name": "AudioPlayerInterface"
-                },
-                "payload": {}
-            },
-        ],
         "clientContext": context,
         "event" : {
             "header" : {

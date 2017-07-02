@@ -53,23 +53,10 @@ const directive_handlers={
 };
 
 function DcsController(options){
-    this.alertManager=new AlertManager();
-    this.audioManager=new AudioManager();
-    this.ttsManager=new TTSManager();
-    this.voiceInputManager=new VoiceInputManager();
-    this.audioManager.on("stop",()=>{
-        this.emit("event",DcsProtocol.createEvent("AudioPlayer","PlaybackStopped",this.getContext()));
-    });
-    this.audioManager.on("pause",()=>{
-        this.emit("event",DcsProtocol.createEvent("AudioPlayer","PlaybackPaused",this.getContext()));
-    });
-    this.audioManager.on("finished",()=>{
-        this.emit("event",DcsProtocol.createEvent("AudioPlayer","PlaybackNearlyFinished",this.getContext()));
-        this.emit("event",DcsProtocol.createEvent("AudioPlayer","PlaybackFinished",this.getContext()));
-    });
-    this.audioManager.on("play",()=>{
-        this.emit("event",DcsProtocol.createEvent("AudioPlayer","PlaybackStarted",this.getContext()));
-    });
+    this.alertManager=new AlertManager(this);
+    this.audioManager=new AudioManager(this);
+    this.ttsManager=new TTSManager(this);
+    this.voiceInputManager=new VoiceInputManager(this);
     this._contents={};
     this.queue=[];
 }
