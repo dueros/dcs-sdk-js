@@ -82,6 +82,11 @@ DcsController.prototype.getContext=function(){
     if(voiceInputContext){
         context.push(voiceInputContext);
     }
+    
+    var voiceOutputContext=this.ttsManager.getContext();
+    if(voiceOutputContext){
+        context.push(voiceOutputContext);
+    }
 
 
     return context;

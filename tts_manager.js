@@ -17,8 +17,23 @@
 const EventEmitter=require("events");
 const util = require('util');
 const DataStreamPlayer= require("./data_stream_player");
-function TTSManager(){
+const DcsProtocol=require("./dcs_protocol");
+function TTSManager(controller){
     this.ttsplayer=new DataStreamPlayer();
+    
+    this.ttsplayer.on("start",()=>{
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.voice_output","SpeechStarted",controller.getContext(),
+            {
+                token:this.last_played_token
+            }));
+    });
+    this.ttsplayer.on("end",()=>{
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.voice_output","SpeechFinished",controller.getContext(),
+            {
+                token:this.last_played_token
+            }));
+    });
+    
 }
 util.inherits(TTSManager, EventEmitter);
 var handlers={

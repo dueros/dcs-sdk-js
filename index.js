@@ -26,9 +26,15 @@ let controller=new DcsController();
 
 controller.setClient(client);
 
+
 controller.on("directive",(response)=>{
-    console.log("on directive: "+JSON.stringify(response));
+    console.log("on directive: "+JSON.stringify(response,null,2));
 });
+
+controller.on("event",(eventData)=>{
+    console.log("send event:"+JSON.stringify(eventData,null,2));
+});
+
 
 var keypress = require('keypress');
 keypress(process.stdin);
@@ -41,11 +47,11 @@ process.stdin.on("keypress",()=>{
     if(controller.isRecognizing()){
         console.log("stopRecognize!!");
         controller.stopRecognize();
-        recorder.stderr().unpipe(process.stderr);
+        //recorder.stderr().unpipe(process.stderr);
     }else{
         console.log("startRecognize!!");
         controller.startRecognize();
-        recorder.stderr().pipe(process.stderr);
+        //recorder.stderr().pipe(process.stderr);
     }
 });
 var isRaspberrypi=child_process.execSync("uname -a").toString().match(/raspberrypi/);

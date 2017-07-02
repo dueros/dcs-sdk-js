@@ -107,15 +107,14 @@ DcsClient.prototype.sendEvent=function(eventData){
                 "DeviceSerialNumber": config.device_id
             }
         },(error, response, body)=>{
-            console.log("event response headers:"+JSON.stringify(response.headers,null,2));
-            console.log("event response:"+body);
+            //console.log("event response headers:"+JSON.stringify(response.headers,null,2));
+            //console.log("event response:"+body);
         });
         var rWrap=this.processEventRequest(r);
         rWrap.on("error",(error)=>{
             console.log("event upload error");
         });
     }
-    console.log("sendEvent:"+JSON.stringify(eventData,null,2));
 };
 
 DcsClient.prototype.processEventRequest=function (r){
@@ -154,7 +153,7 @@ DcsClient.prototype.processEventRequest=function (r){
         var response=null;
         var content_id;
         p.on('header', (header)=> {
-            console.log(JSON.stringify(header, null, '  '));
+            //console.log(JSON.stringify(header, null, '  '));
             if(header["content-disposition"] ){
                 var matches;
                 if(matches= header["content-disposition"][0].match(/name="(\w+)"/)){
@@ -183,7 +182,7 @@ DcsClient.prototype.processEventRequest=function (r){
             if(name=='metadata'){
                 response=JSON.parse(jsonBody);
                 this.emit("directive",response);
-                console.log(JSON.stringify(response, null, '  '));
+                //console.log(JSON.stringify(response, null, '  '));
             }
         });
         p.on('error',()=>{

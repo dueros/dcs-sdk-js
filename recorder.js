@@ -50,7 +50,7 @@ Recorder.prototype.start=function(){
                 this.buffer_manager.delete(MAX_BUFFER_SIZE-MIN_BUFFER_SIZE);
             }
         });
-        this.rec_process.stderr.pipe(process.stderr);
+        //this.rec_process.stderr.pipe(process.stderr);
     }
     return this;
 };
