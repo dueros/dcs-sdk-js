@@ -282,7 +282,7 @@ DownStream.prototype.init=function(){
         clearInterval(this.pingInterval);
     }
     this.pingInterval=setInterval(()=>{
-        http2.get({
+        var req=http2.get({
             "url":"https://"+config.ip+config.ping_uri ,
             "host":config.ip,
             "path":config.ping_uri,
@@ -295,6 +295,10 @@ DownStream.prototype.init=function(){
             if(response.statusCode!=200){
                 this.init();
             }
+        });
+        req.on("error",(e)=>{
+            console.log('downstream ping error!!!!!!!!'+e.toString());
+            this.init();
         });
     },5000);
     this.req.on("error",(e)=>{
