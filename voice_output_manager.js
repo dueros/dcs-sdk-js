@@ -18,7 +18,7 @@ const EventEmitter=require("events");
 const util = require('util');
 const DataStreamPlayer= require("./data_stream_player");
 const DcsProtocol=require("./dcs_protocol");
-function TTSManager(controller){
+function VoiceOutputManager(controller){
     this.ttsplayer=new DataStreamPlayer();
     
     this.ttsplayer.on("start",()=>{
@@ -35,7 +35,7 @@ function TTSManager(controller){
     });
     
 }
-util.inherits(TTSManager, EventEmitter);
+util.inherits(VoiceOutputManager, EventEmitter);
 var handlers={
     "Speak":function(directive,controller){
         this.last_played_token=directive.payload.token;
@@ -59,7 +59,7 @@ var handlers={
         });
     }
 };
-TTSManager.prototype.getContext=function(){
+VoiceOutputManager.prototype.getContext=function(){
     return {
         "header": {
             "namespace": "ai.dueros.device_interface.voice_output",
@@ -73,19 +73,19 @@ TTSManager.prototype.getContext=function(){
         }
     };
 };
-TTSManager.prototype.isPlaying=function(){
+VoiceOutputManager.prototype.isPlaying=function(){
     return this.ttsplayer.isPlaying();
 };
-TTSManager.prototype.stop=function(){
+VoiceOutputManager.prototype.stop=function(){
     return this.ttsplayer.stop();
 };
-TTSManager.prototype.handleDirective=function (directive,controller){
+VoiceOutputManager.prototype.handleDirective=function (directive,controller){
     var name=directive.header.name;
     if(handlers[name]){
         return handlers[name].call(this,directive,controller);
     }
 }
 
-module.exports=TTSManager;
+module.exports=VoiceOutputManager;
 
 
