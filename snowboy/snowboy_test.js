@@ -73,7 +73,8 @@ Recorder.prototype.stderr=function(){
 
 
 models.add({
-  file: __dirname+'/resources/snowboy.umdl',
+  //file: __dirname+'/resources/snowboy.umdl',
+  file: __dirname+'/resources/alexa.umdl',
   //file: 'resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
   sensitivity: '0.8',
   hotwords : 'snowboy'
