@@ -74,8 +74,8 @@ if(isRaspberrypi){
             initiator:{
                 "payload": {
                     "wakeWordIndices": {
-                        "startIndexInSamples": 16*20,
-                        "endIndexInSamples": 16*(wakeupInfo.wakeword_frame_len*8+20)
+                        "startIndexInSamples": 0,
+                        "endIndexInSamples": 16*(wakeupInfo.wakeword_frame_len*10)
                     }   
                 },
                 type:"WAKEWORD"
