@@ -8,7 +8,7 @@ models.add({
   //file: __dirname+'/resources/snowboy.umdl',
   file: __dirname+'/resources/alexa.umdl',
   //file: 'resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
-  sensitivity: '0.8',
+  sensitivity: '0.5',
   hotwords : 'snowboy'
 });
 const detector = new Detector({
