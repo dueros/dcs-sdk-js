@@ -74,10 +74,10 @@ Recorder.prototype.stderr=function(){
 
 models.add({
   //file: __dirname+'/resources/snowboy.umdl',
-  file: __dirname+'/resources/alexa.umdl',
-  //file: 'resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
-  sensitivity: '0.8',
-  hotwords : 'snowboy'
+  //file: __dirname+'/resources/alexa.umdl',
+  file:  __dirname+'/resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
+  sensitivity: '0.5,0.5',
+  hotwords : ['小度小度',"小度小度"]
 });
 
 const detector = new Detector({
