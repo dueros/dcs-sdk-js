@@ -55,7 +55,8 @@ process.stdin.on("keypress",()=>{
         //recorder.stderr().pipe(process.stderr);
     }
 });
-var isRaspberrypi=child_process.execSync("uname -a").toString().match(/raspberrypi/);
+var unameAll=child_process.execSync("uname -a").toString();
+var isRaspberrypi=unameAll.match(/raspberrypi/);
 if(isRaspberrypi){
     const wakeup=require("./wakeup/wakeup.js");
     wakeup.on("wakeup",function(wakeupInfo){
@@ -93,4 +94,16 @@ if(isRaspberrypi){
 
     wakeup.init(recorder.start().out());
     wakeup.start();
+}
+
+if(unameAll.match(/Darwin/)){
+    let snowboy = require("./snowboy/snowboy.js");
+    snowboy.start(recorder.start().out());
+    snowboy.on("hotword",function(){
+        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
+        child_process.exec(cmd,()=>{
+            console.log(cmd+"!!!!!!!!!!!!!!!!!!");
+            controller.startRecognize();
+        });
+    });
 }
