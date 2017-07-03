@@ -85,7 +85,7 @@ cp dcs_config.json.mac dcs_config.json
 
 用一个度秘开放平台合法的client_id, 比如我的测试client_id 1udLzmTG2KGmKGmPkwZZe1gm
 
-访问地址[https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect](https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect)
+访问地址（请复制地址到地址栏去访问）：[https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect](https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect)
 
 ### 入口
   * cd $CODE_ROOT; node index.js
