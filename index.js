@@ -98,8 +98,20 @@ if(isRaspberrypi){
 
 if(unameAll.match(/Darwin/)){
     let snowboy = require("./snowboy/snowboy.js");
+    const BufferManager=require("./wakeup/buffermanager").BufferManager;
+    let bm=new BufferManager();
     snowboy.start(recorder.start().out());
-    snowboy.on("hotword",function(){
+    snowboy.on("silence",()=>{
+        bm.clear();
+    });
+    snowboy.on("sound",(buffer)=>{
+        bm.add(buffer);
+    });
+    snowboy.on("hotword",function(index, hotword, buffer){
+        console.log("hotword "+index);
+        bm.add(buffer);
+        fs.writeFileSync("wake.pcm",bm.toBuffer());
+        bm.clear();
         var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
         child_process.exec(cmd,()=>{
             console.log(cmd+"!!!!!!!!!!!!!!!!!!");
