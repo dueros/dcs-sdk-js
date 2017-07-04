@@ -83,9 +83,9 @@ cp dcs_config.json.mac dcs_config.json
 
 ### 拿到access_token的方法：
 
-用一个度秘开放平台合法的client_id, 比如我的测试client_id 1udLzmTG2KGmKGmPkwZZe1gm
+用一个度秘开放平台合法的client_id
 
-访问地址（请复制地址到地址栏去访问）：[https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect](https://openapi.baidu.com/oauth/2.0/authorize?client_id=1udLzmTG2KGmKGmPkwZZe1gm&response_type=token&redirect_uri=http%3A%2F%2Fwww.example.com%2Foauth_redirect)
+访问地址（请修改里面的CLIENT_ID和REDIRECT_URI，REDIRECT_URI在控制台的Oauth config的安全设置里修改）：[https://openapi.baidu.com/oauth/2.0/authorize?client_id={{CLIENT_ID}}&response_type=token&redirect_uri={{REDIRECT_URI}}](https://openapi.baidu.com/oauth/2.0/authorize?client_id={{CLIENT_ID}}&response_type=token&redirect_uri={{REDIRECT_URI}})
 
 ### 入口
   * cd $CODE_ROOT; node index.js

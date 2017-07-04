@@ -71,13 +71,21 @@ Recorder.prototype.stderr=function(){
     }
 };
 
-
+/*
 models.add({
   //file: __dirname+'/resources/snowboy.umdl',
   //file: __dirname+'/resources/alexa.umdl',
   file:  __dirname+'/resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
   sensitivity: '0.9,0.9',
   hotwords : ['小度小度',"小度小度"]
+});
+*/
+models.add({
+  //file: __dirname+'/resources/snowboy.umdl',
+  file: __dirname+'/resources/alexa.umdl',
+  //file:  __dirname+'/resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
+  sensitivity: '0.5',
+  hotwords : ['alexa']
 });
 
 const detector = new Detector({
