@@ -20,6 +20,7 @@ Recorder.prototype.start=function(){
     if(!this.rec_process){
         this.rec_process=child_process.spawn(rec_cmd.split(" ")[0],rec_cmd.split(" ").slice(1),
                 {   
+                    "env":{"AUDIODEV":"hw:1,0"},
                     stdio:['ignore', 'pipe', 'pipe']
                 }
                 );
@@ -82,30 +83,31 @@ models.add({
 */
 models.add({
   //file: __dirname+'/resources/snowboy.umdl',
-  file: __dirname+'/resources/alexa.umdl',
+  file: __dirname+'/resources/xiaoduxiaodu.umdl',
   //file:  __dirname+'/resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
-  sensitivity: '0.5',
-  hotwords : ['alexa']
+  sensitivity: '0.85',
+  hotwords : ['小度小度']
 });
 
 const detector = new Detector({
   resource:  __dirname+"/resources/common.res",
   models: models,
+  applyFrontend:true,
   audioGain: 1.0
 });
 
 detector.on('silence', function () {
-  console.log('silence');
+  //console.log('silence');
 });
 
 detector.on('sound', function (buffer) {
   // <buffer> contains the last chunk of the audio that triggers the "sound"
   // event. It could be written to a wav stream.
-  console.log('sound');
+  //console.log('sound');
 });
 
 detector.on('error', function () {
-  console.log('error');
+  //console.log('error');
 });
 
 detector.on('hotword', function (index, hotword, buffer) {
