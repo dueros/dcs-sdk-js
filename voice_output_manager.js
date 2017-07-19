@@ -28,10 +28,20 @@ function VoiceOutputManager(controller){
             }));
     });
     this.ttsplayer.on("end",()=>{
+        if(this.promise){
+            this.promise.resolve();
+        }
         controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.voice_output","SpeechFinished",controller.getContext(),
             {
                 token:this.last_played_token
             }));
+    });
+    controller.on("content",(content_id,content)=>{
+        if(this.content_id=content_id){
+            this.ttsplayer.play(content);
+        }else{
+            this.content_cache=[content_id,content];
+        }
     });
     
 }
@@ -41,8 +51,9 @@ var handlers={
         this.last_played_token=directive.payload.token;
         var url=directive.payload.url;
         if(!url){
-            console.log(JSON.stringify(directive));
-            throw new Error("no tts return");
+            console.log("[ERROR] "+JSON.stringify(directive));
+            return;
+            //throw new Error("no tts return");
         }
         var matches,cid;
         if(matches=url.match(/^cid:(.*)/)){
@@ -51,17 +62,14 @@ var handlers={
             return;
         }
         return new Promise((resolve,reject)=>{
-            var contentPromise=controller.getContentPromise(cid);
-            contentPromise.then((params)=>{
-                console.log("resolve content");
-                [content_id,content]=params;
-                this.ttsplayer.once("end",function(){
-                    resolve();
-                });
+            if(this.content_cache && this.content_cache[0]==cid){
                 this.ttsplayer.play(content);
-            }).catch(()=>{
-                reject();
-            });
+            }
+            this.content_id=cid;
+            if(this.promise){
+                this.promise.reject();
+            }
+            this.promise={resolve:resolve,reject,reject};
         });
     }
 };

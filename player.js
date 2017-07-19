@@ -19,7 +19,8 @@ const MPlayer = require('./mplayer/index.js');
 
 function Player(options){
     this.mplayer = new MPlayer(options);
-    ["ready","time","start","play","pause","stop","status","finished"].forEach((eventName)=>{
+    //,"play","pause" //很奇怪，树莓派会不停的触发这两个事件
+    ["ready","time","start","stop","status","finished"].forEach((eventName)=>{
         this.mplayer.on(eventName,(...args)=>{
             if(eventName!="time"){
                 console.log("mplayer event "+eventName);
