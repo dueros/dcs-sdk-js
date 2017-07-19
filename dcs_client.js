@@ -82,11 +82,14 @@ class RecorderWrapper extends Readable {
         this._source.removeListener("data",this.onData);
         this.onData=null;
         this._source=null
+        console.log("stopRecording!!");
     }
 }
 
 DcsClient.prototype.sendEvent=function(eventData){
     if(eventData){
+        var logid=config.device_id + new Date().getTime();
+        console.log("logid:"+logid);
         var r=request({
             postambleCRLF: true,
             url:config.schema+config.ip+config.events_uri,
@@ -103,6 +106,7 @@ DcsClient.prototype.sendEvent=function(eventData){
             headers:{
                 "Content-Type": "multipart/form-data; boundary="+config.boundary,
                 "Host": config.host, 
+                "SAIYALOGID":logid,
                 "Authorization": "Bearer "+config.oauth_token,
                 "DeviceSerialNumber": config.device_id
             }
@@ -139,7 +143,7 @@ DcsClient.prototype.processEventRequest=function (r){
             d1.setBoundary(matches[1]);
         }else{
             rWrap.unpipe(d1);
-            console.log("[ERROR] response error, not multipart");
+            console.log("[ERROR] response error, not multipart, headers:"+JSON.stringify(response.headers));
             rWrap.pipe(process.stderr);
             process.nextTick(()=>{
                 rWrap.emit("error",new Error('not multi part'));
@@ -207,6 +211,8 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         "beforePcm":wakeWordPcm,
         "recorder":this.recorder.start().out()
     });
+    var logid=config.device_id + new Date().getTime();
+    console.log("logid:"+logid);
     var r =this.request = request({
         multipart: {
             chunked: true,
@@ -232,6 +238,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
             //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
         headers:{
             "Content-Type": "multipart/form-data; boundary="+config.boundary,
+            "SAIYALOGID":logid,
             "Host": config.host, 
             "Authorization": "Bearer "+config.oauth_token,
             "DeviceSerialNumber": config.device_id
@@ -250,7 +257,6 @@ DcsClient.prototype.isRecognizing=function(){
 
 DcsClient.prototype.stopRecognize=function(){
     if(this._isRecognizing){
-        //this.request.end();
         this.rec_stream.stopRecording();
         this.request=null;
     }

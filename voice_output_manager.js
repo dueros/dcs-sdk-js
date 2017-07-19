@@ -40,6 +40,10 @@ var handlers={
     "Speak":function(directive,controller){
         this.last_played_token=directive.payload.token;
         var url=directive.payload.url;
+        if(!url){
+            console.log(JSON.stringify(directive));
+            throw new Error("no tts return");
+        }
         var matches,cid;
         if(matches=url.match(/^cid:(.*)/)){
             cid=matches[1];
@@ -55,6 +59,8 @@ var handlers={
                     resolve();
                 });
                 this.ttsplayer.play(content);
+            }).catch(()=>{
+                reject();
             });
         });
     }

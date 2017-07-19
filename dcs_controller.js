@@ -113,6 +113,10 @@ DcsController.prototype.getContentPromise=function(cid){
         delete promise.reject;
         return SynchronousPromise.resolve(args);
     });
+    setTimeout(function(){
+        console.log("on conent:"+cid);
+        _reject();
+    },3000);
     return promise;
 };
 
@@ -195,7 +199,9 @@ DcsController.prototype.deQueue=function(){
     }while(key);
 
     if(promise && promise.then){
-        promise.then(()=>{this.deQueue()});
+        promise
+            .then(()=>{this.deQueue()})
+            .catch(()=>{this.deQueue()});
     }else{
         this.deQueue();
     }
