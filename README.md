@@ -2,28 +2,21 @@
 
 ## 通用的依赖
   * sox，提供录音、格式转换、播放声音的命令行
-  * jq，解析json的配置文件
-  * curl，为了支持http2
   * mplayer，为了播放音乐
 
 
 ### mac下
 ```shell
-brew install sox jq mplayer
-### 以下是安装支持http2的curl
-brew install gnutls nghttp2
-wget https://curl.haxx.se/download/curl-7.54.0.tar.bz2
-tar xvf curl-7.54.0.tar.bz2
-cd curl-7.54.0
-./configure --prefix=~/local --with-gnutls=/usr/local;make;make install
+brew install sox mplayer
+
 ```
 
 ### linux下
 ```shell
-sudo apt-get install sox jq  
+sudo apt-get install sox
 sudo apt-get install libsox-fmt-mp3
 sudo apt-get install libasound2 libasound2-dev alsa-utils
-### curl请自行编译，放到~/local/bin下面
+
 
 #### build mplayer, raspberrypi的仓库里面没有
 sudo apt-get install libmpg123-dev
@@ -46,15 +39,12 @@ sudo make install
 
 
 
-## shell版
-  * dcs_test.sh是 avs协议的demo入口
-
 
 ## node版
 
  以下假设代码被解压到$CODE_ROOT
 
-### 安装node：
+### 安装node及其依赖的库：
 
 ```shell
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash
@@ -62,6 +52,8 @@ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | b
 nvm install --lts
 nvm use --lts
 cd $CODE_ROOT
+npm install
+cd snowboy
 npm install
 ```
 

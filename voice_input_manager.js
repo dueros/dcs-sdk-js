@@ -24,6 +24,7 @@ var handlers={
         controller.startRecognize();
     },
     "StopListen":function(directive,controller){
+        console.log("exec directive StopListen");
         controller.stopRecognize();
     }
 };

@@ -95,26 +95,6 @@ DcsController.prototype.getContext=function(){
     //TODO get speaker status
 
 };
-DcsController.prototype.getContentPromise=function(cid){
-    if(this._contents[cid]){
-        return this._contents[cid];
-    }
-    var _resolve,_reject;
-    var promise=new SynchronousPromise(function(resolve,reject){
-        _resolve=resolve;
-        _reject=reject;
-    });
-    promise.resolve=_resolve;
-    promise.reject=_reject;
-    this._contents[cid]=promise;
-    promise.then((args)=>{
-        delete this._contents[cid];
-        delete promise.resolve;
-        delete promise.reject;
-        return SynchronousPromise.resolve(args);
-    });
-    return promise;
-};
 
 DcsController.prototype.setClient=function(client){
     this.client=client;
@@ -123,7 +103,6 @@ DcsController.prototype.setClient=function(client){
         this.emit("directive",response);
     });
     client.on("content",(content_id,content)=>{
-        this.handleContent(content_id,content);
         this.emit("content",content_id,content);
     });
     this.on("event",(dcs_event)=>{
@@ -131,16 +110,20 @@ DcsController.prototype.setClient=function(client){
     });
 };
 
-DcsController.prototype.handleContent=function(content_id,content){
-    this.getContentPromise(content_id).resolve([content_id,content]);
-};
-
 DcsController.prototype.handleResponse=function(response){
-    if(response){
-        this.queue.push(response);
+    if(!response||!response.directive){
+        return;
     }
-    if(!this.processing){
-        this.deQueue();
+    if(!response.directive.header.dialogRequestId){
+        this.processDirective(response.directive);
+        return;
+    }
+    
+    if(this.currentDialogRequestId && response.directive.header.dialogRequestId==this.currentDialogRequestId){
+        this.queue.push(response);
+        if(!this.processing){
+            this.deQueue();
+        }
     }
 };
 
@@ -157,6 +140,8 @@ DcsController.prototype.startRecognize=function(options){
             var wakeWordPcm=options.wakeWordPcm;
         }
         eventData=DcsProtocol.createRecognizeEvent(options);
+        this.currentDialogRequestId = eventData.event.header.dialogRequestId;
+        this.queue=[];
         eventData.clientContext=this.getContext();
         return this.client.startRecognize(eventData,wakeWordPcm);
     }
@@ -174,28 +159,49 @@ DcsController.prototype.isRecognizing=function(){
     }
     return false;
 };
-DcsController.prototype.deQueue=function(){
-    this.processing=true;
-    var response=this.queue.shift();
-    if(!response||!response.directive){
-        this.processing=false;
-        return;
-    }
-    var directive=response.directive;
+DcsController.prototype.processDirective=function(directive){
     var key=directive.header.namespace+"."+directive.header.name;
-    var promise;
+    var handler;
     do{
         if(directive_handlers.hasOwnProperty(key)){
-            promise=directive_handlers[key].call(this,directive);
+            handler=directive_handlers[key]
             break;
         }
         let parts=key.split(".");
         parts.pop();
         key=parts.join(".");
     }while(key);
+    if(!handler){
+        console.log("no directive handler:"+JSON.stringify(directive));
+        return;
+    }
 
+    var promise=directive_handlers[key].call(this,directive);
+    return promise;
+};
+DcsController.prototype.deQueue=function(){
+    this.processing=true;
+    if(this.queue.length==0){
+        this.processing=false;
+        return;
+    }
+    var response=this.queue.shift();
+    if(!response||!response.directive){
+        this.deQueue();
+        return;
+    }
+    var directive=response.directive;
+    if((directive.header.dialogRequestId&&this.currentDialogRequestId)
+            && directive.header.dialogRequestId!=this.currentDialogRequestId){
+        this.deQueue();
+        return;
+    }
+    
+    var promise=this.processDirective(directive);
     if(promise && promise.then){
-        promise.then(()=>{this.deQueue()});
+        promise
+            .then(()=>{this.deQueue()})
+            .catch(()=>{this.deQueue()});
     }else{
         this.deQueue();
     }
