@@ -46,6 +46,13 @@ function AudioPlayerManager(controller){
                         offsetInMilliseconds:this.offset_ms
                     }));
     });
+    this.player.on("start",()=>{
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackStarted",controller.getContext(),
+                    {
+                        token:this.last_played_token,
+                        offsetInMilliseconds:this.offset_ms
+                    }));
+    });
     this.player.on("finished",()=>{
         controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackNearlyFinished",controller.getContext(),
                     {
