@@ -10,6 +10,7 @@
     "ip":"dueros-h2.baidu.com",
     "schema":"http://",
     "protocol":"http",
+    "downstream_protocol":"http2",
     
     "rec_env":{},
     "play_env":{},

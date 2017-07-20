@@ -17,7 +17,12 @@ const EventEmitter=require("events");
 const util = require('util');
 const request=require("request");
 const config=require("./dcs_config.json");
-const DownStream=require("./downstream");
+var DownStream;
+if(config.downstream_protocol=="http2"){
+    DownStream=require("./downstream");
+}else{
+    DownStream=require("./downstream_h1");
+}
 const Readable = require('stream').Readable;
 const BufferManager=require("./wakeup/buffermanager").BufferManager;
 
