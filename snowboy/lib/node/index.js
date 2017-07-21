@@ -69,9 +69,6 @@ class SnowboyDetect extends stream.Writable {
         if (options.audioGain) {
             this.nativeInstance.SetAudioGain(options.audioGain);
         }
-        if (options.applyFrontend) {
-            this.nativeInstance.ApplyFrontend(options.applyFrontend);
-        }
     }
     reset() {
         return this.nativeInstance.Reset();

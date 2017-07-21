@@ -97,7 +97,7 @@ if(isRaspberrypi){
 }
 
 if(unameAll.match(/Darwin/)){
-    let snowboy = require("./snowboy/snowboy.js");
+    let snowboy = require("./snowboy.js");
     const BufferManager=require("./wakeup/buffermanager").BufferManager;
     let bm=new BufferManager();
     snowboy.start(recorder.start().out());

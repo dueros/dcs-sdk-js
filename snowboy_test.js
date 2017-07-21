@@ -1,13 +1,15 @@
-const Detector = require('.').Detector;
-const Models = require('.').Models;
+const Detector = require('./snowboy').Detector;
+const Models = require('./snowboy').Models;
+
+const config=require("./dcs_config.json");
 
 const models = new Models();
 
 
 
 let child_process=require("child_process");
-let rec_cmd='rec -t wav -r44100 -b32 -c2 -';
-let convert_cmd='sox -t wav -r44100 -b32 -c2 - -t s16 -r16000 -b16 -c1 -';
+let rec_cmd=config.rec_cmd+' -t wav -r44100 -b32 -c2 -';
+let convert_cmd=config.sox_cmd+' -t wav -r44100 -b32 -c2 - -t s16 -r16000 -b16 -c1 -';
 
 function Recorder(){
     this.rec_process=null;
@@ -20,7 +22,7 @@ Recorder.prototype.start=function(){
     if(!this.rec_process){
         this.rec_process=child_process.spawn(rec_cmd.split(" ")[0],rec_cmd.split(" ").slice(1),
                 {   
-                    "env":{"AUDIODEV":"hw:1,0"},
+                    env:config.rec_env,
                     stdio:['ignore', 'pipe', 'pipe']
                 }
                 );
@@ -83,14 +85,14 @@ models.add({
 */
 models.add({
   //file: __dirname+'/resources/snowboy.umdl',
-  file: __dirname+'/resources/xiaoduxiaodu.umdl',
+  file: __dirname+'/snowboy/resources/xiaoduxiaodu.umdl',
   //file:  __dirname+'/resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
   sensitivity: '0.85',
   hotwords : ['小度小度']
 });
 
 const detector = new Detector({
-  resource:  __dirname+"/resources/common.res",
+  resource:  __dirname+"/snowboy/resources/common.res",
   models: models,
   applyFrontend:true,
   audioGain: 1.0
