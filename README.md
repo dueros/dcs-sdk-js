@@ -53,8 +53,13 @@ nvm install --lts
 nvm use --lts
 cd $CODE_ROOT
 npm install
+####依赖snowboy唤醒的平台，比如mac####
 cd snowboy
 npm install
+npm install -g node-pre-gyp
+node-pre-gyp clean
+node-pre-gyp configure
+node-pre-gyp build
 ```
 
 ## 修改配置
