@@ -16,8 +16,8 @@
 const config=require("./dcs_config.json");
 let child_process=require("child_process");
 const BufferManager=require("./wakeup/buffermanager").BufferManager;
-let rec_cmd=config.rec_cmd+' -t wav -r44100 -b32 -c2 -';
-let convert_cmd=config.sox_cmd+' -t wav -r44100 -b32 -c2 - -t s16 -r16000 -b16 -c1 -';
+let rec_cmd=config.rec_cmd+' -t wav -r44100 -b16 -c2 -';
+let convert_cmd=config.sox_cmd+' -t wav -r44100 -b16 -c2 - -t s16 -r16000 -b16 -c1 -';
 
 function Recorder(){
     this.rec_process=null;
@@ -30,7 +30,7 @@ Recorder.prototype.start=function(){
     if(!this.rec_process){
         this.rec_process=child_process.spawn(rec_cmd.split(" ")[0],rec_cmd.split(" ").slice(1),
                 {   
-                    env:config.rec_env,
+                    //env:config.rec_env,
                     stdio:['ignore', 'pipe', 'pipe']
                 }
                 );
