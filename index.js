@@ -19,6 +19,7 @@ const Recorder=require("./recorder");
 const config=require("./dcs_config.json");
 const child_process=require("child_process");
 const fs = require('fs');
+const bind_led = require('./bind_led');
 var recorder=new Recorder();
 var client=new DcsClient({recorder:recorder});
 
@@ -34,6 +35,8 @@ controller.on("directive",(response)=>{
 controller.on("event",(eventData)=>{
     console.log("send event:"+JSON.stringify(eventData,null,2));
 });
+
+bind_led(controller);
 
 
 var keypress = require('keypress');
@@ -73,9 +76,8 @@ var isRaspberrypi=unameAll.match(/raspberrypi/);
         bm.add(buffer);
         fs.writeFileSync("wake.pcm",bm.toBuffer());
         bm.clear();
-        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
-        child_process.exec(cmd,()=>{
-            console.log(cmd+"!!!!!!!!!!!!!!!!!!");
+        //var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
+        //child_process.exec(cmd,()=>{
             controller.startRecognize();
-        });
+        //});
     });

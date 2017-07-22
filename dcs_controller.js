@@ -143,6 +143,7 @@ DcsController.prototype.startRecognize=function(options){
         this.currentDialogRequestId = eventData.event.header.dialogRequestId;
         this.queue=[];
         eventData.clientContext=this.getContext();
+        this.emit("event",eventData);
         return this.client.startRecognize(eventData,wakeWordPcm);
     }
     return false;
