@@ -37,13 +37,13 @@ const detector = new Detector({
 });
 
 detector.on('silence', function () {
-  console.log('snowboy silence');
+  //console.log('snowboy silence');
 });
 
 detector.on('sound', function (buffer) {
   // <buffer> contains the last chunk of the audio that triggers the "sound"
   // event. It could be written to a wav stream.
-  console.log('snowboy sound');
+  //console.log('snowboy sound');
 });
 
 detector.on('error', function () {

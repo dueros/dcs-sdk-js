@@ -57,46 +57,7 @@ process.stdin.on("keypress",()=>{
 });
 var unameAll=child_process.execSync("uname -a").toString();
 var isRaspberrypi=unameAll.match(/raspberrypi/);
-if(isRaspberrypi){
-    const wakeup=require("./wakeup/wakeup.js");
-    wakeup.on("wakeup",function(wakeupInfo){
-        console.log(wakeupInfo);
-        //wakeupInfo.wakeword_frame_len;
-        var buf=recorder.getLatestBuffers(wakeupInfo.wakeword_frame_len*10);
-        fs.writeFile("wake.pcm",buf);
-        
-        
-        //recorder.stop();
-        //声音采样率16k，每ms 16个sample，每个sample 2个字节(16bit)
-        //带误唤醒检测的模式
-        /*
-        controller.startRecognize({
-            wakeWordPcm:buf,
-            initiator:{
-                "payload": {
-                    "wakeWordIndices": {
-                        "startIndexInSamples": 0,
-                        "endIndexInSamples": 16*(wakeupInfo.wakeword_frame_len*10)
-                    }   
-                },
-                type:"WAKEWORD"
-            }
-        });
-        */
-        ///没有AEC所以不能放提示音的时候录音
-        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
-        child_process.exec(cmd,()=>{
-            console.log(cmd+"!!!!!!!!!!!!!!!!!!");
-            controller.startRecognize();
-        });
-    });
 
-
-    wakeup.init(recorder.start().out());
-    wakeup.start();
-}
-
-if(unameAll.match(/Darwin/)){
     let snowboy = require("./snowboy.js");
     const BufferManager=require("./wakeup/buffermanager").BufferManager;
     let bm=new BufferManager();
@@ -118,4 +79,3 @@ if(unameAll.match(/Darwin/)){
             controller.startRecognize();
         });
     });
-}
