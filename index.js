@@ -20,6 +20,7 @@ const config=require("./dcs_config.json");
 const child_process=require("child_process");
 const fs = require('fs');
 const bind_led = require('./bind_led');
+const respeaker_btn= require('./respeaker_btn');
 var recorder=new Recorder();
 var client=new DcsClient({recorder:recorder});
 
@@ -38,10 +39,7 @@ controller.on("event",(eventData)=>{
 
 bind_led(controller);
 
-
-var keypress = require('keypress');
-keypress(process.stdin);
-process.stdin.on("keypress",()=>{
+function onKeypressed(){
     if(controller.isPlaying()){
         controller.stopPlay();
         controller.stopRecognize();
@@ -57,7 +55,14 @@ process.stdin.on("keypress",()=>{
         controller.startRecognize();
         //recorder.stderr().pipe(process.stderr);
     }
-});
+}
+
+var keypress = require('keypress');
+keypress(process.stdin);
+process.stdin.on("keypress",onKeypressed);
+
+respeaker_btn.on("click",onKeypressed);
+
 var unameAll=child_process.execSync("uname -a").toString();
 var isRaspberrypi=unameAll.match(/raspberrypi/);
 
