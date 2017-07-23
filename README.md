@@ -7,15 +7,16 @@
 
 ### mac下
 ```shell
-brew install sox mplayer
+brew install sox mplayer python
 
 ```
 
-### linux下
+### 树莓派linux下
 ```shell
 sudo apt-get install sox
 sudo apt-get install libsox-fmt-mp3
 sudo apt-get install libasound2 libasound2-dev alsa-utils
+sudo apt-get install python
 
 
 #### build mplayer, raspberrypi的仓库里面没有
@@ -64,17 +65,26 @@ node-pre-gyp build
 
 ## 修改配置
 
-树莓派+录音套件，请执行
+### 几种平台上的默认配置文件
+
+树莓派 + DuerOS个人版录音套件，请执行
 
 ```shell
 cp dcs_config.json.pi dcs_config.json
 ```
 
-mac环境下，请执行
+树莓派 + ReSpeaker 2-Mics，请执行
+
+```shell
+cp dcs_config.json.pi.respeaker dcs_config.json
+```
+
+macos环境下，请执行
 ```shell
 cp dcs_config.json.mac dcs_config.json
 ```
 
+### 需要单独修改的配置项
 * 修改dcs_config.json中的access_token（oauth登录信息）
 * 修改dcs_config.json中的device_id为代表本机id的字符串 （设备id）
 
