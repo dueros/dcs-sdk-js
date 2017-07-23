@@ -93,7 +93,7 @@ class RecorderWrapper extends Readable {
 
 DcsClient.prototype.sendEvent=function(eventData){
     if(eventData){
-        var logid=config.device_id + new Date().getTime();
+        var logid=config.device_id + new Date().getTime()+"_monitor";
         console.log("logid:"+logid);
         var r=request({
             postambleCRLF: true,
@@ -111,7 +111,7 @@ DcsClient.prototype.sendEvent=function(eventData){
             headers:{
                 "Content-Type": "multipart/form-data; boundary="+config.boundary,
                 "Host": config.host, 
-                "SAIYALOGID":logid,
+                //"SAIYALOGID":logid,
                 "Authorization": "Bearer "+config.oauth_token,
                 "DeviceSerialNumber": config.device_id
             }
@@ -220,7 +220,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         "beforePcm":wakeWordPcm,
         "recorder":this.recorder.start().out()
     });
-    var logid=config.device_id + new Date().getTime();
+    var logid=config.device_id + new Date().getTime()+"_monitor";
     console.log("logid:"+logid);
     var r =this.request = request({
         multipart: {
@@ -247,7 +247,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
             //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
         headers:{
             "Content-Type": "multipart/form-data; boundary="+config.boundary,
-            "SAIYALOGID":logid,
+            //"SAIYALOGID":logid,
             "Host": config.host, 
             "Authorization": "Bearer "+config.oauth_token,
             "DeviceSerialNumber": config.device_id
