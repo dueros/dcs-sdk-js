@@ -138,6 +138,11 @@ DcsClient.prototype.processEventRequest=function (r){
         rWrap.emit("error",new Error('not multi part'));
     });
     r.on('response', function(response) {
+        if(response.statusCode==204){
+            //server no response
+            rWrap.unpipe(d1);
+            return;
+        }
         if(!response.headers['content-type']){
             //throw new Exception("server header error: no content-type");
             console.log("server header error: no content-type");
