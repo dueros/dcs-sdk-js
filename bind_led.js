@@ -17,5 +17,8 @@ module.exports=function(controller){
         if(response.directive.header.name=="StopListen"){
             led.think();
         }
+        if(response.directive.header.namespace=="ai.dueros.device_interface.audio_player"){
+            led.off();
+        }
     });
 };

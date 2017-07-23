@@ -19,8 +19,6 @@ const Recorder=require("./recorder");
 const config=require("./dcs_config.json");
 const child_process=require("child_process");
 const fs = require('fs');
-const bind_led = require('./bind_led');
-const respeaker_btn= require('./respeaker_btn');
 var recorder=new Recorder();
 var client=new DcsClient({recorder:recorder});
 
@@ -37,7 +35,6 @@ controller.on("event",(eventData)=>{
     console.log("send event:"+JSON.stringify(eventData,null,2));
 });
 
-bind_led(controller);
 
 function onKeypressed(){
     if(controller.isPlaying()){
@@ -61,28 +58,45 @@ var keypress = require('keypress');
 keypress(process.stdin);
 process.stdin.on("keypress",onKeypressed);
 
-respeaker_btn.on("click",onKeypressed);
+
+if(config.respeaker_2mic_hat && config.respeaker_2mic_hat.led){
+    const bind_led = require('./bind_led');
+    bind_led(controller);
+}
+
+
+if(config.respeaker_2mic_hat && config.respeaker_2mic_hat.button){
+    const respeaker_btn= require('./respeaker_btn');
+    respeaker_btn.on("click",onKeypressed);
+}
+
 
 var unameAll=child_process.execSync("uname -a").toString();
 var isRaspberrypi=unameAll.match(/raspberrypi/);
 
-    let snowboy = require("./snowboy.js");
-    const BufferManager=require("./wakeup/buffermanager").BufferManager;
-    let bm=new BufferManager();
-    snowboy.start(recorder.start().out());
-    snowboy.on("silence",()=>{
-        bm.clear();
-    });
-    snowboy.on("sound",(buffer)=>{
-        bm.add(buffer);
-    });
-    snowboy.on("hotword",function(index, hotword, buffer){
-        console.log("hotword "+index);
-        bm.add(buffer);
-        fs.writeFileSync("wake.pcm",bm.toBuffer());
-        bm.clear();
-        //var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
-        //child_process.exec(cmd,()=>{
+
+
+let snowboy = require("./snowboy.js");
+const BufferManager=require("./wakeup/buffermanager").BufferManager;
+let bm=new BufferManager();
+snowboy.start(recorder.start().out());
+snowboy.on("silence",()=>{
+    bm.clear();
+});
+snowboy.on("sound",(buffer)=>{
+    bm.add(buffer);
+});
+snowboy.on("hotword",function(index, hotword, buffer){
+    console.log("hotword "+index);
+    bm.add(buffer);
+    fs.writeFileSync("wake.pcm",bm.toBuffer());
+    bm.clear();
+    if(config.respeaker_2mic_hat && config.respeaker_2mic_hat.led){
+        controller.startRecognize();
+    }else{
+        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
+        child_process.exec(cmd,()=>{
             controller.startRecognize();
-        //});
-    });
+        });
+    }
+});
