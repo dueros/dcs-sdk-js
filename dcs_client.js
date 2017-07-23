@@ -214,7 +214,6 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         console.log("is recognizing");
         return;
     }
-    console.log(JSON.stringify(eventData,null,2));
     var self=this;
     var rec_stream=this.rec_stream=new RecorderWrapper({
         "highWaterMark":200000,

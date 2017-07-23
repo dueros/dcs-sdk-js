@@ -70,7 +70,8 @@ mac环境下，请执行
 cp dcs_config.json.mac dcs_config.json
 ```
 
-修改dcs_config.json中的access_token（oauth登录信息）
+* 修改dcs_config.json中的access_token（oauth登录信息）
+* 修改dcs_config.json中的device_id为代表本机id的字符串 （设备id）
 
 
 ### 拿到access_token的方法：
