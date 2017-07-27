@@ -32,7 +32,7 @@ DataStreamPlayer.prototype.play=function(readable){
     this.stop();
     var player_process=child_process.spawn(play_cmd.split(" ")[0],play_cmd.split(" ").slice(1),
         {
-            //env:config.play_env,
+            env:config.play_env,
             stdio:['pipe', 'pipe', process.stderr]
         }
     );
