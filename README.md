@@ -27,6 +27,7 @@ cd MPlayer-1.3.0
 ./configure;
 make
 sudo make install
+cd -
 
 #### build libiconv, raspberrypi的仓库里没有
 wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
@@ -35,6 +36,7 @@ cd libiconv-1.15
 ./configure --prefix=/usr
 make
 sudo make install
+cd -
 
 ```
 
@@ -44,6 +46,12 @@ sudo make install
 ## node版
 
  以下假设代码被解压到$CODE_ROOT
+
+```shell
+PWD=$(dirname $0)
+git clone https://github.com/dueros/dcs-sdk-js.git
+export CODE_ROOT=$PWD/dcs-sdk-js
+```
 
 ### 安装node及其依赖的库：
 
