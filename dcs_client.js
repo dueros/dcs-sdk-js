@@ -95,6 +95,17 @@ DcsClient.prototype.sendEvent=function(eventData){
     if(eventData){
         var logid=config.device_id + new Date().getTime()+"_monitor";
         console.log("logid:"+logid);
+        var headers={
+            "Content-Type": "multipart/form-data; boundary="+config.boundary,
+            "Host": config.host, 
+            //"SAIYALOGID":logid,
+            "Authorization": "Bearer "+config.oauth_token,
+            "DeviceSerialNumber": config.device_id
+        };
+        if(config.event_header){
+            Object.assign(headers,config.event_header);
+        }
+
         var r=request({
             postambleCRLF: true,
             url:config.schema+config.ip+config.events_uri,
@@ -108,13 +119,7 @@ DcsClient.prototype.sendEvent=function(eventData){
                 }
                 ]
             },
-            headers:{
-                "Content-Type": "multipart/form-data; boundary="+config.boundary,
-                "Host": config.host, 
-                //"SAIYALOGID":logid,
-                "Authorization": "Bearer "+config.oauth_token,
-                "DeviceSerialNumber": config.device_id
-            }
+            headers:headers
         },(error, response, body)=>{
             //console.log("event response headers:"+JSON.stringify(response.headers,null,2));
             //console.log("event response:"+body);
@@ -225,6 +230,16 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     });
     var logid=config.device_id + new Date().getTime()+"_monitor";
     console.log("logid:"+logid);
+    var headers={
+        "Content-Type": "multipart/form-data; boundary="+config.boundary,
+        //"SAIYALOGID":logid,
+        "Host": config.host, 
+        "Authorization": "Bearer "+config.oauth_token,
+        "DeviceSerialNumber": config.device_id
+    };
+    if(config.event_header){
+        Object.assign(headers,config.event_header);
+    }
     var r =this.request = request({
         multipart: {
             chunked: true,
@@ -248,13 +263,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         postambleCRLF: true,
         "url":config.schema+config.ip+config.events_uri ,
             //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
-        headers:{
-            "Content-Type": "multipart/form-data; boundary="+config.boundary,
-            //"SAIYALOGID":logid,
-            "Host": config.host, 
-            "Authorization": "Bearer "+config.oauth_token,
-            "DeviceSerialNumber": config.device_id
-        }
+        headers:headers
     });
     var rWrap=this.processEventRequest(r);
     rWrap.on("error",()=>{
