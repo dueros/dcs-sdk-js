@@ -17,6 +17,8 @@ sudo apt-get install sox
 sudo apt-get install libsox-fmt-mp3
 sudo apt-get install libasound2 libasound2-dev alsa-utils
 sudo apt-get install python
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libatlas-dev
 
 
 #### build mplayer, raspberrypi的仓库里面没有

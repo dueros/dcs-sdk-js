@@ -145,6 +145,9 @@ DcsClient.prototype.processEventRequest=function (r){
     r.on('response', function(response) {
         if(response.statusCode==204){
             //server no response
+            rWrap.removeAllListeners();
+            rWrap.on("error",()=>{
+            });
             rWrap.unpipe(d1);
             return;
         }
