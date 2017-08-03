@@ -48,14 +48,14 @@ util.inherits(DcsClient, EventEmitter);
 class RecorderWrapper extends Readable {
     constructor(options) {
         super(options);
-        this.buffer_manager=new BufferManager();
+        //this.buffer_manager=new BufferManager();
         this._source = options.recorder;
         // Every time there's data, push it into the internal buffer.
         if(options.beforePcm){
             if (!this.push(options.beforePcm)){
                 throw new Error("push error");
             }
-            this.buffer_manager.add(options.beforePcm);
+            //this.buffer_manager.add(options.beforePcm);
             //console.log("push ret:"+ret);
             //console.log("push length:"+options.beforePcm.length);
         }else{
@@ -67,13 +67,16 @@ class RecorderWrapper extends Readable {
             if (!this.push(chunk)){
                 this._source.removeListener("data",onData);
             }
-            this.buffer_manager.add(chunk);
+            //this.buffer_manager.add(chunk);
         }.bind(this);
         this._source.on("data",onData);
         // When the source ends, push the EOF-signaling `null` chunk
         this._source.on("end" ,() => {
             this.push(null);
             //fs.writeFileSync("recorder.pcm",this.buffer_manager.slice(0));
+        });
+        this._source.on("error",()=>{
+            this.stopRecording();
         });
     }
     // _read will be called when the stream wants to pull more data in
@@ -82,13 +85,76 @@ class RecorderWrapper extends Readable {
         this._source.read(size);
     }
     stopRecording(){
-        fs.writeFileSync("recorder.pcm",this.buffer_manager.slice(0));
+        //fs.writeFileSync("recorder.pcm",this.buffer_manager.slice(0));
         this.push(null);
         this._source.removeListener("data",this.onData);
         this.onData=null;
         this._source=null
         console.log("stopRecording!!");
     }
+}
+
+function wavHeader(){
+    function writeString(view, offset, string){
+        for (var i = 0; i < string.length; i++){
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+        return offset+string.length;
+    }
+    var buffer = new ArrayBuffer(44);
+    var view = new DataView(buffer);
+    var length=100000;
+
+    /* RIFF identifier */
+    writeString(view, 0, 'RIFF');
+    /* file length */
+    view.setUint32(4, length+32, true);
+    /* RIFF type */
+    writeString(view, 8, 'WAVE');
+    /* format chunk identifier */
+    writeString(view, 12, 'fmt ');
+    /* format chunk length */
+    view.setUint32(16, 16, true);
+    /* sample format (raw) */
+    view.setUint16(20, 0x0040, true);
+    /* channel count */
+    view.setUint16(22, 1, true);
+    /* sample rate */
+    view.setUint32(24, 16000, true);
+    /* byte rate (sample rate * block align) */
+    view.setUint32(28, 32000, true);
+    /* block align (channel count * bytes per sample) */
+    view.setUint16(32, 2, true);
+    /* bits per sample */
+    view.setUint16(34, 16, true);
+    /* data chunk identifier */
+    writeString(view, 36, 'data');
+    /* data chunk length */
+    view.setUint32(40, length, true);
+
+    return new Buffer(view.buffer);
+}
+
+
+
+function pcm2adpcm(recorder) {
+
+    let child_process=require("child_process");
+    let convert_process=child_process.spawn(__dirname+"/adpcm/Wav2Adpcm",["-l"]);
+    recorder.pipe(convert_process.stdin);
+    convert_process.stdout.pipe(fs.createWriteStream(__dirname+"/recorder.adpcm",{
+        flags: 'w',
+        defaultEncoding: 'binary',
+        autoClose: true
+    }));
+    
+    return new RecorderWrapper({
+        "highWaterMark":200000,
+        "beforePcm":wavHeader(),
+        "recorder":convert_process.stdout
+    });
+    
+    //return convert_process.stdout;
 }
 
 DcsClient.prototype.sendEvent=function(eventData){
@@ -228,6 +294,11 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         "beforePcm":wakeWordPcm,
         "recorder":this.recorder.start().out()
     });
+    rec_stream.pipe(fs.createWriteStream(__dirname+"/recorder.pcm",{
+        flags: 'w',
+        defaultEncoding: 'binary',
+        autoClose: true
+    }));
     var logid=config.device_id + new Date().getTime()+"_monitor";
     console.log("logid:"+logid);
     var headers={
@@ -252,6 +323,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
             { 
                 'Content-Disposition': 'form-data; name="audio"',
                 'Content-Type': 'application/octet-stream',
+                //"body": pcm2adpcm(rec_stream),
                 "body": rec_stream,
                     //"body": fs.createReadStream("test.pcm")
                     //"body": fs.readFileSync("test.pcm")
