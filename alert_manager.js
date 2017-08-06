@@ -16,22 +16,155 @@
 ///播放器控制类，解决播放列表的问题
 const EventEmitter=require("events");
 const util = require('util');
-function AlertManager(){
+const fs = require('fs');
+const DcsProtocol=require("./dcs_protocol");
+const config=require("./dcs_config.json");
+const child_process=require("child_process");
+
+function AlertManager(controller){
+    setInterval(()=>{
+        this.notify();
+    },1000);
+    //},60000);
+    var fname=__dirname+"/alerts.json";
+    this.alertsData=[];
+    if(fs.existsSync(fname)){
+        try{
+            this.alertsData=JSON.parse(fs.readFileSync(fname));
+        }catch(e){
+            this.alertsData=[];
+        }
+    }
+    process.on("beforeExit",()=>{
+        this.save();
+    });
+    
+    this.on("playend",(token)=>{
+        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.alerts","AlertStopped",controller.getContext(),
+            {
+                token:token
+            }));
+        
+    });
+    
+    this.handlers={
+        "SetAlert":function(directive){
+            this.setAlert({
+                token:directive.payload.token,
+                type:directive.payload.type,
+                time:new Date(directive.payload.scheduledTime).getTime(),
+                notify:false,
+                payload:directive.payload
+            });
+            controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.alerts","SetAlertSucceeded",controller.getContext(),
+                {
+                    token:directive.payload.token
+                }));
+        },
+        "DeleteAlert":function(directive){
+            this.alertsData=this.alertsData.filter(_alertData =>directive.payload.token != _alertData.token);
+
+            controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.alerts","DeleteAlertSucceeded",controller.getContext(),
+                {
+                    token:directive.payload.token
+                }));
+        }
+    };
 }
 util.inherits(AlertManager, EventEmitter);
-var handlers={
-    "SetAlert":function(directive){
-    },
-    "DeleteAlert":function(directive){
+
+AlertManager.prototype.save=function(){
+    if(this.alertsData){
+        fs.writeFileSync(__dirname+"/alerts.json",JSON.stringify(this.alertsData,null,2));
     }
 };
-AlertManager.prototype.getContext=function(){
-    //TODO
+
+AlertManager.prototype.getAllAlerts=function(){
+    return this.alertsData.slice();    
 };
-AlertManager.prototype.handleDirective=function (directive){
+
+AlertManager.prototype.setAlert=function(alertData){
+    this.alertsData=this.alertsData.filter(_alertData =>{
+        return (alertData.token != _alertData.token) && (_alertData.notify===false)
+    });
+    var nowTime=new Date().getTime();
+
+    if(nowTime<alertData.time){
+        this.alertsData.push(alertData);
+        this.save();
+    }else{
+        console.log("can't set alert before now");
+    }
+};
+
+AlertManager.prototype.getContext=function(){
+    function convertAlert(alertData){
+        var date=new Date();
+        date.setTime(alertData.time);
+        return {
+            "token":alertData.token,
+            "type":alertData.type,
+            "scheduledTime":date.toISOString()
+        }
+    }
+    let allAlerts=this.alertsData.filter((a)=>{
+        return a && a.notify===false;
+    }).map((alertData)=>{
+        convertAlert(alertData);
+    });
+    let activeAlerts=[];
+    if(this.activeAlertData){
+        activeAlerts.push(convertAlert(this.activeAlertData));
+    }
+    return {
+        "header": {
+            "namespace": "ai.dueros.device_interface.alerts",
+            "name": "AlertState"
+        },
+        "payload": {
+            "allAlerts":allAlerts,
+            "activeAlerts":activeAlerts
+        }
+    };
+
+};
+AlertManager.prototype.play=function(alertData){
+    let play_params='-t wav alert.wav repeat 30';
+    this.stopPlay();
+    this.activeAlertData=alertData;
+    this.player_process=child_process.spawn(config.play_cmd,play_params.split(" "));
+    this.player_process.on("close",()=>{
+        console.log("alert play end!\n");
+        this.player_process=null;
+        this.emit("playend",alertData.token);
+    });
+
+};
+AlertManager.prototype.stopPlay=function(){
+    if(this.player_process){
+        this.player_process.kill("SIGKILL");
+        this.player_process=null;
+        this.activeAlertData=null;
+    }
+};
+AlertManager.prototype.isActive=function(){
+    return !!this.player_process;
+};
+AlertManager.prototype.notify=function(){
+    //console.log(this.alertsData);
+    this.alertsData.forEach(_alertData =>{
+        var nowTime=new Date().getTime();
+        if(nowTime>_alertData.time && !_alertData.notify){
+            _alertData.notify=true;
+            this.save();
+            this.play(_alertData);
+        }
+    });
+};
+AlertManager.prototype.handleDirective=function (directive,controller){
     var name=directive.header.name;
-    if(handlers[name]){
-        handlers[name].call(this,directive);
+    if(this.handlers[name]){
+        this.handlers[name].call(this,directive,controller);
     }
 }
 

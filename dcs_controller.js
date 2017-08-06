@@ -42,6 +42,9 @@ const directive_handlers={
   }
 }
      */
+    "ai.dueros.device_interface.alerts":function(directive){
+        return this.alertManager.handleDirective(directive,this);
+    },
     "ai.dueros.device_interface.voice_input":function(directive){
         return this.voiceInputManager.handleDirective(directive,this);
     },
@@ -68,7 +71,7 @@ function DcsController(options){
 util.inherits(DcsController, EventEmitter);
 
 DcsController.prototype.isPlaying=function(){
-    return (this.audioPlayerManager.isPlaying()||this.voiceOutputManager.isPlaying());
+    return (this.audioPlayerManager.isPlaying()||this.voiceOutputManager.isPlaying()||this.alertManager.isActive());
 
 };
 
@@ -141,6 +144,7 @@ DcsController.prototype.handleResponse=function(response){
 DcsController.prototype.stopPlay=function(directive){
     this.audioPlayerManager.stop();
     this.voiceOutputManager.stop();
+    this.alertManager.stopPlay();
 };
 
 DcsController.prototype.startRecognize=function(options){
