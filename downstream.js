@@ -104,8 +104,12 @@ DownStream.prototype.init=function(){
         });
         p.on('end', function() {
             if(jsonBody){
-                response=JSON.parse(jsonBody);
-                self.emit("directive",response);
+                try{
+                    response=JSON.parse(jsonBody);
+                }catch(e){}
+                if(response){
+                    self.emit("directive",response);
+                }
             }
             console.log(JSON.stringify(response, null, '  '));
         });
