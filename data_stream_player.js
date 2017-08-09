@@ -28,7 +28,7 @@ function DataStreamPlayer(){
 util.inherits(DataStreamPlayer, EventEmitter);
 DataStreamPlayer.prototype.play=function(readable){
     this.emit("start");
-    let play_cmd=config.play_cmd+' -t mp3 -';
+    let play_cmd=config.play_cmd+' --buffer 1024 -t mp3 -';
     this.stop();
     var player_process=child_process.spawn(play_cmd.split(" ")[0],play_cmd.split(" ").slice(1),
         {
