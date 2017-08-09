@@ -337,6 +337,9 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
             //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
         headers:headers
     });
+    r.on("socket",(socket)=>{
+        socket.setNoDelay(true);
+    });
     var rWrap=this.processEventRequest(r);
     rWrap.on("error",()=>{
         this.stopRecognize();
