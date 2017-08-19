@@ -1,12 +1,21 @@
 {
-  "name": "dcs",
+  "name": "dcs-sdk-js",
   "version": "1.0.0",
-  "description": "",
+  "description": "duer os node.js sdk",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": {
+      "name": "wangpeng20",
+      "email": "wwwppp0801@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "wangpeng20",
+      "email": "wwwppp0801@gmail.com"
+    }
+  ],
   "license": "ISC",
   "dependencies": {
     "dicer": "^0.2.5",
@@ -18,7 +27,7 @@
     "mplayer": "^2.1.0",
     "multipart-write-stream": "^1.0.9",
     "multiparty": "^4.1.3",
-    "onoff": "^1.1.4",
+    "onoff": "^1.1.5",
     "request": "^2.81.0",
     "synchronous-promise": "^1.0.12"
   }

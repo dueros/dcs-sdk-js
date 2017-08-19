@@ -100,3 +100,7 @@ snowboy.on("hotword",function(index, hotword, buffer){
         });
     }
 });
+
+module.exports={
+    controller:controller
+}
