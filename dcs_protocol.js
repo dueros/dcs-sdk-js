@@ -31,7 +31,6 @@ function createEvent(namespace,name, context,_payload){
     */
     var eventData={
         "requestId":"wp"+new Date().getTime(),
-        "clientContext": context,
         "event" : {
             "header" : {
                 "namespace" : namespace,
@@ -40,6 +39,9 @@ function createEvent(namespace,name, context,_payload){
             },
             "payload" : payload
         },
+    };
+    if(context){
+        eventData.clientContext=context;
     }
     return eventData;
 }
