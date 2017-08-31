@@ -41,6 +41,16 @@ const directive_handlers={
     }
   }
 }
+    "ai.dueros.device_interface.image_recognition":function(directive){
+        var _event=DcsProtocol.createEvent("ai.dueros.device_interface.image_recognition","StartUploadScreenShot",this.getContext(),
+            {
+                "token":"1502376005",
+                "type":"face",
+                "url":"http://b.hiphotos.baidu.com/xiaodu/pic/item/f9198618367adab4db715da581d4b31c8601e4b7.jpg"
+            });
+        this.emit("event",_event);
+        return true;
+    },
      */
     "ai.dueros.device_interface.alerts":function(directive){
         return this.alertManager.handleDirective(directive,this);
@@ -119,6 +129,14 @@ DcsController.prototype.setClient=function(client){
         this.emit("content",content_id,content);
     });
     this.on("event",(dcs_event)=>{
+        if(dcs_event &&dcs_event.event && dcs_event.event.header){
+            if(
+                dcs_event.event.header.namespace=="ai.dueros.device_interface.voice_input" &&
+                dcs_event.event.header.name=="ListenStarted"
+            ){
+                return;
+            }
+        }
         client.sendEvent(dcs_event);
     });
 };
