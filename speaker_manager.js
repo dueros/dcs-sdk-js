@@ -78,11 +78,15 @@ SpeakerManager.prototype.setVolume=function(volume){
 
 SpeakerManager.prototype.getCurrentVolume=function (){
     if(system.get()=="raspberrypi"){
-        let output=child_process.execSync("for device in $(amixer controls|awk -F, '{print $2}'|awk -F= '{print $2}'|sort|uniq);do amixer get $device;done").toString();
-        let matches=output.match(/\[([0-9]+)\%\]/);
-        if(matches && matches[1]){
-            return parseInt(matches[1],10);
-        }else{
+        try{
+            let output=child_process.execSync("for device in $(amixer controls|awk -F, '{print $2}'|awk -F= '{print $2}'|sort|uniq);do amixer get $device;done").toString();
+            let matches=output.match(/\[([0-9]+)\%\]/);
+            if(matches && matches[1]){
+                return parseInt(matches[1],10);
+            }else{
+                return 100;
+            }
+        }catch(e){
             return 100;
         }
     }
