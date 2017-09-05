@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": {
-      "name": "wangpeng20",
-      "email": "wwwppp0801@gmail.com"
+    "name": "wangpeng20",
+    "email": "wwwppp0801@gmail.com"
   },
   "maintainers": [
     {
