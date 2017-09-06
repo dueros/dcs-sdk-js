@@ -23,7 +23,7 @@ const AlertManager=require("./alert_manager");
 const VoiceInputManager=require("./voice_input_manager");
 const VoiceOutputManager=require("./voice_output_manager");
 const LocationManager=require("./location_manager");
-const SynchronousPromise=require("synchronous-promise").SynchronousPromise;
+const ScreenManager=require("./screen_manager");
 const directive_handlers={
     /*
      *
@@ -53,6 +53,9 @@ const directive_handlers={
         return true;
     },
      */
+    "ai.dueros.device_interface.screen":function(directive){
+        return this.screenManager.handleDirective(directive,this);
+    },
     "ai.dueros.device_interface.location":function(directive){
         return this.locationManager.handleDirective(directive,this);
     },
@@ -80,6 +83,7 @@ function DcsController(options){
     this.speakerManager=new SpeakerManager(this);
     this.voiceOutputManager=new VoiceOutputManager(this);
     this.voiceInputManager=new VoiceInputManager(this);
+    this.screenManager=new ScreenManager(this);
     this._contents={};
     this.queue=[];
 }
@@ -119,6 +123,11 @@ DcsController.prototype.getContext=function(namespace){
     var locationContext=this.locationManager.getContext();
     if(locationContext){
         context.push(locationContext);
+    }
+
+    var screenContext=this.screenManager.getContext();
+    if(screenContext){
+        context.push(screenContext);
     }
 
 
