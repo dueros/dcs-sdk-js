@@ -16,7 +16,7 @@
 const DcsClient=require("./dcs_client");
 const DcsController=require("./dcs_controller");
 const Recorder=require("./recorder");
-const config=require("./dcs_config.json");
+const config=require("./config.js").getAll();
 const child_process=require("child_process");
 const fs = require('fs');
 var recorder=new Recorder();

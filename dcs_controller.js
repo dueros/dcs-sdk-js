@@ -24,6 +24,8 @@ const VoiceInputManager=require("./voice_input_manager");
 const VoiceOutputManager=require("./voice_output_manager");
 const LocationManager=require("./location_manager");
 const ScreenManager=require("./screen_manager");
+const configModule=require("./config.js");
+const config=configModule.getAll();
 const directive_handlers={
     /*
      *
@@ -267,6 +269,15 @@ DcsController.prototype.deQueue=function(){
     }else{
         this.deQueue();
     }
+};
+
+DcsController.prototype.setAccessToken=function(access_token){
+    if(access_token){
+        configModule.save("oauth_token",access_token);
+    }
+};
+DcsController.prototype.getAccessToken=function(){
+    return config.oauth_token;
 };
 
 

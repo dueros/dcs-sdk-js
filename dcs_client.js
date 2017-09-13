@@ -16,7 +16,7 @@
 const EventEmitter=require("events");
 const util = require('util');
 const request=require("request");
-const config=require("./dcs_config.json");
+const config=require("./config.js").getAll();
 var DownStream;
 if(config.downstream_protocol=="http2"){
     DownStream=require("./downstream");
