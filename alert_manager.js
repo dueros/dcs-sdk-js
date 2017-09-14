@@ -80,7 +80,7 @@ AlertManager.prototype.save=function(){
 };
 
 AlertManager.prototype.getAllAlerts=function(){
-    return this.alertsData.slice();    
+    return this.alertsData.slice(0);    
 };
 
 AlertManager.prototype.setAlert=function(alertData){
@@ -105,12 +105,12 @@ AlertManager.prototype.getContext=function(){
             "token":alertData.token,
             "type":alertData.type,
             "scheduledTime":date.toISOString()
-        }
+        };
     }
     let allAlerts=this.alertsData.filter((a)=>{
         return a && a.notify===false;
     }).map((alertData)=>{
-        convertAlert(alertData);
+        return convertAlert(alertData);
     });
     let activeAlerts=[];
     if(this.activeAlertData){
