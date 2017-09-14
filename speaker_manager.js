@@ -21,22 +21,40 @@ const system = require('./system');
 const DcsProtocol=require("./dcs_protocol");
 
 function SpeakerManager(){
+    this.logicVolume=this.getCurrentVolume();
+    this.isMute=false;
     this.handlers={
         "SetVolume":(directive)=>{
-            this.setVolume(directive.payload.volume);
+            this.logicVolume=directive.payload.volume;
+            if(!this.isMute){
+                this.setVolume(directive.payload.volume);
+            }
         },
         "AdjustVolume":(directive)=>{
-            this.setVolume(this.getCurrentVolume() + directive.payload.volume);
+            /*
+            let currentVolume=this.getCurrentVolume();
+            if(currentVolume>0){
+                this.logicVolume=currentVolume;
+            }
+            */
+            this.logicVolume=this.logicVolume + directive.payload.volume;
+            if(!this.isMute){
+                this.setVolume(this.logicVolume);
+            }
         },
         "SetMute":(directive)=>{
-            this.setVolume(0);
+            this.isMute=directive.payload.mute;
+            if(this.isMute){
+                this.setVolume(0);
+            }else{
+                this.setVolume(this.logicVolume);
+            }
         }
     };
 }
 util.inherits(SpeakerManager, EventEmitter);
 SpeakerManager.prototype.getContext=function(){
-    var volume=this.getCurrentVolume();
-    if(volume===null){
+    if(this.logicVolume===null){
         return;
     }
     return {
@@ -45,8 +63,8 @@ SpeakerManager.prototype.getContext=function(){
             "name": "VolumeState"
         },
         "payload": {
-            "volume": volume,
-            "muted": volume<3
+            "volume": this.logicVolume,
+            "muted": this.isMute
         }
     };
 };
@@ -58,8 +76,8 @@ SpeakerManager.prototype.handleDirective=function (directive,controller){
         setTimeout(()=>{
             controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.speaker_controller","VolumeChanged",controller.getContext(),
                 {
-                    "volume": volume,
-                    "muted": volume<3
+                    "volume": this.logicVolume,
+                    "muted": this.isMute
                 }));
         },0);
     }
