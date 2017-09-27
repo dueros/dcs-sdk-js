@@ -1,18 +1,18 @@
 /*
-* Copyright (c) 2017 Baidu, Inc. All Rights Reserved.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-*   http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright (c) 2017 Baidu, Inc. All Rights Reserved.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 ///播放器控制类，解决播放列表的问题
 const EventEmitter=require("events");
 const util = require('util');
@@ -87,6 +87,42 @@ ScreenManager.prototype.elementSelected=function (token,index){
             "index": index,
         }));
 };
+ScreenManager.prototype.getLastPlayerList=function (){
+    return { "token": "11111",
+        "title": "周杰伦的专辑",
+        "nowPlayingIndex": 0,
+        "list":[
+            {
+                "title": "东风破",
+                "titleSubtext1": "叶惠美",
+                "image":{
+                    "sources":[
+                        {
+                            "url":"http://p3.music.126.net/6OARlbfxOysQJU5iZ8WKSA==/18769762999688243.jpg"
+                        }
+                    ]
+                },
+                "isFavorited": false,
+                "url": "https://www.baidu.com"
+            },
+            {
+                "title":"简单爱",
+                "titleSubtext1":"JAY",
+                "image":{
+                    "sources":[
+                        {
+                            "url":"http://p3.music.126.net/6OARlbfxOysQJU5iZ8WKSA==/18769762999688243.jpg"
+                        }
+                    ]
+                },
+                "isFavorited":false,
+                "url":"https://www.baidu.com"
+            }
+        ]
+    };
+
+};
+
 
 ScreenManager.prototype.getLastPlayerInfo=function (){
     //TODO
@@ -96,108 +132,111 @@ ScreenManager.prototype.getLastPlayerInfo=function (){
         "title": "告白气球",
         "titleSubtext1": "周杰伦",
         "titleSubtext2": "周杰伦床边的故事",
-        "lyricUrl": "http://bd.kuwo.cn/yinyue/6340467?from=baidu",
+        "lyric":{
+            "url":"http://bd.kuwo.cn/yinyue/6340467?from=baidu",
+            "format":"url"
+        },
         "mediaLengthInMilliseconds": 191000,
         "backgroundImage": {
-            "sources": [
-               {
-                    "url": "http://p3.music.126.net/6OARlbfxOysQJU5iZ8WKSA==/18769762999688243.jpg"
-               }
-            ]
-        },
+                "sources": [
+                       {
+                                "url": "http://p3.music.126.net/6OARlbfxOysQJU5iZ8WKSA==/18769762999688243.jpg"
+                           }
+                    ]
+            },
         "art" : {
-          "sources" : [
-            {
-              "size" : "medium",
-              "url" : "http://p4.music.126.net/yjVbsgfNeF2h7fIvnxuZDQ==/18894007811887644.jpg?param=130y130"
-            }
-          ]
-        },
+              "sources" : [
+                    {
+                          "size" : "medium",
+                              "url" : "http://p4.music.126.net/yjVbsgfNeF2h7fIvnxuZDQ==/18894007811887644.jpg?param=130y130"
+                        }
+                  ]
+            },
         "provider": {
-          "name": "网易云音乐",
-          "logo" : {
-            "sources" : [
-              {
-                "url" : "https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=452376239,853081037&fm=58"
-              }
-            ]
-          },
-        },
+              "name": "网易云音乐",
+              "logo" : {
+                    "sources" : [
+                          {
+                                "url" : "https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=452376239,853081037&fm=58"
+                              }
+                        ]
+                  },
+            },
       },
       "controls": [
-        {
-          "type": "BUTTON",
-          "name": "PREVIOUS",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "PLAY_PAUSE",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "NEXT",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "LYRIC",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "REPEAT_ONE",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "REPEAT_ALL",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "SHUFFLE",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "FAVORITE",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "SHOW_PLAYLIST",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "RECOMMEND",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "THUMBS_UP",
-          "enabled": true,
-          "selected": false
-        },
-        {
-          "type": "BUTTON",
-          "name": "THUMBS_DOWN",
-          "enabled": true,
-          "selected": false
-        }
-      ]
+            {
+                  "type": "BUTTON",
+                      "name": "PREVIOUS",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "PLAY_PAUSE",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "NEXT",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "LYRIC",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "REPEAT_ONE",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "REPEAT_ALL",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "SHUFFLE",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "FAVORITE",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "SHOW_PLAYLIST",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "RECOMMEND",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "THUMBS_UP",
+                      "enabled": true,
+                      "selected": false
+                },
+            {
+                  "type": "BUTTON",
+                      "name": "THUMBS_DOWN",
+                      "enabled": true,
+                      "selected": false
+                }
+          ]
     };
 };
 
