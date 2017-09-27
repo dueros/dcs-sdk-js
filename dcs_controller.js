@@ -22,6 +22,7 @@ const SpeakerManager=require("./speaker_manager");
 const AlertManager=require("./alert_manager");
 const VoiceInputManager=require("./voice_input_manager");
 const VoiceOutputManager=require("./voice_output_manager");
+const HttpManager=require("./http_manager");
 const LocationManager=require("./location_manager");
 const ScreenManager=require("./screen_manager");
 const configModule=require("./config.js");
@@ -55,6 +56,9 @@ const directive_handlers={
         return true;
     },
      */
+    "ai.dueros.device_interface.http":function(directive){
+        return this.httpManager.handleDirective(directive,this);
+    },
     "ai.dueros.device_interface.screen":function(directive){
         return this.screenManager.handleDirective(directive,this);
     },
@@ -86,6 +90,7 @@ function DcsController(options){
     this.voiceOutputManager=new VoiceOutputManager(this);
     this.voiceInputManager=new VoiceInputManager(this);
     this.screenManager=new ScreenManager(this);
+    this.httpManager=new HttpManager(this);
     this._contents={};
     this.queue=[];
 }
