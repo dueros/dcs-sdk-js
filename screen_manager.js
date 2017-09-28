@@ -88,37 +88,120 @@ ScreenManager.prototype.elementSelected=function (token,index){
         }));
 };
 ScreenManager.prototype.getLastPlayerList=function (){
-    return { "token": "11111",
-        "title": "周杰伦的专辑",
-        "nowPlayingIndex": 0,
-        "list":[
+    return {
+      "directive": {
+        "header": {
+          "messageId": "YXVkaW9fbXVzaWMrd3AxNTA2NTk0NTUxMTE3",
+          "name": "RenderAudioList",
+          "namespace": "ai.dueros.device_interface.screen_extended_card"
+        },
+        "payload": {
+          "list": [
             {
-                "title": "东风破",
-                "titleSubtext1": "叶惠美",
-                "image":{
-                    "sources":[
-                        {
-                            "url":"http://p3.music.126.net/6OARlbfxOysQJU5iZ8WKSA==/18769762999688243.jpg"
-                        }
-                    ]
-                },
-                "isFavorited": false,
-                "url": "https://www.baidu.com"
+              "image": {
+                "src": "http://img1.kuwo.cn/star/starheads/240/42/97/3914752958.jpg"
+              },
+              "isFavorited": false,
+              "title": "兰亭序",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=996710999"
             },
             {
-                "title":"简单爱",
-                "titleSubtext1":"JAY",
-                "image":{
-                    "sources":[
-                        {
-                            "url":"http://p3.music.126.net/6OARlbfxOysQJU5iZ8WKSA==/18769762999688243.jpg"
-                        }
-                    ]
-                },
-                "isFavorited":false,
-                "url":"https://www.baidu.com"
+              "image": {
+                "src": "http://qukufile2.qianqian.com/data2/pic/d863425b4f78ba39b1f043ce1f0c1505/2449485/2449485.jpg@s_1,w_150,h_150"
+              },
+              "isFavorited": false,
+              "title": "夜曲",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=1149223390"
+            },
+            {
+              "image": {
+                "src": "http://img1.kuwo.cn/star/starheads/240/42/97/3914752958.jpg"
+              },
+              "isFavorited": false,
+              "title": "回到过去",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=981737049"
+            },
+            {
+              "image": {
+                "src": "http://img1.kuwo.cn/star/starheads/240/42/97/3914752958.jpg"
+              },
+              "isFavorited": false,
+              "title": "蒲公英的约定",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=994723015"
+            },
+            {
+              "image": {
+                "src": "http://img1.kuwo.cn/star/starheads/240/42/97/3914752958.jpg"
+              },
+              "isFavorited": false,
+              "title": "半岛铁盒",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=1009699825"
+            },
+            {
+              "image": {
+                "src": "http://qukufile2.qianqian.com/data2/pic/e22ca5aea6af7c553d9b7a56f8129a59/270514481/270514481.jpg@s_1,w_150,h_150"
+              },
+              "isFavorited": false,
+              "title": "彩虹",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=1112289813"
+            },
+            {
+              "image": {
+                "src": "http://qukufile2.qianqian.com/data2/pic/7218b20000d01c78affb18e9e488cf5a/270866866/270866866.jpg@s_0,w_150"
+              },
+              "isFavorited": false,
+              "title": "布拉格广场",
+              "titleSubtext1": "周杰伦 蔡依林",
+              "url": "http://audio_music/command/play?playtoken=1005223548"
+            },
+            {
+              "image": {
+                "src": "http://qukufile2.qianqian.com/data2/pic/74f4fb6d6d5aff140ce31439f0bfed4f/23660766/23660766.jpg@s_1,w_150,h_150"
+              },
+              "isFavorited": false,
+              "title": "安静",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=1150790932"
+            },
+            {
+              "image": {
+                "src": "http://img1.kuwo.cn/star/starheads/240/42/97/3914752958.jpg"
+              },
+              "isFavorited": false,
+              "title": "退后",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=1037731709"
+            },
+            {
+              "image": {
+                "src": "http://qukufile2.qianqian.com/data2/pic/86de6a0dad614537003e2828717b7397/10735646/10735646.jpg@s_1,w_150,h_150"
+              },
+              "isFavorited": false,
+              "title": "简单爱",
+              "titleSubtext1": "周杰伦",
+              "url": "http://audio_music/command/play?playtoken=997036570"
+            },
+            {
+              "image": {
+                "src": "http://qukufile2.qianqian.com/data2/pic/89788878/89788878.jpg@s_0,w_150"
+              },
+              "isFavorited": false,
+              "title": "屋顶",
+              "titleSubtext1": "温岚 周杰伦",
+              "url": "http://audio_music/command/play?playtoken=1002759881"
             }
-        ]
+          ],
+          "nowPlayingIndex": 3,
+          "title": "播放列表",
+          "token": "YXVkaW9fbXVzaWMrMTAyMjIzNDA0OA=="
+        }
+      }
     };
 
 };
