@@ -39,7 +39,7 @@ function AudioPlayerManager(controller){
                         offsetInMilliseconds:this.offset_ms
                     }));
     });
-    this.player.on("play",()=>{
+    this.player.on("start",()=>{
         controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackStarted",controller.getContext(),
                     {
                         token:this.last_played_token,
@@ -93,7 +93,9 @@ var handlers={
             this.playlist=[];
             this.player.openFile(directive.payload.audioItem.stream.url);
             if(directive.payload.audioItem.stream.offsetInMilliseconds){
-                this.player.seek(parseInt(directive.payload.audioItem.stream.offsetInMilliseconds/1000));
+                this.player.once("start",()=>{
+                    this.player.seek(parseInt(directive.payload.audioItem.stream.offsetInMilliseconds/1000));
+                });
             }
             this.player.play();
             this.last_played_token=directive.payload.audioItem.stream.token;
