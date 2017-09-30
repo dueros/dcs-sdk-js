@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const child_process = require('child_process');
 const system = require('./system');
@@ -47,11 +46,12 @@ function ScreenManager(dcsController){
         }
     };
 }
-util.inherits(ScreenManager, EventEmitter);
+util.inherits(ScreenManager, BaseManager);
+ScreenManager.prototype.NAMESPACE="ai.dueros.device_interface.screen";
 ScreenManager.prototype.getContext=function(){
     var context={
         "header": {
-            "namespace": "ai.dueros.device_interface.screen",
+            "namespace": this.NAMESPACE,
             "name": "ViewState"
         },
         "payload": {
@@ -66,6 +66,12 @@ ScreenManager.prototype.getContext=function(){
     return context;
 };
 ScreenManager.prototype.handleDirective=function (directive,controller){
+    if(
+        directive.header.namespace!=this.NAMESPACE &&
+        directive.header.namespace!="ai.dueros.device_interface.screen_extended_card"
+    ){
+        return;
+    }
     var name=directive.header.name;
     if(this.handlers[name]){
         this.handlers[name].call(this,directive);
@@ -73,18 +79,20 @@ ScreenManager.prototype.handleDirective=function (directive,controller){
     }
 };
 
-ScreenManager.prototype.buttonClicked=function (buttonName){
-    this.dcsController.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.screen","ButtonClicked",controller.getContext(),
+ScreenManager.prototype.buttonClicked=function (token,buttonName){
+    this.dcsController.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.form","ButtonClicked",controller.getContext(),
         {
+            "token": token,
             "name": buttonName,
         }));
 };
 
-ScreenManager.prototype.elementSelected=function (token,index){
-    this.dcsController.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.screen","ElementSelected",controller.getContext(),
+ScreenManager.prototype.radioButtonClicked=function (token,index,selectedValue){
+    this.dcsController.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.form","RadioButtonClicked",controller.getContext(),
         {
             "token": token,
             "index": index,
+            "selectedValue": selectedValue
         }));
 };
 ScreenManager.prototype.getLastPlayerList=function (){

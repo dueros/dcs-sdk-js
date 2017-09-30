@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const DataStreamPlayer= require("./data_stream_player");
 const DcsProtocol=require("./dcs_protocol");
@@ -22,7 +21,7 @@ function VoiceOutputManager(controller){
     this.ttsplayer=new DataStreamPlayer();
     
     this.ttsplayer.on("start",()=>{
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.voice_output","SpeechStarted",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"SpeechStarted",controller.getContext(),
             {
                 token:this.last_played_token
             }));
@@ -31,7 +30,7 @@ function VoiceOutputManager(controller){
         if(this.promise){
             this.promise.resolve();
         }
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.voice_output","SpeechFinished",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"SpeechFinished",controller.getContext(),
             {
                 token:this.last_played_token
             }));
@@ -45,7 +44,8 @@ function VoiceOutputManager(controller){
     });
     
 }
-util.inherits(VoiceOutputManager, EventEmitter);
+util.inherits(VoiceOutputManager, BaseManager);
+VoiceOutputManager.prototype.NAMESPACE="ai.dueros.device_interface.voice_output";
 var handlers={
     "Speak":function(directive,controller){
         this.last_played_token=directive.payload.token;
@@ -76,7 +76,7 @@ var handlers={
 VoiceOutputManager.prototype.getContext=function(){
     return {
         "header": {
-            "namespace": "ai.dueros.device_interface.voice_output",
+            "namespace": this.NAMESPACE,
             "name": "SpeechState"
         },
         "payload": {
@@ -94,6 +94,10 @@ VoiceOutputManager.prototype.stop=function(){
     return this.ttsplayer.stop();
 };
 VoiceOutputManager.prototype.handleDirective=function (directive,controller){
+
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
     var name=directive.header.name;
     if(handlers[name]){
         return handlers[name].call(this,directive,controller);

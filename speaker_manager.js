@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const child_process = require('child_process');
 const system = require('./system');
@@ -52,14 +51,15 @@ function SpeakerManager(){
         }
     };
 }
-util.inherits(SpeakerManager, EventEmitter);
+util.inherits(SpeakerManager, BaseManager);
+SpeakerManager.prototype.NAMESPACE="ai.dueros.device_interface.speaker_controller";
 SpeakerManager.prototype.getContext=function(){
     if(this.logicVolume===null){
         return;
     }
     return {
         "header": {
-            "namespace": "ai.dueros.device_interface.speaker_controller",
+            "namespace": this.NAMESPACE,
             "name": "VolumeState"
         },
         "payload": {
@@ -69,12 +69,16 @@ SpeakerManager.prototype.getContext=function(){
     };
 };
 SpeakerManager.prototype.handleDirective=function (directive,controller){
+
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
     var name=directive.header.name;
     if(this.handlers[name]){
         this.handlers[name].call(this,directive);
         var volume=this.getCurrentVolume();
         setTimeout(()=>{
-            controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.speaker_controller","VolumeChanged",controller.getContext(),
+            controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"VolumeChanged",controller.getContext(),
                 {
                     "volume": this.logicVolume,
                     "muted": this.isMute

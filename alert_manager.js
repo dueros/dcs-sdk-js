@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const fs = require('fs');
 const DcsProtocol=require("./dcs_protocol");
@@ -40,7 +39,7 @@ function AlertManager(controller){
     });
     
     this.on("playend",(token)=>{
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.alerts","AlertStopped",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"AlertStopped",controller.getContext(),
             {
                 token:token
             }));
@@ -56,7 +55,7 @@ function AlertManager(controller){
                 notify:false,
                 payload:directive.payload
             });
-            controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.alerts","SetAlertSucceeded",controller.getContext(),
+            controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"SetAlertSucceeded",controller.getContext(),
                 {
                     token:directive.payload.token
                 }));
@@ -64,14 +63,15 @@ function AlertManager(controller){
         "DeleteAlert":function(directive){
             this.alertsData=this.alertsData.filter(_alertData =>directive.payload.token != _alertData.token);
 
-            controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.alerts","DeleteAlertSucceeded",controller.getContext(),
+            controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"DeleteAlertSucceeded",controller.getContext(),
                 {
                     token:directive.payload.token
                 }));
         }
     };
 }
-util.inherits(AlertManager, EventEmitter);
+util.inherits(AlertManager, BaseManager);
+AlertManager.prototype.NAMESPACE="ai.dueros.device_interface.alerts";
 
 AlertManager.prototype.save=function(){
     if(this.alertsData){
@@ -118,7 +118,7 @@ AlertManager.prototype.getContext=function(){
     }
     return {
         "header": {
-            "namespace": "ai.dueros.device_interface.alerts",
+            "namespace": this.NAMESPACE,
             "name": "AlertState"
         },
         "payload": {
@@ -130,7 +130,7 @@ AlertManager.prototype.getContext=function(){
 };
 AlertManager.prototype.play=function(alertData){
     let play_params='-t wav alert.wav repeat 30';
-    this.stopPlay();
+    this.stop();
     this.activeAlertData=alertData;
     this.player_process=child_process.spawn(config.play_cmd,play_params.split(" "));
     this.player_process.on("close",()=>{
@@ -140,7 +140,7 @@ AlertManager.prototype.play=function(alertData){
     });
 
 };
-AlertManager.prototype.stopPlay=function(){
+AlertManager.prototype.stop=function(){
     if(this.player_process){
         this.player_process.kill("SIGKILL");
         this.player_process=null;
@@ -162,6 +162,11 @@ AlertManager.prototype.notify=function(){
     });
 };
 AlertManager.prototype.handleDirective=function (directive,controller){
+
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
+
     var name=directive.header.name;
     if(this.handlers[name]){
         this.handlers[name].call(this,directive,controller);

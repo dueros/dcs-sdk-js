@@ -13,12 +13,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 function VoiceInputManager(){
 }
-util.inherits(VoiceInputManager, EventEmitter);
+util.inherits(VoiceInputManager, BaseManager);
+VoiceInputManager.prototype.NAMESPACE="ai.dueros.device_interface.voice_input";
 var handlers={
     "Listen":function(directive,controller){
         controller.startRecognize();
@@ -31,7 +31,7 @@ var handlers={
 VoiceInputManager.prototype.getContext=function(){
     return {
         "header": {
-            "namespace": "ai.dueros.device_interface.voice_input",
+            "namespace": this.NAMESPACE,
             "name": "ListenState"
         },
         "payload": {
@@ -40,6 +40,10 @@ VoiceInputManager.prototype.getContext=function(){
     };
 };
 VoiceInputManager.prototype.handleDirective=function (directive, controller){
+
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
     var name=directive.header.name;
     if(handlers[name]){
         handlers[name].call(this,directive,controller);

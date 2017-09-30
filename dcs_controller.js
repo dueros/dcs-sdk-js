@@ -27,60 +27,6 @@ const LocationManager=require("./location_manager");
 const ScreenManager=require("./screen_manager");
 const configModule=require("./config.js");
 const config=configModule.getAll();
-const directive_handlers={
-    /*
-     *
-{
-  "directive": {
-    "header": {
-      "namespace": "SpeechSynthesizer",
-      "name": "Speak",
-      "dialogRequestId": "string",
-      "messageId": "string"
-    },
-    "payload": {
-      "format": "AUDIO_MPEG",
-      "token": "1495556956_13665vo42",
-      "url": "cid:97"
-    }
-  }
-}
-    "ai.dueros.device_interface.image_recognition":function(directive){
-        var _event=DcsProtocol.createEvent("ai.dueros.device_interface.image_recognition","StartUploadScreenShot",this.getContext(),
-            {
-                "token":"1502376005",
-                "type":"face",
-                "url":"http://b.hiphotos.baidu.com/xiaodu/pic/item/f9198618367adab4db715da581d4b31c8601e4b7.jpg"
-            });
-        this.emit("event",_event);
-        return true;
-    },
-     */
-    "ai.dueros.device_interface.http":function(directive){
-        return this.httpManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.screen":function(directive){
-        return this.screenManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.location":function(directive){
-        return this.locationManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.alerts":function(directive){
-        return this.alertManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.voice_input":function(directive){
-        return this.voiceInputManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.voice_output":function(directive){
-        return this.voiceOutputManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.speaker_controller":function(directive){
-        return this.speakerManager.handleDirective(directive,this);
-    },
-    "ai.dueros.device_interface.audio_player":function(directive){
-        return this.audioPlayerManager.handleDirective(directive,this);
-    }
-};
 
 function DcsController(options){
     this.locationManager=new LocationManager(this);
@@ -91,6 +37,16 @@ function DcsController(options){
     this.voiceInputManager=new VoiceInputManager(this);
     this.screenManager=new ScreenManager(this);
     this.httpManager=new HttpManager(this);
+    this.managers=[
+        this.locationManager,
+        this.alertManager,
+        this.audioPlayerManager,
+        this.speakerManager,
+        this.voiceOutputManager,
+        this.voiceInputManager,
+        this.screenManager,
+        this.httpManager,
+    ];
     this._contents={};
     this.queue=[];
 }
@@ -102,53 +58,27 @@ DcsController.prototype.isPlaying=function(){
 };
 
 DcsController.prototype.getContext=function(namespace){
-    var context=[];
-    var alertContext=this.alertManager.getContext();
-    if(alertContext){
-        context.push(alertContext);
-    }
-    var audioContext=this.audioPlayerManager.getContext();
-    if(audioContext){
-        context.push(audioContext);
-    }
-    
-    var speakerContext=this.speakerManager.getContext();
-    if(speakerContext){
-        context.push(speakerContext);
-    }
+    var contexts=this.managers.map((manager)=>{
+        return manager.getContext();
+    });
+    contexts=contexts.filter((context)=>{
+        return !!context;
+    });
 
-    var voiceInputContext=this.voiceInputManager.getContext();
-    if(voiceInputContext){
-        context.push(voiceInputContext);
-    }
-    
-    var voiceOutputContext=this.voiceOutputManager.getContext();
-    if(voiceOutputContext){
-        context.push(voiceOutputContext);
-    }
-    
-    var locationContext=this.locationManager.getContext();
-    if(locationContext){
-        context.push(locationContext);
-    }
 
-    var screenContext=this.screenManager.getContext();
-    if(screenContext){
-        context.push(screenContext);
-    }
 
 
     if(namespace){
-        for(let i=0;i<context.length;i++){
-            if(context[i].header.namespace==namespace){
-                return context[i];
+        for(let i=0;i<contexts.length;i++){
+            if(contexts[i].header.namespace==namespace){
+                return contexts[i];
             }
         }
         return null;
     }
 
 
-    return context;
+    return contexts;
     //TODO get all alerts
     //TODO get audio player
     //TODO get speaker status
@@ -196,9 +126,14 @@ DcsController.prototype.handleResponse=function(response){
 
 
 DcsController.prototype.stopPlay=function(directive){
+    this.managers.forEach((manager)=>{
+        manager.stop();
+    });
+    /*
     this.audioPlayerManager.stop();
     this.voiceOutputManager.stop();
-    this.alertManager.stopPlay();
+    this.alertManager.stop();
+    */
 };
 
 DcsController.prototype.startRecognize=function(options){
@@ -229,23 +164,17 @@ DcsController.prototype.isRecognizing=function(){
     return false;
 };
 DcsController.prototype.processDirective=function(directive){
-    var key=directive.header.namespace+"."+directive.header.name;
-    var handler;
-    do{
-        if(directive_handlers.hasOwnProperty(key)){
-            handler=directive_handlers[key]
-            break;
-        }
-        let parts=key.split(".");
-        parts.pop();
-        key=parts.join(".");
-    }while(key);
-    if(!handler){
-        console.log("no directive handler:"+JSON.stringify(directive));
-        return;
-    }
-
-    var promise=directive_handlers[key].call(this,directive);
+    let promise=Promise.resolve();
+    this.managers.forEach((manager)=>{
+        promise=promise.then(()=>{
+            let tmpRet=manager.handleDirective(directive,this);
+            if(tmpRet){
+                return tmpRet;
+            }else{
+                return Promise.resolve();
+            }
+        });
+    });
     return promise;
 };
 DcsController.prototype.deQueue=function(){

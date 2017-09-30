@@ -13,7 +13,8 @@
     "downstream_protocol":"http2",
     
     "event_header":{
-        "from_mac":"1"
+        "from_mac":"1",
+        "debug_boss":"nj03-rp-m22nlp156.nj03.baidu.com:8486"
     },
     
     "rec_env":{},

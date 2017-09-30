@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const request = require('request');
 function HttpManager(){
 }
-util.inherits(HttpManager, EventEmitter);
+util.inherits(HttpManager, BaseManager);
 var handlers={
     "DoHttpRequest":function(directive,controller){
         let params={};
@@ -62,7 +61,11 @@ var handlers={
 HttpManager.prototype.getContext=function(){
     return ;
 };
+HttpManager.prototype.NAMESPACE="ai.dueros.device_interface.http";
 HttpManager.prototype.handleDirective=function (directive, controller){
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
     var name=directive.header.name;
     if(handlers[name]){
         handlers[name].call(this,directive,controller);

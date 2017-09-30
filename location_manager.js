@@ -13,11 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const child_process = require('child_process');
-const system = require('./system');
 const DcsProtocol=require("./dcs_protocol");
 
 function LocationManager(){
@@ -29,14 +27,15 @@ function LocationManager(){
     this.handlers={
     };
 }
-util.inherits(LocationManager, EventEmitter);
+util.inherits(LocationManager, BaseManager);
+LocationManager.prototype.NAMESPACE="ai.dueros.device_interface.location";
 LocationManager.prototype.getContext=function(){
     if(!this.loc){
         return;
     }
     return {
         "header": {
-            "namespace": "ai.dueros.device_interface.location",
+            "namespace": this.NAMESPACE,
             "name": "GpsState"
         },
         "payload": {
@@ -59,6 +58,9 @@ LocationManager.prototype.setLocation=function(loc){
 };
 
 LocationManager.prototype.handleDirective=function (directive,controller){
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
     //NONE
 }
 

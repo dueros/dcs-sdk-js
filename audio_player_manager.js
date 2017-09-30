@@ -13,8 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-///播放器控制类，解决播放列表的问题
-const EventEmitter=require("events");
+const BaseManager=require("./base_manager");
 const util = require('util');
 const Player=require("./player");
 const DcsProtocol=require("./dcs_protocol");
@@ -24,7 +23,7 @@ function AudioPlayerManager(controller){
     this.player=new Player();
     this.player.on("stop",()=>{
         controller.emit("event",
-                DcsProtocol.createEvent( "ai.dueros.device_interface.audio_player", "PlaybackStopped", controller.getContext(),
+                DcsProtocol.createEvent( this.NAMESPACE, "PlaybackStopped", controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
@@ -33,33 +32,33 @@ function AudioPlayerManager(controller){
                 );
     });
     this.player.on("pause",()=>{
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackPaused",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackPaused",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
                     }));
     });
     this.player.on("start",()=>{
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackStarted",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackStarted",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
                     }));
     });
     this.player.on("start",()=>{
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackStarted",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackStarted",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
                     }));
     });
     this.player.on("finished",()=>{
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackNearlyFinished",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackNearlyFinished",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
                     }));
-        controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.audio_player","PlaybackFinished",controller.getContext(),
+        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackFinished",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
@@ -70,7 +69,8 @@ function AudioPlayerManager(controller){
         this.offset_ms=sec*1000;
     });
 }
-util.inherits(AudioPlayerManager, EventEmitter);
+util.inherits(AudioPlayerManager, BaseManager);
+AudioPlayerManager.prototype.NAMESPACE="ai.dueros.device_interface.audio_player";
 var handlers={
     "ClearQueue":function(directive){
         if(directive.payload.clearBehavior=="CLEAR_ENQUEUED"){
@@ -131,7 +131,7 @@ AudioPlayerManager.prototype.stop=function(){
 AudioPlayerManager.prototype.getContext=function(){
     return {
         "header": {
-            "namespace": "ai.dueros.device_interface.audio_player",
+            "namespace": this.NAMESPACE,
             "name": "PlaybackState"
         },
         "payload": {
@@ -143,6 +143,9 @@ AudioPlayerManager.prototype.getContext=function(){
 
 };
 AudioPlayerManager.prototype.handleDirective=function (directive){
+    if(directive.header.namespace!=this.NAMESPACE){
+        return;
+    }
     var name=directive.header.name;
     if(handlers[name]){
         handlers[name].call(this,directive);
