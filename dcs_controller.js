@@ -57,6 +57,10 @@ DcsController.prototype.isPlaying=function(){
 
 };
 
+DcsController.prototype.addDeviceModule=function(manager){
+    this.managers.push(manager);
+};
+
 DcsController.prototype.getContext=function(namespace){
     var contexts=this.managers.map((manager)=>{
         return manager.getContext();
