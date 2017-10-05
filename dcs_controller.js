@@ -62,15 +62,18 @@ DcsController.prototype.addDeviceModule=function(manager){
 };
 
 DcsController.prototype.getContext=function(namespace){
-    var contexts=this.managers.map((manager)=>{
-        return manager.getContext();
+    var contexts=[];
+    this.managers.forEach((manager)=>{
+        let context=manager.getContext();
+        if(Array.isArray(context)){
+            contexts=contexts.concat(context);
+        }else if(!!context){
+            contexts.push(context);
+        }
     });
     contexts=contexts.filter((context)=>{
         return !!context;
     });
-
-
-
 
     if(namespace){
         for(let i=0;i<contexts.length;i++){
