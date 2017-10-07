@@ -128,6 +128,10 @@ AudioPlayerManager.prototype.isPlaying=function(){
 AudioPlayerManager.prototype.stop=function(){
     return this.player.stop();
 };
+AudioPlayerManager.prototype.seekTo=function(offsetInMilliseconds){
+    return this.player.seek(parseInt(offsetInMilliseconds/1000));
+};
+
 AudioPlayerManager.prototype.getContext=function(){
     return {
         "header": {
