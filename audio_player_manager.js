@@ -129,7 +129,10 @@ AudioPlayerManager.prototype.stop=function(){
     return this.player.stop();
 };
 AudioPlayerManager.prototype.seekTo=function(offsetInMilliseconds){
-    return this.player.seek(parseInt(offsetInMilliseconds/1000));
+    if(this.player.isPlaying()){
+        this.offset_ms=offsetInMilliseconds;
+        this.player.seek(parseInt(offsetInMilliseconds/1000));
+    }
 };
 
 AudioPlayerManager.prototype.getContext=function(){
