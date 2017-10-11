@@ -218,13 +218,13 @@ ScreenManager.prototype.getLastPlayerList=function (){
 ScreenManager.prototype.getLastPlayerInfo=function (){
     //TODO
     return {
-      "audioItemId": this.last_player_token,
+      "token": this.last_player_token,
       "content": {
         "title": "告白气球",
         "titleSubtext1": "周杰伦",
         "titleSubtext2": "周杰伦床边的故事",
         "lyric":{
-            "url":"http://bd.kuwo.cn/yinyue/6340467?from=baidu",
+            "url":"http://qukufile2.qianqian.com/data2/lrc/12459382/12459382.lrc",
             "format":"url"
         },
         "mediaLengthInMilliseconds": 191000,
@@ -236,21 +236,13 @@ ScreenManager.prototype.getLastPlayerInfo=function (){
                     ]
             },
         "art" : {
-              "sources" : [
-                    {
-                          "size" : "medium",
-                              "url" : "http://p4.music.126.net/yjVbsgfNeF2h7fIvnxuZDQ==/18894007811887644.jpg?param=130y130"
-                        }
-                  ]
+                     "src" : "http://p4.music.126.net/yjVbsgfNeF2h7fIvnxuZDQ==/18894007811887644.jpg?param=130y130"
             },
         "provider": {
               "name": "网易云音乐",
               "logo" : {
-                    "sources" : [
-                          {
-                                "url" : "https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=452376239,853081037&fm=58"
-                              }
-                        ]
+                                "src" : "https://ss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=452376239,853081037&fm=58"
+ 
                   },
             },
       },
@@ -280,22 +272,9 @@ ScreenManager.prototype.getLastPlayerInfo=function (){
                       "selected": false
                 },
             {
-                  "type": "BUTTON",
-                      "name": "REPEAT_ONE",
-                      "enabled": true,
-                      "selected": false
-                },
-            {
-                  "type": "BUTTON",
-                      "name": "REPEAT_ALL",
-                      "enabled": true,
-                      "selected": false
-                },
-            {
-                  "type": "BUTTON",
-                      "name": "SHUFFLE",
-                      "enabled": true,
-                      "selected": false
+                  "type": "RADIO_BUTTON",
+                      "name": "REPEAT",
+                      "selectedValue": "REPEAT_ALL",
                 },
             {
                   "type": "BUTTON",
