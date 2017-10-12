@@ -42,6 +42,13 @@ Recorder.prototype.start=function(){
                 {stdio:['pipe', 'pipe', 'pipe']}
                 );
         this.rec_process.stdout.pipe(this.convert_process.stdin);
+        
+        this.convert_process.stdin.on("error",()=>{
+            //应该不会发生，以防万一
+            console.log("recorder convert process write pipe error");
+            this.stop();
+        });
+
         console.log("rec start");
         this.buffer_manager=new BufferManager();
         var MAX_BUFFER_SIZE=16000*16*1/8 * 8; //8s的pcm流

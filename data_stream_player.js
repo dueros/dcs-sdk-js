@@ -38,6 +38,10 @@ DataStreamPlayer.prototype.play=function(readable){
     );
     this.player_process=player_process;
     readable.pipe(player_process.stdin);
+    player_process.stdin.on("error",()=>{
+        console.log("tts process write pipe error");
+        this.stop();
+    });
     player_process.on("close",()=>{
         console.log("tts play end!\n");
         this.player_process=null;
