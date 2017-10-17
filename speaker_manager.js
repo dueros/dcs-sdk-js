@@ -25,6 +25,12 @@ function SpeakerManager(){
     this.handlers={
         "SetVolume":(directive)=>{
             this.logicVolume=directive.payload.volume;
+            if(this.logicVolume<0){
+                this.logicVolume=0;
+            }
+            if(this.logicVolume>100){
+                this.logicVolume=100;
+            }
             if(!this.isMute){
                 this.setVolume(directive.payload.volume);
             }
@@ -37,6 +43,12 @@ function SpeakerManager(){
             }
             */
             this.logicVolume=this.logicVolume + directive.payload.volume;
+            if(this.logicVolume<0){
+                this.logicVolume=0;
+            }
+            if(this.logicVolume>100){
+                this.logicVolume=100;
+            }
             if(!this.isMute){
                 this.setVolume(this.logicVolume);
             }
@@ -114,7 +126,12 @@ SpeakerManager.prototype.getCurrentVolume=function (){
     }
     if(system.get()=="macos"){
         let output=child_process.execSync('osascript -e "get output volume of (get volume settings)"').toString();
-        return parseInt(output,10);
+        let volume=parseInt(output,10);
+        if(isNaN(volume)){
+            console.log("当前的播放设备不支持调整音量，请检查声音设置！");
+            return 50;
+        }
+        return volume;
     }
     return null;
 };

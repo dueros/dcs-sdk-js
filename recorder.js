@@ -19,8 +19,8 @@ const BufferManager=require("./wakeup/buffermanager").BufferManager;
 let rec_bits=config.rec_bits?config.rec_bits:"32";
 let rec_sample_rate=config.rec_sample_rate?config.rec_sample_rate:"44100";
 let rec_channel=config.rec_channel?config.rec_channel:"1";
-let rec_cmd=config.rec_cmd+' --buffer 1024 -t wav -r'+rec_sample_rate+' -b'+rec_bits+' -c'+rec_channel+' -';
-let convert_cmd=config.sox_cmd+' --buffer 1024 -t wav -r'+rec_sample_rate+' -b'+rec_bits+' -c'+rec_channel+' - -t s16 -r16000 -b16 -c1 -';
+let rec_cmd=config.rec_cmd+' -V1 --buffer 1024 -t wav -r'+rec_sample_rate+' -b'+rec_bits+' -c'+rec_channel+' -';
+let convert_cmd=config.sox_cmd+' -V1 --buffer 1024 -t wav -r'+rec_sample_rate+' -b'+rec_bits+' -c'+rec_channel+' - -t s16 -r16000 -b16 -c1 -';
 
 function Recorder(){
     this.rec_process=null;
