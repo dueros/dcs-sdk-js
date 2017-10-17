@@ -17,6 +17,7 @@ DownStream.prototype.init=function(){
     if(this.req){
         this.req.abort();
     }
+    console.log(config.oauth_token);
     this.req=http2.get({
         "url":"https://"+config.ip+config.directive_uri ,
         "host":config.ip,

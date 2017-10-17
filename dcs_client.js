@@ -343,6 +343,8 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     var rWrap=this.processEventRequest(r);
     rWrap.on("error",()=>{
         this.stopRecognize();
+        console.log("re init downstream when recognizing error");
+        this.downstream.init();
     });
     this._isRecognizing=true;
 };

@@ -215,6 +215,10 @@ DcsController.prototype.deQueue=function(){
 DcsController.prototype.setAccessToken=function(access_token){
     if(access_token){
         configModule.save("oauth_token",access_token);
+        config.oauth_token=access_token;
+        if(this.client && this.client.downstream){
+            this.client.downstream.init();
+        }
     }
 };
 DcsController.prototype.getAccessToken=function(){
