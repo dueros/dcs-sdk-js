@@ -199,7 +199,8 @@ DcsClient.prototype.sendEvent=function(eventData){
 
 DcsClient.prototype.processEventRequest=function (r){
     let rWrap=new Readable().wrap(r);
-    rWrap.on("error",()=>{
+    rWrap.on("error",(e)=>{
+        console.log(e);
         console.log("rWrap on error");
     });
 
@@ -341,7 +342,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         socket.setNoDelay(true);
     });
     var rWrap=this.processEventRequest(r);
-    rWrap.on("error",()=>{
+    rWrap.on("error",(e)=>{
         this.stopRecognize();
         console.log("re init downstream when recognizing error");
         this.downstream.init();
