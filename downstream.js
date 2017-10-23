@@ -59,8 +59,9 @@ DownStream.prototype.init=function(){
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
         this.init();
     });
-    this.req.on('response', function(response) {
+    this.req.on('response', (response)=> {
         console.log("downstream created!");
+        this.emit("init",response);
         if(!response.headers['content-type']){
             throw new Exception("server header error: no content-type");
         }

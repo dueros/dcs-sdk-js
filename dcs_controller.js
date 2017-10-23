@@ -101,6 +101,13 @@ DcsController.prototype.setClient=function(client){
     client.on("content",(content_id,content)=>{
         this.emit("content",content_id,content);
     });
+    client.on("downstream_init",()=>{
+        this.emit("event",DcsProtocol.createEvent(
+            "ai.dueros.device_interface.system",
+            "SynchronizeState",
+            this.getContext()
+        ));
+    });
     this.on("event",(dcs_event)=>{
         if(dcs_event &&dcs_event.event && dcs_event.event.header){
             if(

@@ -42,6 +42,9 @@ function DcsClient(options){
     this.downstream.on("content",(content_id,readable)=>{
         this.emit("content",content_id,readable);
     });
+    this.downstream.on("init",()=>{
+        this.emit("downstream_init");
+    });
 }
 
 util.inherits(DcsClient, EventEmitter);
