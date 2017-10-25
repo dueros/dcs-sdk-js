@@ -66,7 +66,7 @@ function AudioPlayerManager(controller){
         this.playNext();
     });
     this.player.on("time",(sec)=>{
-        this.offset_ms=sec*1000;
+        this.offset_ms=parseInt(sec*1000,10);
     });
 }
 util.inherits(AudioPlayerManager, BaseManager);
@@ -130,7 +130,7 @@ AudioPlayerManager.prototype.stop=function(){
 };
 AudioPlayerManager.prototype.seekTo=function(offsetInMilliseconds){
     if(this.player.isPlaying()){
-        this.offset_ms=offsetInMilliseconds;
+        this.offset_ms=parseInt(offsetInMilliseconds,10);
         this.player.seek(parseInt(offsetInMilliseconds/1000));
     }
 };
