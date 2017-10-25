@@ -1,7 +1,7 @@
 const EventEmitter=require("events");
 const util = require('util');
 const request=require("request");
-const config=require("./dcs_config.json");
+const config=require("./config.js").getAll();
 const Readable = require('stream').Readable;
 const http2=require("http2");
 const fs = require('fs');
