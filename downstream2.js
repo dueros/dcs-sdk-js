@@ -17,7 +17,9 @@ DownStream.prototype.init=function(){
     var self=this;
     if(this.req){
         if(!this.http2session.destroyed){
-            this.req.rstWithCancel();
+            if(!this.req.destroyed){
+                this.req.rstWithCancel();
+            }
         }
         this.http2session.shutdown({graceful:true});
     }
