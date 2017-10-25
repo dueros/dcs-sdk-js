@@ -1,4 +1,4 @@
-///base on decrypcted module 'npm install http2'
+///base on node built-in http module
 const EventEmitter=require("events");
 const util = require('util');
 const request=require("request");
@@ -16,33 +16,28 @@ function DownStream(){
 DownStream.prototype.init=function(){
     var self=this;
     if(this.req){
-        this.req.abort();
+        this.req.rstWithCancel();
+        this.http2session.shutdown({graceful:true});
     }
     console.log(config.oauth_token);
-    this.req=http2.get({
-        "url":"https://"+config.ip+config.directive_uri ,
-        "host":config.ip,
-        "path":config.directive_uri,
-        headers:{
-            "Authorization": "Bearer "+config.oauth_token,
-            "DeviceSerialNumber": config.device_id
-        }
+    this.http2session=http2.connect("https://"+config.ip);
+    this.req=this.http2session.request({
+        ":path":config.directive_uri,
+        "authorization": "Bearer "+config.oauth_token,
+        "deviceSerialNumber": config.device_id
     });
     if(this.pingInterval){
         clearInterval(this.pingInterval);
     }
     this.pingInterval=setInterval(()=>{
-        var req=http2.get({
-            "url":"https://"+config.ip+config.ping_uri ,
-            "host":config.ip,
-            "path":config.ping_uri,
-            headers:{
-                "Authorization": "Bearer "+config.oauth_token,
-                "DeviceSerialNumber": config.device_id
-            }
-        },(response)=>{
-            //console.log(response.statusCode);
-            if(response.statusCode!=200){
+        var req=this.http2session.request({
+            ":path":config.ping_uri ,
+            "authorization": "Bearer "+config.oauth_token,
+            "deviceSerialNumber": config.device_id
+        });
+        req.on("response",(headers)=>{
+            //console.log(headers[':status']);
+            if(headers[':status']!=200){
                 this.init();
             }
         });
@@ -60,16 +55,20 @@ DownStream.prototype.init=function(){
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
         this.init();
     });
-    this.req.on('response', function(response) {
+    this.req.on('response', (headers) => {
         console.log("downstream created!");
-        if(!response.headers['content-type']){
+        if(!headers['content-type']){
             throw new Exception("server header error: no content-type");
         }
-        var matches=response.headers['content-type'].match(/boundary=([^;]*)/);
+        var matches=headers['content-type'].match(/boundary=([^;]*)/);
         if(matches&&matches[1]){
             d.setBoundary(matches[1]);
         }
-        response.pipe(d);
+        this.req.on("data",(data)=>{
+            console.log(data.toString());
+        });
+        let rWrap=new Readable().wrap(this.req);
+        rWrap.pipe(d);
     });
     //content-type: multipart/form-data; boundary=___dumi_avs_xuejuntao___
     d.on('part', function(p) {
