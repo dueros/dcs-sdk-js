@@ -16,7 +16,9 @@ function DownStream(){
 DownStream.prototype.init=function(){
     var self=this;
     if(this.req){
-        this.req.rstWithCancel();
+        if(!this.http2session.destroyed){
+            this.req.rstWithCancel();
+        }
         this.http2session.shutdown({graceful:true});
     }
     console.log(config.oauth_token);
