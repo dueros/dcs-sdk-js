@@ -20,11 +20,8 @@ const config=require("./config.js").getAll();
 const child_process=require("child_process");
 const fs = require('fs');
 var recorder=new Recorder();
-var client=new DcsClient({recorder:recorder});
 
 let controller=new DcsController();
-
-controller.setClient(client);
 
 
 controller.on("directive",(response)=>{
@@ -102,5 +99,12 @@ snowboy.on("hotword",function(index, hotword, buffer){
 });
 
 module.exports={
+    start:function(){
+        var client=new DcsClient({recorder:recorder});
+        controller.setClient(client);
+    },
     controller:controller
+}
+if(require.main===module){
+    module.exports.start();
 }
