@@ -89,9 +89,11 @@ var handlers={
                 this.player.once("start",()=>{
                     this.player.seek(parseInt(directive.payload.audioItem.stream.offsetInMilliseconds/1000));
                 });
+                this.offset_ms = directive.payload.audioItem.stream.offsetInMilliseconds;
+            }else{
+                this.offset_ms = 0;
             }
             this.player.play();
-            this.offset_ms = 0;
             this.last_played_token=directive.payload.audioItem.stream.token;
         }
         if(directive.payload.playBehavior=="ENQUEUE"){
