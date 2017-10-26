@@ -25,6 +25,10 @@ DownStream.prototype.init=function(){
     }
     console.log(config.oauth_token);
     this.http2session=http2.connect("https://"+config.ip);
+    this.http2session.on("error",()=>{
+        console.log('downstream session error!!!!!!!!');
+        this.init();
+    });
     this.req=this.http2session.request({
         ":path":config.directive_uri,
         "authorization": "Bearer "+config.oauth_token,
