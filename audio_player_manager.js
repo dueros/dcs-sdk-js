@@ -19,7 +19,7 @@ const Player=require("./player");
 const DcsProtocol=require("./dcs_protocol");
 function AudioPlayerManager(controller){
     this.playlist=[];
-    //this.player=new Player({debug:1});
+//  this.player=new Player({debug:1});
     this.player=new Player();
     this.player.on("stop",()=>{
         controller.emit("event",
@@ -33,13 +33,6 @@ function AudioPlayerManager(controller){
     });
     this.player.on("pause",()=>{
         controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackPaused",controller.getContext(),
-                    {
-                        token:this.last_played_token,
-                        offsetInMilliseconds:this.offset_ms
-                    }));
-    });
-    this.player.on("start",()=>{
-        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackStarted",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
@@ -98,6 +91,7 @@ var handlers={
                 });
             }
             this.player.play();
+            this.offset_ms = 0;
             this.last_played_token=directive.payload.audioItem.stream.token;
         }
         if(directive.payload.playBehavior=="ENQUEUE"){
@@ -119,6 +113,7 @@ AudioPlayerManager.prototype.playNext=function(){
         let playitem=this.playlist.shift();
         this.player.openFile(playitem.url);
         this.last_played_token=playitem.token;
+        this.offset_ms = 0;
         this.player.play();
     }
 };
