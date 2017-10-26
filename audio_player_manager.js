@@ -30,6 +30,7 @@ function AudioPlayerManager(controller){
                     }
                     )
                 );
+        this.offset_ms=0;
     });
     this.player.on("pause",()=>{
         controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackPaused",controller.getContext(),
