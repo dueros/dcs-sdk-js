@@ -13,20 +13,45 @@ function DownStream(){
     this.init();
 }
 
-DownStream.prototype.init=function(){
+
+
+//this.state: connecting/closed/connected
+
+DownStream.prototype.isConnected=function(){
+    return this.state=="connected";
+};
+
+DownStream.prototype.init=async function(){
     var self=this;
+    if(this.state=="connecting"){
+        return;
+    }
     if(this.req){
-        if(!this.http2session.destroyed){
-            if(!this.req.destroyed){
-                this.req.rstWithCancel();
-            }
+        try{
+            this.req.rstWithCancel();
+        }catch(e){
         }
-        this.http2session.shutdown({graceful:true});
+        this.req=null;
+    }
+    if(this.http2session){
+        try{
+            this.http2session.shutdown({graceful:true});
+        }catch(e){
+        }
+        await new Promise((resolve,reject)=>{
+            setTimeout( resolve ,1000);
+        });
     }
     console.log(config.oauth_token);
     this.http2session=http2.connect("https://"+config.ip);
     this.http2session.on("error",()=>{
+        this.state="closed";
         console.log('downstream session error!!!!!!!!');
+        this.init();
+    });
+    this.http2session.on("close",()=>{
+        this.state="closed";
+        console.log('downstream closed!!!!!!!!');
         this.init();
     });
     this.req=this.http2session.request({
@@ -34,10 +59,15 @@ DownStream.prototype.init=function(){
         "authorization": "Bearer "+config.oauth_token,
         "deviceSerialNumber": config.device_id
     });
+    this.state="connecting";
     if(this.pingInterval){
         clearInterval(this.pingInterval);
     }
     this.pingInterval=setInterval(()=>{
+        if(!this.http2session || this.http2session.aborted || this.http2session.destroyed){
+            console.log('downstream ping error, stream closed');
+            return;
+        }
         var req=this.http2session.request({
             ":path":config.ping_uri ,
             "authorization": "Bearer "+config.oauth_token,
@@ -49,6 +79,11 @@ DownStream.prototype.init=function(){
                 this.init();
             }
         });
+        setTimeout(()=>{
+            if(!req.destroyed){
+                req.rstWithCancel();
+            }
+        },5000);
         req.on("error",(e)=>{
             console.log('downstream ping error!!!!!!!!'+e.toString());
             this.init();
@@ -64,6 +99,7 @@ DownStream.prototype.init=function(){
         this.init();
     });
     this.req.on('response', (headers) => {
+        this.state="connected";
         console.log("downstream created!");
         if(!headers['content-type']){
             throw new Exception("server header error: no content-type");

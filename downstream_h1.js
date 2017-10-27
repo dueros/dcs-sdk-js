@@ -12,11 +12,16 @@ function DownStream(){
     this.init();
 }
 
+DownStream.prototype.isConnected=function(){
+    return this.state=="connected";
+};
+
 DownStream.prototype.init=function(){
     var self=this;
     if(this.req){
         this.req.abort();
     }
+    this.state="connecting";
     console.log(config.oauth_token);
     this.req=request.get({
         "url":config.schema+config.ip+config.directive_uri ,
@@ -35,6 +40,7 @@ DownStream.prototype.init=function(){
         this.init();
     });
     this.req.on('response', (response)=> {
+        this.state="connected";
         console.log("downstream created!");
         this.emit("init",response);
         if(!response.headers['content-type']){
