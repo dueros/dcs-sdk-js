@@ -159,7 +159,7 @@ AlertManager.prototype.notify=function(){
             _alertData.notify=true;
             this.save();
             this.play(_alertData);
-            this.dcs_controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"AlertStarted",controller.getContext(),
+            this.dcs_controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"AlertStarted",this.dcs_controller.getContext(),
                 {
                     token:_alertData.token
                 }));
