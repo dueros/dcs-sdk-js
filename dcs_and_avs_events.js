@@ -153,7 +153,7 @@ module.exports=[
         dcs_namespace: 'ai.dueros.device_interface.voice_input',
         avs_namespace:"SpeechRecognizer",
         dcs_name:"ListenStarted",
-        avs_name:"ListenStarted",
+        avs_name:"Recognize",
     },
     { 
         dcs_namespace: 'ai.dueros.device_interface.voice_input',

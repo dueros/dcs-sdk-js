@@ -5,9 +5,9 @@ function cloneObject(object){
 const storageFilename="storage.json"
 
 var default_config;
-try{
+if(fs.existsSync(__dirname+"/dcs_config.js")){
     default_config=require("./dcs_config");
-}catch(e){
+} else{
     default_config=require("./dcs_config.json");
 }
 default_config=cloneObject(default_config);
