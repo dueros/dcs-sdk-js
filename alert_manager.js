@@ -161,7 +161,7 @@ AlertManager.prototype.notify=function(){
             this.play(_alertData);
             this.dcs_controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"AlertStarted",controller.getContext(),
                 {
-                    token:token
+                    token:_alertData.token
                 }));
         }
     });
