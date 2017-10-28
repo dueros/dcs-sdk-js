@@ -1,7 +1,7 @@
 const Detector = require('./snowboy').Detector;
 const Models = require('./snowboy').Models;
 
-const config=require("./dcs_config.json");
+const config=require("./config").getAll();
 
 const models = new Models();
 

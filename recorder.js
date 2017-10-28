@@ -13,7 +13,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-const config=require("./dcs_config.json");
+const config=require("./config").getAll();
 let child_process=require("child_process");
 const BufferManager=require("./wakeup/buffermanager").BufferManager;
 let rec_bits=config.rec_bits?config.rec_bits:"32";

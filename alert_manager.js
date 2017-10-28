@@ -17,7 +17,7 @@ const BaseManager=require("./base_manager");
 const util = require('util');
 const fs = require('fs');
 const DcsProtocol=require("./dcs_protocol");
-const config=require("./dcs_config.json");
+const config=require("./config").getAll();
 const child_process=require("child_process");
 
 function AlertManager(controller){
