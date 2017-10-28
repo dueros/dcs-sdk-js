@@ -19,7 +19,7 @@
 const util = require('util');
 const EventEmitter=require("events");
 let child_process=require("child_process");
-const config=require("./dcs_config.json");
+const config=require("./config").getAll();
 
 function DataStreamPlayer(){
     //let play_cmd='mpg123 -';

@@ -3,7 +3,13 @@ function cloneObject(object){
     return JSON.parse(JSON.stringify(object));
 }
 const storageFilename="storage.json"
-var default_config=require("./dcs_config.json");
+
+var default_config;
+try{
+    default_config=require("./dcs_config");
+}catch(e){
+    default_config=require("./dcs_config.json");
+}
 default_config=cloneObject(default_config);
 var config=default_config;
 var storage={};

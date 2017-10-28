@@ -18,8 +18,29 @@ const util = require('util');
 const request=require("request");
 const config=require("./config.js").getAll();
 var DownStream;
+function version_compare(v1,v2){
+    let tmp1=v1.replace(/^[a-zA-Z]+/,'').split(".");
+    let tmp2=v2.replace(/^[a-zA-Z]+/,'').split(".");
+    for(let i=0;i<Math.min(tmp1.length,tmp2.length);i++){
+        let t1=parseInt(tmp1[i],10);
+        let t2=parseInt(tmp2[i],10);
+        if(t1<t2){
+            return -1;
+        }
+        if(t1>t2){
+            return 1;
+        }
+    }
+    return 0;
+
+}
 if(config.downstream_protocol=="http2"){
-    DownStream=require("./downstream");
+    if(version_compare(process.version,"v8.8.0")==-1){
+        DownStream=require("./downstream");
+    }else{
+        console.log("use node built in http2 module");
+        DownStream=require("./downstream2");
+    }
 }else{
     DownStream=require("./downstream_h1");
 }
@@ -41,6 +62,9 @@ function DcsClient(options){
     });
     this.downstream.on("content",(content_id,readable)=>{
         this.emit("content",content_id,readable);
+    });
+    this.downstream.on("init",()=>{
+        this.emit("downstream_init");
     });
 }
 
@@ -190,16 +214,17 @@ DcsClient.prototype.sendEvent=function(eventData){
             //console.log("event response headers:"+JSON.stringify(response.headers,null,2));
             //console.log("event response:"+body);
         });
-        var rWrap=this.processEventRequest(r);
+        var rWrap=processEventRequest.call(this,r);
         rWrap.on("error",(error)=>{
             console.log("event upload error");
         });
     }
 };
 
-DcsClient.prototype.processEventRequest=function (r){
+function processEventRequest (r){
     let rWrap=new Readable().wrap(r);
-    rWrap.on("error",()=>{
+    rWrap.on("error",(e)=>{
+        console.log(e);
         console.log("rWrap on error");
     });
 
@@ -340,9 +365,11 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     r.on("socket",(socket)=>{
         socket.setNoDelay(true);
     });
-    var rWrap=this.processEventRequest(r);
-    rWrap.on("error",()=>{
+    var rWrap=processEventRequest.call(this,r);
+    rWrap.on("error",(e)=>{
         this.stopRecognize();
+        console.log("re init downstream when recognizing error",e);
+        this.downstream.init();
     });
     this._isRecognizing=true;
 };

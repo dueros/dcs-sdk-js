@@ -19,7 +19,7 @@ const Player=require("./player");
 const DcsProtocol=require("./dcs_protocol");
 function AudioPlayerManager(controller){
     this.playlist=[];
-    //this.player=new Player({debug:1});
+//  this.player=new Player({debug:1});
     this.player=new Player();
     this.player.on("stop",()=>{
         controller.emit("event",
@@ -30,16 +30,10 @@ function AudioPlayerManager(controller){
                     }
                     )
                 );
+        this.offset_ms=0;
     });
     this.player.on("pause",()=>{
         controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackPaused",controller.getContext(),
-                    {
-                        token:this.last_played_token,
-                        offsetInMilliseconds:this.offset_ms
-                    }));
-    });
-    this.player.on("start",()=>{
-        controller.emit("event",DcsProtocol.createEvent(this.NAMESPACE,"PlaybackStarted",controller.getContext(),
                     {
                         token:this.last_played_token,
                         offsetInMilliseconds:this.offset_ms
@@ -66,7 +60,7 @@ function AudioPlayerManager(controller){
         this.playNext();
     });
     this.player.on("time",(sec)=>{
-        this.offset_ms=sec*1000;
+        this.offset_ms=parseInt(sec*1000,10);
     });
 }
 util.inherits(AudioPlayerManager, BaseManager);
@@ -96,6 +90,9 @@ var handlers={
                 this.player.once("start",()=>{
                     this.player.seek(parseInt(directive.payload.audioItem.stream.offsetInMilliseconds/1000));
                 });
+                this.offset_ms = directive.payload.audioItem.stream.offsetInMilliseconds;
+            }else{
+                this.offset_ms = 0;
             }
             this.player.play();
             this.last_played_token=directive.payload.audioItem.stream.token;
@@ -119,6 +116,7 @@ AudioPlayerManager.prototype.playNext=function(){
         let playitem=this.playlist.shift();
         this.player.openFile(playitem.url);
         this.last_played_token=playitem.token;
+        this.offset_ms = 0;
         this.player.play();
     }
 };
@@ -130,7 +128,7 @@ AudioPlayerManager.prototype.stop=function(){
 };
 AudioPlayerManager.prototype.seekTo=function(offsetInMilliseconds){
     if(this.player.isPlaying()){
-        this.offset_ms=offsetInMilliseconds;
+        this.offset_ms=parseInt(offsetInMilliseconds,10);
         this.player.seek(parseInt(offsetInMilliseconds/1000));
     }
 };

@@ -1,7 +1,7 @@
 const EventEmitter=require("events");
 const util = require('util');
 const request=require("request");
-const config=require("./dcs_config.json");
+const config=require("./config.js").getAll();
 const Readable = require('stream').Readable;
 const http2=require("http2");
 const fs = require('fs');
@@ -12,11 +12,17 @@ function DownStream(){
     this.init();
 }
 
+DownStream.prototype.isConnected=function(){
+    return this.state=="connected";
+};
+
 DownStream.prototype.init=function(){
     var self=this;
     if(this.req){
         this.req.abort();
     }
+    this.state="connecting";
+    console.log(config.oauth_token);
     this.req=request.get({
         "url":config.schema+config.ip+config.directive_uri ,
         headers:{
@@ -33,8 +39,10 @@ DownStream.prototype.init=function(){
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
         this.init();
     });
-    this.req.on('response', function(response) {
+    this.req.on('response', (response)=> {
+        this.state="connected";
         console.log("downstream created!");
+        this.emit("init",response);
         if(!response.headers['content-type']){
             throw new Exception("server header error: no content-type");
         }

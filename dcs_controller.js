@@ -101,6 +101,13 @@ DcsController.prototype.setClient=function(client){
     client.on("content",(content_id,content)=>{
         this.emit("content",content_id,content);
     });
+    client.on("downstream_init",()=>{
+        this.emit("event",DcsProtocol.createEvent(
+            "ai.dueros.device_interface.system",
+            "SynchronizeState",
+            this.getContext()
+        ));
+    });
     this.on("event",(dcs_event)=>{
         if(dcs_event &&dcs_event.event && dcs_event.event.header){
             if(
@@ -215,9 +222,12 @@ DcsController.prototype.deQueue=function(){
 DcsController.prototype.setAccessToken=function(access_token){
     if(access_token){
         configModule.save("oauth_token",access_token);
-        setTimeout(()=>{
-            this.client.downstream.init();
-        },2000);
+        config.oauth_token=access_token;
+        if(this.client){
+            setTimeout(()=>{
+                this.client.downstream.init();
+            },2000);
+        }
     }
 };
 DcsController.prototype.getAccessToken=function(){

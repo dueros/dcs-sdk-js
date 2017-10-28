@@ -20,8 +20,12 @@ const config=require("./config.js").getAll();
 const child_process=require("child_process");
 const fs = require('fs');
 var recorder=new Recorder();
+var client=new DcsClient({recorder:recorder});
 
 let controller=new DcsController();
+
+controller.setClient(client);
+
 
 controller.on("directive",(response)=>{
     console.log("on directive: "+JSON.stringify(response,null,2));
@@ -71,39 +75,17 @@ var unameAll=child_process.execSync("uname -a").toString();
 var isRaspberrypi=unameAll.match(/raspberrypi/);
 
 
-
-let snowboy = require("./snowboy.js");
-const BufferManager=require("./wakeup/buffermanager").BufferManager;
-let bm=new BufferManager();
-snowboy.start(recorder.start().out());
-snowboy.on("silence",()=>{
-    bm.clear();
-});
-snowboy.on("sound",(buffer)=>{
-    bm.add(buffer);
-});
-snowboy.on("hotword",function(index, hotword, buffer){
-    console.log("hotword "+index);
-    bm.add(buffer);
-    fs.writeFileSync("wake.pcm",bm.toBuffer());
-    bm.clear();
-    if(config.respeaker_2mic_hat && config.respeaker_2mic_hat.led){
+const wakeup=require("./wakeup/wakeup.js");
+wakeup.on("wakeup",function(wakeupInfo){
+    console.log(wakeupInfo);
+    ///没有AEC所以不能放提示音的时候录音
+    var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
+    child_process.exec(cmd,()=>{
+        console.log(cmd+"!!!!!!!!!!!!!!!!!!");
         controller.startRecognize();
-    }else{
-        var cmd=config.play_cmd+" -t wav '"+__dirname+"/nihao.wav'";
-        child_process.exec(cmd,()=>{
-            controller.startRecognize();
-        });
-    }
+    });
 });
 
 module.exports={
-    start:function(){
-        var client=new DcsClient({recorder:recorder});
-        controller.setClient(client);
-    },
     controller:controller
-}
-if(require.main===module){
-    module.exports.start();
 }

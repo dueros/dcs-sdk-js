@@ -26,8 +26,8 @@ models.add({
   //file: __dirname+'/resources/snowboy.umdl',
   //file: __dirname+'/resources/alexa.umdl',
   file:  __dirname+'/snowboy/resources/xiaoduxiaodu.umdl',
-  sensitivity: '0.9',
-  hotwords : '小度小度'
+  sensitivity: '0.35,0.35,0.45',
+  hotwords : ['小度小度',"小度小度","小度小度"]
 });
 
 const detector = new Detector({
