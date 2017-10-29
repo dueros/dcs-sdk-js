@@ -14,9 +14,11 @@
 * limitations under the License.
 */
 const DcsClient=require("./dcs_client");
+const AvsClient=require("./avs_client");
 const DcsController=require("./dcs_controller");
 const Recorder=require("./recorder");
-const config=require("./config.js").getAll();
+const configModule=require("./config.js");
+const config=configModule.getAll();
 const child_process=require("child_process");
 const fs = require('fs');
 var recorder=new Recorder();
@@ -101,9 +103,20 @@ module.exports={
         recorder=_recorder;
     },
     start:function(){
-        var client=new DcsClient({recorder:recorder});
+        if(config.avs_protocol){
+            console.log("use avs!!");
+            configModule.set("directive_uri",config.avs_directive_uri);
+            configModule.set("events_uri",config.avs_events_uri);
+            configModule.set("ping_uri",config.avs_ping_uri);
+            console.log(config);
+
+            let client=new AvsClient({recorder:recorder});
+            controller.setClient(client);
+        }else{
+            let client=new DcsClient({recorder:recorder});
+            controller.setClient(client);
+        }
         snowboy.start(recorder.start().out());
-        controller.setClient(client);
     },
     controller:controller
 }
