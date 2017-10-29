@@ -75,7 +75,6 @@ var isRaspberrypi=unameAll.match(/raspberrypi/);
 let snowboy = require("./snowboy.js");
 const BufferManager=require("./wakeup/buffermanager").BufferManager;
 let bm=new BufferManager();
-snowboy.start(recorder.start().out());
 snowboy.on("silence",()=>{
     bm.clear();
 });
@@ -98,8 +97,12 @@ snowboy.on("hotword",function(index, hotword, buffer){
 });
 
 module.exports={
+    setRecorder:function(_recorder){
+        recorder=_recorder;
+    },
     start:function(){
         var client=new DcsClient({recorder:recorder});
+        snowboy.start(recorder.start().out());
         controller.setClient(client);
     },
     controller:controller
