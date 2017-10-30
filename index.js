@@ -83,7 +83,7 @@ snowboy.on("silence",()=>{
 snowboy.on("sound",(buffer)=>{
     bm.add(buffer);
 });
-snowboy.on("hotword",function(index, hotword, buffer){
+function onWakeup(index, hotword, buffer){
     console.log("hotword "+index);
     bm.add(buffer);
     fs.writeFileSync("wake.pcm",bm.toBuffer());
@@ -96,11 +96,15 @@ snowboy.on("hotword",function(index, hotword, buffer){
             controller.startRecognize();
         });
     }
-});
+}
+snowboy.on("hotword",onWakeup);
 
 module.exports={
     setRecorder:function(_recorder){
         recorder=_recorder;
+    },
+    emitWakeup:function(){
+        onWakeup(1,"小度小度",Buffer.alloc(0));
     },
     start:function(){
         if(config.avs_protocol){
