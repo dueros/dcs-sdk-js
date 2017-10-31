@@ -188,7 +188,7 @@ DcsClient.prototype.sendEvent=function(eventData){
         var headers={
             "Content-Type": "multipart/form-data; boundary="+config.boundary,
             "Host": config.host, 
-            //"SAIYALOGID":logid,
+            "SAIYALOGID":logid,
             "Authorization": "Bearer "+config.oauth_token,
             "DeviceSerialNumber": config.device_id
         };
@@ -328,7 +328,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
     console.log("logid:"+logid);
     var headers={
         "Content-Type": "multipart/form-data; boundary="+config.boundary,
-        //"SAIYALOGID":logid,
+        "SAIYALOGID":logid,
         "Host": config.host, 
         "Authorization": "Bearer "+config.oauth_token,
         "DeviceSerialNumber": config.device_id
