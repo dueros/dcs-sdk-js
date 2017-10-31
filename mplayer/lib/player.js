@@ -38,6 +38,9 @@ Player.prototype = _.extend({
             this.emit('playstop');
             this.spawn();
         }.bind(this));
+        process.on("beforeExit",()=>{
+            instance.kill("SIGKILL");
+        });
 
         this.instance = instance;
     },
