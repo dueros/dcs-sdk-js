@@ -107,6 +107,7 @@ DcsController.prototype.setClient=function(client){
             "SynchronizeState",
             this.getContext()
         ));
+		this.emit("downstream_init");
     });
     this.on("event",(dcs_event)=>{
         if(dcs_event &&dcs_event.event && dcs_event.event.header){
