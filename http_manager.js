@@ -16,6 +16,7 @@
 const BaseManager=require("./base_manager");
 const util = require('util');
 const request = require('request');
+const DcsProtocol=require("./dcs_protocol");
 function HttpManager(){
 }
 util.inherits(HttpManager, BaseManager);
