@@ -183,7 +183,7 @@ function pcm2adpcm(recorder) {
 
 DcsClient.prototype.sendEvent=function(eventData){
     if(eventData){
-        var logid=config.device_id + new Date().getTime()+"_monitor";
+        var logid=config.device_id+"_" + new Date().getTime()+"_monitor";
         console.log("event logid:"+logid);
         var headers={
             "Content-Type": "multipart/form-data; boundary="+config.boundary,
@@ -324,7 +324,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         defaultEncoding: 'binary',
         autoClose: true
     }));
-    var logid=config.device_id + new Date().getTime()+"_monitor";
+    var logid=config.device_id +"_" + new Date().getTime()+"_monitor";
     console.log("voice logid:"+logid);
     var headers={
         "Content-Type": "multipart/form-data; boundary="+config.boundary,

@@ -9,6 +9,9 @@ schema=$(jq -r .schema dcs_config.json)
 host=$(jq -r .host dcs_config.json)
 device_id=$(jq -r .device_id dcs_config.json)
 rec_AUDIODEV=$(jq -r .rec_env.AUDIODEV dcs_config.json)
+
+SAIYALOGID=$(jq -r .device_id dcs_config.json)_dcs_test_$(date +%s)
+echo $SAIYALOGID > last_saiya_logid
 #proxy="--proxy1.0 127.0.0.1:8888"
 
 protocol=$(jq -r .protocol dcs_config.json)
@@ -16,12 +19,12 @@ if [ x$protocol == "xhttp2" ];then
     protocol_param="--http2"
 fi
 
-echo $rec_AUDIODEV
-if [ "x$rec_AUDIODEV" == "xnull" ];then
-    rec -t wav test.wav
-else
-    AUDIODEV="$rec_AUDIODEV" rec -t wav test.wav
-fi
+#echo $rec_AUDIODEV
+#if [ "x$rec_AUDIODEV" == "xnull" ];then
+#    rec -t wav test.wav
+#else
+#    AUDIODEV="$rec_AUDIODEV" rec -t wav test.wav
+#fi
 sox test.wav -t wav -r16000 -c1 -b 16 test_mic.wav
 
 cat >postbody.php <<END
@@ -97,7 +100,7 @@ END
 
 php postbody.php > postbody
 
-curl -k -v -X POST $protocol_param   "$schema$ip$events_uri" -H "Expect:" -H "Host: $host"  -H "Authorization: Bearer $oauth_token" -H "DeviceSerialNumber: $device_id"  -H "Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09" --data-binary @postbody >res.mp3
+curl -k -v -X POST $protocol_param   "$schema$ip$events_uri" -H "SAIYALOGID: $SAIYALOGID" -H "Expect:" -H "Host: $host"  -H "Authorization: Bearer $oauth_token" -H "DeviceSerialNumber: $device_id"  -H "Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09" --data-binary @postbody >res.mp3
 
 php -r '$a=file_get_contents("res.mp3");$a=explode("--___dumi_avs_xuejuntao___",$a);file_put_contents("res1.mp3",$a[2]);'
 php -r '$a=file_get_contents("res.mp3");$a=explode("\r\n",$a,5);file_put_contents("res2.mp3",$a[4]);'

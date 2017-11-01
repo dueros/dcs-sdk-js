@@ -21,6 +21,10 @@ if(fs.existsSync(__dirname+"/"+storageFilename)){
     }
 }
 
+//if(fs.existsSync(__dirname+"/dcs_config.js")){
+//    fs.writeFileSync(__dirname+"/dcs_config.json", JSON.stringify(config,null,2));
+//}
+
 
 module.exports={
     get:function(key){

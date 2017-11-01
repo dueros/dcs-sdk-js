@@ -44,6 +44,12 @@ DownStream.prototype.init=async function(){
     }
     console.log(config.oauth_token);
     this.http2session=http2.connect("https://"+config.ip);
+
+    this.http2session.setTimeout(3600*1000, ()=>{
+        this.state="closed";
+        console.log('downstream session timeout!!!!!!!!');
+        this.init();
+    });
     this.http2session.on("error",()=>{
         this.state="closed";
         console.log('downstream session error!!!!!!!!');
@@ -51,11 +57,14 @@ DownStream.prototype.init=async function(){
     });
     this.http2session.on("close",()=>{
         this.state="closed";
-        console.log('downstream closed!!!!!!!!');
+        console.log('downstream session closed!!!!!!!!');
         this.init();
     });
+    var logid=config.device_id+"_" + new Date().getTime()+"_monitor";
+    console.log("downstream logid:"+logid);
     this.req=this.http2session.request({
         ":path":config.directive_uri,
+        "SAIYALOGID":logid,
         "authorization": "Bearer "+config.oauth_token,
         "deviceSerialNumber": config.device_id
     });
@@ -93,6 +102,9 @@ DownStream.prototype.init=async function(){
         console.log('downstream error!!!!!!!!'+e.toString());
         this.init();
     });
+    this.req.on("streamClosed",()=>{
+        console.log('downstream closed');
+    });
     var d = new Dicer({"boundary":""});
     d.on('error',()=>{
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
@@ -109,14 +121,14 @@ DownStream.prototype.init=async function(){
             d.setBoundary(matches[1]);
         }
         this.req.on("data",(data)=>{
-            console.log(data.toString());
+            //console.log(data.toString());
         });
         let rWrap=new Readable().wrap(this.req);
         rWrap.pipe(d);
     });
     //content-type: multipart/form-data; boundary=___dumi_avs_xuejuntao___
     d.on('part', function(p) {
-        console.log("on part");
+        //console.log("on part");
         var name=null;
         var jsonBody="";
         var response=null;
@@ -124,7 +136,7 @@ DownStream.prototype.init=async function(){
             name=null;
             jsonBody="";
             response=null;
-            console.log(JSON.stringify(header, null, '  '));
+            //console.log(JSON.stringify(header, null, '  '));
             if(header["content-disposition"] ){
                 var matches;
                 if(matches= header["content-disposition"][0].match(/name="(\w+)"/)){
@@ -133,7 +145,7 @@ DownStream.prototype.init=async function(){
             }
             if(header['content-id']){
                 var content_id=header["content-id"][0].replace(/[<>]/g,"");
-                console.log("content_id:"+content_id);
+                //console.log("content_id:"+content_id);
                 file=fs.createWriteStream(__dirname+"/tmp/"+content_id,{
                     flags: 'w',
                     defaultEncoding: 'binary',
@@ -156,14 +168,14 @@ DownStream.prototype.init=async function(){
                     self.emit("directive",response);
                 }
             }
-            console.log(JSON.stringify(response, null, '  '));
+            //console.log(JSON.stringify(response, null, '  '));
         });
         p.on('error',()=>{
             console.log('downstream dicer error, event part error');
         });
     });
     d.on('finish', function() {
-        console.log('End of parts');
+        //console.log('End of parts');
     });
 
 }

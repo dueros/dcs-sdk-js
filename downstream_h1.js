@@ -23,9 +23,12 @@ DownStream.prototype.init=function(){
     }
     this.state="connecting";
     console.log(config.oauth_token);
+    var logid=config.device_id+"_" + new Date().getTime()+"_monitor";
+    console.log("downstream logid:"+logid);
     this.req=request.get({
         "url":config.schema+config.ip+config.directive_uri ,
         headers:{
+            "SAIYALOGID":logid,
             "Host": config.host, 
             "Authorization": "Bearer "+config.oauth_token,
             "DeviceSerialNumber": config.device_id
