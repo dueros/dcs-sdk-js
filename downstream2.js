@@ -26,13 +26,6 @@ DownStream.prototype.init=async function(){
     if(this.state=="connecting"){
         return;
     }
-    if(this.req){
-        try{
-            this.req.rstWithCancel();
-        }catch(e){
-        }
-        this.req=null;
-    }
     if(this.http2session){
         try{
             this.http2session.shutdown({graceful:true});
@@ -41,6 +34,13 @@ DownStream.prototype.init=async function(){
         await new Promise((resolve,reject)=>{
             setTimeout( resolve ,1000);
         });
+    }
+    if(this.req){
+        try{
+            this.req.rstWithCancel();
+        }catch(e){
+        }
+        this.req=null;
     }
     console.log(config.oauth_token);
     this.http2session=http2.connect("https://"+config.ip);
