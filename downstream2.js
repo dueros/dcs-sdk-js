@@ -113,6 +113,7 @@ DownStream.prototype.init=async function(){
     this.req.on('response', (headers) => {
         this.state="connected";
         console.log("downstream created!");
+        this.emit("downstream_created");
         if(!headers['content-type']){
             throw new Exception("server header error: no content-type");
         }

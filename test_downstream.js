@@ -4,27 +4,34 @@ const child_process=require("child_process");
 
 let d=new DownStream();
 let child;
-let exitTimeoutId;
+let recvStopListen;
 
 d.on("directive",(response)=>{
     console.log("directive!!",response.directive.header.name);
     if(response.directive.header.name=="StopListen"){
-        clearTimeout(exitTimeoutId);
+        recvStopListen=true;
         child.kill("SIGKILL");
     }
 });
-
-let intervalId=setInterval(()=>{
+function test(){
     d.init();
-    child=child_process.spawn("/bin/sh",["dcs_test.sh"]);
-        //child.stdout.pipe(process.stdout);
-        //child.stderr.pipe(process.stderr);
-        //child_process.exec("sh -c dcs_test.sh");
-    exitTimeoutId=setTimeout(()=>{
-        console.log(new Date(),"no stopListen");
-        clearInterval(intervalId);
-        //process.exit(-1);
-    },4000);
+    d.once("downstream_created",()=>{
+        child=child_process.spawn("/bin/sh",["dcs_test.sh"]);
+            //child.stdout.pipe(process.stdout);
+            //child.stderr.pipe(process.stderr);
+            //child_process.exec("sh -c dcs_test.sh");
+        setTimeout(()=>{
+            if(!recvStopListen){
+                console.log(new Date(),"no stopListen");
+                return;
+            }
+            recvStopListen=false;
+            test();
+            //process.exit(-1);
+        },4000);
+    });
+}
+test();
     /*
     let req=d.http2session.request({
         ":path":config.directive_uri,
@@ -44,7 +51,6 @@ let intervalId=setInterval(()=>{
         req.rstWithCancel();
     },1000);;
     */
-},5000);
 /*
 setInterval(()=>{
     d.init();
