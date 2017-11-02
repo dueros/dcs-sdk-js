@@ -45,11 +45,6 @@ DownStream.prototype.init=async function(){
     console.log(config.oauth_token);
     this.http2session=http2.connect("https://"+config.ip);
 
-    this.http2session.setTimeout(3600*1000, ()=>{
-        this.state="closed";
-        console.log('downstream session timeout!!!!!!!!');
-        this.init();
-    });
     this.http2session.on("error",()=>{
         this.state="closed";
         console.log('downstream session error!!!!!!!!');
