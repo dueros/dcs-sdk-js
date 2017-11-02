@@ -68,6 +68,12 @@ DownStream.prototype.init=async function(){
         "authorization": "Bearer "+config.oauth_token,
         "deviceSerialNumber": config.device_id
     });
+    this.http2session.setTimeout(0, () =>{
+        console.log("downstream session timeout");
+    });
+    this.req.setTimeout(0, () =>{
+        console.log("downstream stream timeout");
+    });
     this.state="connecting";
     if(this.pingInterval){
         clearInterval(this.pingInterval);
