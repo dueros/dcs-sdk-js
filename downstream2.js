@@ -140,6 +140,12 @@ DownStream.prototype.init=async function(){
             //console.log(data.toString());
         });
         let rWrap=new Readable().wrap(this.req);
+        rWrap.pipe(fs.createWriteStream(__dirname+"/tmp/ds"+logid,{
+                flags: 'w',
+                defaultEncoding: 'binary',
+                autoClose: true
+            })
+        );
         rWrap.pipe(d);
     });
     //content-type: multipart/form-data; boundary=___dumi_avs_xuejuntao___
@@ -162,11 +168,6 @@ DownStream.prototype.init=async function(){
             if(header['content-id']){
                 var content_id=header["content-id"][0].replace(/[<>]/g,"");
                 //console.log("content_id:"+content_id);
-                file=fs.createWriteStream(__dirname+"/tmp/"+content_id,{
-                    flags: 'w',
-                    defaultEncoding: 'binary',
-                    autoClose: true
-                });
                 self.emit("content",content_id,p);
             }
         });

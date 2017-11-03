@@ -75,11 +75,6 @@ DownStream.prototype.init=function(){
             if(header['content-id']){
                 var content_id=header["content-id"][0].replace(/[<>]/g,"");
                 console.log("content_id:"+content_id);
-                file=fs.createWriteStream(__dirname+"/tmp/"+content_id,{
-                    flags: 'w',
-                    defaultEncoding: 'binary',
-                    autoClose: true
-                });
                 self.emit("content",content_id,p);
             }
         });
