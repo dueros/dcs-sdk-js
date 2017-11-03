@@ -26,21 +26,35 @@ DownStream.prototype.init=async function(){
     if(this.state=="connecting"){
         return;
     }
-    if(this.http2session){
-        try{
-            this.http2session.shutdown({graceful:true});
-        }catch(e){
-        }
-        await new Promise((resolve,reject)=>{
-            setTimeout( resolve ,1000);
-        });
-    }
+    
     if(this.req){
         try{
             this.req.rstWithCancel();
         }catch(e){
         }
         this.req=null;
+    }
+    
+    if(this.pingInterval){
+        clearInterval(this.pingInterval);
+        if(this.pingReq){
+            try{
+                this.pingReq.rstWithCancel();
+            }catch(e){
+            }
+            this.pingReq=null;
+        }
+    }
+    
+    if(this.http2session){
+        try{
+            this.http2session.shutdown({graceful:true});
+        }catch(e){
+        }
+        this.http2session=null;
+        await new Promise((resolve,reject)=>{
+            setTimeout( resolve ,1000);
+        });
     }
     console.log(config.oauth_token);
     this.http2session=http2.connect("https://"+config.ip);
@@ -78,7 +92,7 @@ DownStream.prototype.init=async function(){
             console.log('downstream ping error, stream closed');
             return;
         }
-        var req=this.http2session.request({
+        var req=this.pingReq=this.http2session.request({
             ":path":config.ping_uri ,
             "authorization": "Bearer "+config.oauth_token,
             "deviceSerialNumber": config.device_id
@@ -106,7 +120,7 @@ DownStream.prototype.init=async function(){
     this.req.on("streamClosed",()=>{
         console.log('downstream closed');
     });
-    var d = new Dicer({"boundary":""});
+    var d =this.dicer = new Dicer({"boundary":""});
     d.on('error',()=>{
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
         this.init();
