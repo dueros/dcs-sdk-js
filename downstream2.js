@@ -62,7 +62,6 @@ DownStream.prototype.init=async function(){
     this.http2session.on("error",()=>{
         this.state="closed";
         console.log('downstream session error!!!!!!!!');
-        this.init();
     });
     this.http2session.on("close",()=>{
         this.state="closed";
@@ -115,15 +114,14 @@ DownStream.prototype.init=async function(){
     },5000);
     this.req.on("error",(e)=>{
         console.log('downstream error!!!!!!!!'+e.toString());
-        this.init();
     });
     this.req.on("streamClosed",()=>{
         console.log('downstream closed');
+        this.init();
     });
     var d =this.dicer = new Dicer({"boundary":""});
     d.on('error',()=>{
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
-        this.init();
     });
     this.req.on('response', (headers) => {
         this.state="connected";
