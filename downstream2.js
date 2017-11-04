@@ -100,6 +100,15 @@ DownStream.prototype.init=async function(){
             "authorization": "Bearer "+config.oauth_token,
             "deviceSerialNumber": config.device_id
         });
+        req.setTimeout(5000, () => {
+            console.log("downstream ping timeout");
+            if(!req.destroyed){
+                req.rstWithCancel();
+            }
+            if(this.req && !this.req.destroyed){
+                this.req.rstWithCancel();
+            }
+        });
         req.on("response",(headers)=>{
             //console.log(headers[':status']);
             if(headers[':status']!=200){
