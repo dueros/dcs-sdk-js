@@ -67,7 +67,7 @@ DownStream.prototype.init=async function(){
         this.state="closed";
         this.emit("sessionClosed");
         console.log('downstream session closed!!!!!!!!');
-        this.init();
+        //this.init();
     });
     var logid=config.device_id+"_" + new Date().getTime()+"_monitor";
     console.log("downstream logid:"+logid);
@@ -90,6 +90,9 @@ DownStream.prototype.init=async function(){
     this.pingInterval=setInterval(()=>{
         if(!this.http2session || this.http2session.aborted || this.http2session.destroyed){
             console.log('downstream ping error, stream closed');
+            if(this.pingInterval){
+                this.clearInterval(this.pingInterval);
+            }
             return;
         }
         var req=this.pingReq=this.http2session.request({
@@ -100,7 +103,8 @@ DownStream.prototype.init=async function(){
         req.on("response",(headers)=>{
             //console.log(headers[':status']);
             if(headers[':status']!=200){
-                this.init();
+                console.log("ping status error!!",headers);
+                //this.init();
             }
         });
         setTimeout(()=>{
@@ -110,7 +114,7 @@ DownStream.prototype.init=async function(){
         },5000);
         req.on("error",(e)=>{
             console.log('downstream ping error!!!!!!!!'+e.toString());
-            this.init();
+            //this.init();
         });
     },5000);
     this.req.on("error",(e)=>{
@@ -126,6 +130,9 @@ DownStream.prototype.init=async function(){
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');
     });
     this.req.on('response', (headers) => {
+        if(!this.req){
+            return;
+        }
         this.state="connected";
         console.log("downstream created!");
         this.emit("downstream_created");
