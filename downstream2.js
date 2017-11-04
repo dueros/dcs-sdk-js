@@ -65,6 +65,7 @@ DownStream.prototype.init=async function(){
     });
     this.http2session.on("close",()=>{
         this.state="closed";
+        this.emit("sessionClosed");
         console.log('downstream session closed!!!!!!!!');
         this.init();
     });
@@ -116,6 +117,7 @@ DownStream.prototype.init=async function(){
         console.log('downstream error!!!!!!!!'+e.toString());
     });
     this.req.on("streamClosed",()=>{
+        this.emit("streamClosed");
         console.log('downstream closed');
         this.init();
     });
