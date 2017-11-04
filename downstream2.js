@@ -91,7 +91,7 @@ DownStream.prototype.init=async function(){
         if(!this.http2session || this.http2session.aborted || this.http2session.destroyed){
             console.log('downstream ping error, stream closed');
             if(this.pingInterval){
-                this.clearInterval(this.pingInterval);
+                clearInterval(this.pingInterval);
             }
             return;
         }

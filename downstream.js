@@ -4,7 +4,7 @@ const util = require('util');
 const request=require("request");
 const config=require("./config.js").getAll();
 const Readable = require('stream').Readable;
-const http2=require("http2");
+const http2=require("./node_modules/http2");
 const fs = require('fs');
 const Dicer = require('dicer');
 
@@ -53,6 +53,10 @@ DownStream.prototype.init=function(){
             if(response.statusCode!=200){
                 this.init();
             }
+        });
+        req.setTimeout(5000,()=>{
+            console.log('downstream ping timeout');
+            req.abort();
         });
         req.on("error",(e)=>{
             console.log('downstream ping error!!!!!!!!'+e.toString());
