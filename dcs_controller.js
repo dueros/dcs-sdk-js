@@ -221,7 +221,9 @@ DcsController.prototype.deQueue=function(){
 };
 
 DcsController.prototype.setAccessToken=function(access_token){
-    if(access_token){
+    console.log("new access_token:",access_token);
+    console.log("old access_token:",config.oauth_token);
+    if(access_token && config.oauth_token != access_token){
         configModule.save("oauth_token",access_token);
         config.oauth_token=access_token;
         if(this.client){

@@ -99,6 +99,7 @@ function onWakeup(index, hotword, buffer){
 }
 snowboy.on("hotword",onWakeup);
 
+let started=false;
 module.exports={
     setRecorder:function(_recorder){
         recorder=_recorder;
@@ -106,7 +107,14 @@ module.exports={
     emitWakeup:function(){
         onWakeup(1,"小度小度",Buffer.alloc(0));
     },
+    isStarted:function(){
+        return started;
+    },
     start:function(){
+        if(started){
+            return;
+        }
+        started=true;
         if(config.avs_protocol){
             console.log("use avs!!");
             configModule.set("directive_uri",config.avs_directive_uri);
