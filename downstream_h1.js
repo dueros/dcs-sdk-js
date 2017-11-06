@@ -31,7 +31,7 @@ DownStream.prototype.init=function(){
             "SAIYALOGID":logid,
             "Host": config.host, 
             "Authorization": "Bearer "+config.oauth_token,
-            "DeviceSerialNumber": config.device_id
+            "Dueros-Device-Id": config.device_id
         }
     });
     this.req.on("error",()=>{
@@ -47,7 +47,8 @@ DownStream.prototype.init=function(){
         console.log("downstream created!");
         this.emit("init",response);
         if(!response.headers['content-type']){
-            throw new Exception("server header error: no content-type");
+            console.log(response.headers);
+            throw new Error("server header error: no content-type");
         }
         var matches=response.headers['content-type'].match(/boundary=([^;]*)/);
         if(matches&&matches[1]){

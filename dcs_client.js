@@ -190,7 +190,7 @@ DcsClient.prototype.sendEvent=function(eventData){
             "Host": config.host, 
             "SAIYALOGID":logid,
             "Authorization": "Bearer "+config.oauth_token,
-            "DeviceSerialNumber": config.device_id
+            "Dueros-Device-Id": config.device_id
         };
         if(config.event_header){
             Object.assign(headers,config.event_header);
@@ -331,7 +331,7 @@ DcsClient.prototype.startRecognize=function(eventData,wakeWordPcm){
         "SAIYALOGID":logid,
         "Host": config.host, 
         "Authorization": "Bearer "+config.oauth_token,
-        "DeviceSerialNumber": config.device_id
+        "Dueros-Device-Id": config.device_id
     };
     if(config.event_header){
         Object.assign(headers,config.event_header);

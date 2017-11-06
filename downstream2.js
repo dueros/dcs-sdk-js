@@ -75,7 +75,7 @@ DownStream.prototype.init=async function(){
         ":path":config.directive_uri,
         "SAIYALOGID":logid,
         "authorization": "Bearer "+config.oauth_token,
-        "deviceSerialNumber": config.device_id
+        "Dueros-Device-Id": config.device_id
     });
     this.http2session.setTimeout(0, () =>{
         console.log("downstream session timeout");
@@ -98,7 +98,7 @@ DownStream.prototype.init=async function(){
         var req=this.pingReq=this.http2session.request({
             ":path":config.ping_uri ,
             "authorization": "Bearer "+config.oauth_token,
-            "deviceSerialNumber": config.device_id
+            "Dueros-Device-Id": config.device_id
         });
         req.setTimeout(5000, () => {
             console.log("downstream ping timeout");
