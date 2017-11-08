@@ -13,6 +13,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+
+const config=require("./config.js").getAll();
+
 function createEvent(namespace,name, context,_payload){
     var payload={};
     if(_payload){
@@ -40,6 +43,9 @@ function createEvent(namespace,name, context,_payload){
             "payload" : payload
         },
     };
+    if(config.debug){
+        eventData.debug=config.debug;
+    }
     if(context){
         eventData.clientContext=context;
     }
@@ -60,6 +66,9 @@ function createRecognizeEvent(options){
             }
         },
     };
+    if(config.debug){
+        ev.debug=config.debug;
+    }
     if(options && options.initiator){
         ev.event.payload.initiator=options.initiator;
     }
