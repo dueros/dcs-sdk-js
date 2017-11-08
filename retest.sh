@@ -10,7 +10,7 @@ rec_AUDIODEV=$(jq -r .rec_env.AUDIODEV dcs_config.json)
 
 php postbody.php > postbody
 
-curl -k -v -X POST $protocol_param   "$schema$ip$events_uri" -H "Expect:" -H "Host: $host"  -H "Authorization: Bearer $oauth_token" -H "DeviceSerialNumber: $device_id"  -H "Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09" --data-binary @postbody >res.mp3
+curl -k -v -X POST $protocol_param   "$schema$ip$events_uri" -H "Expect:" -H "Host: $host"  -H "Authorization: Bearer $oauth_token" -H "Dueros-Device-Id: $device_id"  -H "Content-Type: multipart/form-data; boundary=----------------------------4ebf00fbcf09" --data-binary @postbody >res.mp3
 
 php -r '$a=file_get_contents("res.mp3");$a=explode("--___dumi_avs_xuejuntao___",$a);file_put_contents("res1.mp3",$a[2]);'
 php -r '$a=file_get_contents("res.mp3");$a=explode("\r\n",$a,5);file_put_contents("res2.mp3",$a[4]);'

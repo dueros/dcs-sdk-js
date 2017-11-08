@@ -33,7 +33,7 @@ DownStream.prototype.init=function(){
         headers:{
             "SAIYALOGID":logid,
             "Authorization": "Bearer "+config.oauth_token,
-            "DeviceSerialNumber": config.device_id
+            "Dueros-Device-Id": config.device_id
         }
     });
     if(this.pingInterval){
@@ -46,7 +46,7 @@ DownStream.prototype.init=function(){
             "path":config.ping_uri,
             headers:{
                 "Authorization": "Bearer "+config.oauth_token,
-                "DeviceSerialNumber": config.device_id
+                "Dueros-Device-Id": config.device_id
             }
         },(response)=>{
             //console.log(response.statusCode);

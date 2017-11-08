@@ -75,7 +75,15 @@ DownStream.prototype.init=async function(){
         ":path":config.directive_uri,
         "SAIYALOGID":logid,
         "authorization": "Bearer "+config.oauth_token,
-        "deviceSerialNumber": config.device_id
+        "Dueros-Device-Id": config.device_id
+    });
+    this.req.on("error",(e)=>{
+        console.log('downstream error!!!!!!!!'+e.toString());
+    });
+    this.req.on("streamClosed",()=>{
+        this.emit("streamClosed");
+        console.log('downstream closed');
+        this.init();
     });
     this.http2session.setTimeout(0, () =>{
         console.log("downstream session timeout");
@@ -98,7 +106,7 @@ DownStream.prototype.init=async function(){
         var req=this.pingReq=this.http2session.request({
             ":path":config.ping_uri ,
             "authorization": "Bearer "+config.oauth_token,
-            "deviceSerialNumber": config.device_id
+            "Dueros-Device-Id": config.device_id
         });
         req.setTimeout(5000, () => {
             console.log("downstream ping timeout");
@@ -126,14 +134,6 @@ DownStream.prototype.init=async function(){
             //this.init();
         });
     },5000);
-    this.req.on("error",(e)=>{
-        console.log('downstream error!!!!!!!!'+e.toString());
-    });
-    this.req.on("streamClosed",()=>{
-        this.emit("streamClosed");
-        console.log('downstream closed');
-        this.init();
-    });
     var d =this.dicer = new Dicer({"boundary":""});
     d.on('error',()=>{
         console.log('downstream dicer error, no multi part in downstream!!!!!!!!');

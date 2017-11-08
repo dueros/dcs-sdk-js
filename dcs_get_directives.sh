@@ -13,6 +13,6 @@ if [ x$protocol == "xhttp2" ];then
     protocol_param="--http2"
 fi
 
-curl2 -k -v $protocol_param   "$schema$ip$directive_uri" -H "Host: $host"  -H "Authorization: Bearer $oauth_token" -H "DeviceSerialNumber: $device_id"
-#curl2 -k -v  "http://nj03-rp-m22nlp159.nj03.baidu.com:8998$directive_uri" -H "Host: avs-dumi-na.baidu.com"  -H "Authorization: Bearer $oauth_token" -H "DeviceSerialNumber: luoxing_dumi_xxxxxxx"
+curl2 -k -v $protocol_param   "$schema$ip$directive_uri" -H "Host: $host"  -H "Authorization: Bearer $oauth_token" -H "Dueros-Device-Id: $device_id"
+#curl2 -k -v  "http://nj03-rp-m22nlp159.nj03.baidu.com:8998$directive_uri" -H "Host: avs-dumi-na.baidu.com"  -H "Authorization: Bearer $oauth_token" -H "Dueros-Device-Id: luoxing_dumi_xxxxxxx"
 
