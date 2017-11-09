@@ -189,6 +189,11 @@ DcsClient.prototype.sendEvent=function(eventData){
             //console.log("event response:"+body);
         });
         var rWrap=processEventRequest.call(this,r);
+        rWrap.pipe(fs.createWriteStream("test1.log",{
+            flags: 'w',
+            defaultEncoding: 'binary',
+            autoClose: true
+        }));
         rWrap.on("error",(error)=>{
             console.log("event upload error");
         });
@@ -236,7 +241,7 @@ function processEventRequest (r){
 
     d1.on('part', (p) => {
         var name=null;
-        var jsonBody="";
+        var jsonBody=new BufferManager();
         var response=null;
         var content_id;
         p.on('header', (header)=> {
@@ -261,13 +266,13 @@ function processEventRequest (r){
         });
         p.on('data', function(data) {
             if(name=="metadata"){
-                jsonBody+=data.toString("utf8");
+                jsonBody.add(data);
             }
         });
         p.on('end', ()=>{
             content_id=null;
             if(name=='metadata'){
-                response=JSON.parse(jsonBody);
+                response=JSON.parse(jsonBody.toBuffer().toString("utf8"));
                 this.emit("directive",response);
                 //console.log(JSON.stringify(response, null, '  '));
             }
