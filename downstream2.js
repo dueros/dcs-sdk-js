@@ -7,6 +7,7 @@ const Readable = require('stream').Readable;
 const http2=require("http2");
 const fs = require('fs');
 const Dicer = require('dicer');
+const BufferManager=require("./wakeup/buffermanager").BufferManager;
 
 function DownStream(){
     EventEmitter.call(this);
@@ -168,11 +169,11 @@ DownStream.prototype.init=async function(){
     d.on('part', function(p) {
         //console.log("on part");
         var name=null;
-        var jsonBody="";
+        var jsonBody=new BufferManager();
         var response=null;
         p.on('header', function(header) {
             name=null;
-            jsonBody="";
+            jsonBody.clear();
             response=null;
             //console.log(JSON.stringify(header, null, '  '));
             if(header["content-disposition"] ){
@@ -189,13 +190,13 @@ DownStream.prototype.init=async function(){
         });
         p.on('data', function(data) {
             if(name=="metadata"){
-                jsonBody+=data.toString("utf8");
+                jsonBody.add(data);
             }
         });
         p.on('end', function() {
             if(jsonBody){
                 try{
-                    response=JSON.parse(jsonBody);
+                    response=JSON.parse(jsonBody.toBuffer().toString("utf8"));
                 }catch(e){}
                 if(response){
                     self.emit("directive",response);
