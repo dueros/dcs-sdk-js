@@ -13,66 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const BaseManager=require("./base_manager");
+const BaseManager = require("./base_manager");
 const util = require('util');
 const request = require('request');
-const DcsProtocol=require("./dcs_protocol");
-function HttpManager(){
-}
+const DcsProtocol = require("./dcs_protocol");
+
+function HttpManager() {}
 util.inherits(HttpManager, BaseManager);
-var handlers={
-    "DoHttpRequest":function(directive,controller){
-        let params={};
-        let token=directive.payload.token;
-        params.url=directive.payload.url;
-        if(directive.payload.headers){
-            params.headers=directive.payload.headers;
+var handlers = {
+    "DoHttpRequest": function(directive, controller) {
+        let params = {};
+        let token = directive.payload.token;
+        params.url = directive.payload.url;
+        if (directive.payload.headers) {
+            params.headers = directive.payload.headers;
         }
-        if(directive.payload.body && directive.payload.body.data){
+        if (directive.payload.body && directive.payload.body.data) {
             //TODO
-            params.body=directive.payload.body.data;
+            params.body = directive.payload.body.data;
         }
-        if(directive.payload.method){
-            params.method=directive.payload.method.toLocaleLowerCase();
+        if (directive.payload.method) {
+            params.method = directive.payload.method.toLocaleLowerCase();
         }
-        request(params,function(error, response, body){
-            if(error){
-                controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.http","HttpRequestFailed",controller.getContext(),
-                    {
-                        token:token,
-                        reason:"OTHER",
-                        messageId:""+error,
-                    }));
+        request(params, function(error, response, body) {
+            if (error) {
+                controller.emit("event", DcsProtocol.createEvent("ai.dueros.device_interface.http", "HttpRequestFailed", controller.getContext(), {
+                    token: token,
+                    reason: "OTHER",
+                    messageId: "" + error,
+                }));
                 return;
             }
 
-            controller.emit("event",DcsProtocol.createEvent("ai.dueros.device_interface.http","HttpRequestSucceeded",controller.getContext(),
-                {
-                    token:token,
-                    code:""+response.statusCode,
-                    headers:response.headers,
-                    body:{
-                        dataType:"TEXT",
-                        data:body
-                    }
-                }));
+            controller.emit("event", DcsProtocol.createEvent("ai.dueros.device_interface.http", "HttpRequestSucceeded", controller.getContext(), {
+                token: token,
+                code: "" + response.statusCode,
+                headers: response.headers,
+                body: {
+                    dataType: "TEXT",
+                    data: body
+                }
+            }));
         });
     },
 };
-HttpManager.prototype.getContext=function(){
-    return ;
+HttpManager.prototype.getContext = function() {
+    return;
 };
-HttpManager.prototype.NAMESPACE="ai.dueros.device_interface.http";
-HttpManager.prototype.handleDirective=function (directive, controller){
-    if(directive.header.namespace!=this.NAMESPACE){
+HttpManager.prototype.NAMESPACE = "ai.dueros.device_interface.http";
+HttpManager.prototype.handleDirective = function(directive, controller) {
+    if (directive.header.namespace != this.NAMESPACE) {
         return;
     }
-    var name=directive.header.name;
-    if(handlers[name]){
-        handlers[name].call(this,directive,controller);
+    var name = directive.header.name;
+    if (handlers[name]) {
+        handlers[name].call(this, directive, controller);
     }
 }
 
-module.exports=HttpManager;
-
-
+module.exports = HttpManager;

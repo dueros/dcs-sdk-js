@@ -1,5 +1,7 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 const stream = require("stream");
 const path = require("path");
 const fs = require("fs");
@@ -7,13 +9,13 @@ const binary = require("node-pre-gyp");
 const bindingPath = binary.find(path.resolve(path.join(__dirname, '../../package.json')));
 const SnowboyDetectNative = require(bindingPath).SnowboyDetect;
 var DetectionResult;
-(function (DetectionResult) {
+(function(DetectionResult) {
     DetectionResult[DetectionResult["SILENCE"] = -2] = "SILENCE";
     DetectionResult[DetectionResult["ERROR"] = -1] = "ERROR";
     DetectionResult[DetectionResult["SOUND"] = 0] = "SOUND";
 })(DetectionResult || (DetectionResult = {}));
 var ModelType;
-(function (ModelType) {
+(function(ModelType) {
     ModelType[ModelType["PMDL"] = 0] = "PMDL";
     ModelType[ModelType["UMDL"] = 1] = "UMDL";
 })(ModelType || (ModelType = {}));

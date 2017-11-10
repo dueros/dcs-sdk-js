@@ -18,7 +18,7 @@ var MPlayer = function(options) {
     };
 
     this.player.once('ready', function() {
-        if(options.verbose) {
+        if (options.verbose) {
             console.log('player.ready');
         }
         this.emit('ready');
@@ -26,28 +26,28 @@ var MPlayer = function(options) {
 
     this.player.on('statuschange', function(status) {
         this.status = _.extend(this.status, status);
-        if(options.verbose) {
+        if (options.verbose) {
             console.log('player.status', this.status);
         }
         this.emit('status', this.status);
     }.bind(this));
 
     this.player.on('playstart', function() {
-        if(options.verbose) {
+        if (options.verbose) {
             console.log('player.start');
         }
         this.emit('start');
     }.bind(this));
 
     this.player.on('playstop', function() {
-        if(options.verbose) {
+        if (options.verbose) {
             console.log('player.stop');
         }
         this.emit('stop')
     }.bind(this));
-    
+
     this.player.on('playfinished', function() {
-        if(options.verbose) {
+        if (options.verbose) {
             console.log('player.finished');
         }
         this.emit('finished')
@@ -62,21 +62,21 @@ var MPlayer = function(options) {
             paused = true;
             this.status.playing = false;
             this.emit('pause');
-            if(options.verbose) {
+            if (options.verbose) {
                 console.log('player.pause');
             }
         }.bind(this), 100);
-        if(paused) {
+        if (paused) {
             paused = false;
             this.status.playing = true;
             this.emit('play');
-            if(options.verbose) {
+            if (options.verbose) {
                 console.log('player.play');
             }
         }
         this.status.position = time;
         this.emit('time', time);
-        if(options.verbose) {
+        if (options.verbose) {
             console.log('player.time', time);
         }
     }.bind(this));
@@ -84,7 +84,7 @@ var MPlayer = function(options) {
 
 MPlayer.prototype = _.extend({
     setOptions: function(options) {
-        if(options && options.length) {
+        if (options && options.length) {
             options.forEach(function(value, key) {
                 this.player.cmd('set_property', [key, value]);
             }.bind(this));
@@ -107,13 +107,13 @@ MPlayer.prototype = _.extend({
         this.status.playing = true;
     },
     play: function() {
-        if(!this.status.playing) {
+        if (!this.status.playing) {
             this.player.cmd('pause');
             this.status.playing = true;
         }
     },
     pause: function() {
-        if(this.status.playing) {
+        if (this.status.playing) {
             this.player.cmd('pause');
             this.status.playing = false;
         }

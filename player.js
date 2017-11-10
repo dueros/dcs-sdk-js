@@ -1,35 +1,35 @@
 /*
-* Copyright (c) 2017 Baidu, Inc. All Rights Reserved.
-* 
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-*   http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-const EventEmitter=require("events");
+ * Copyright (c) 2017 Baidu, Inc. All Rights Reserved.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+const EventEmitter = require("events");
 const util = require('util');
 const MPlayer = require('./mplayer/index.js');
 
-function Player(options){
+function Player(options) {
     this.mplayer = new MPlayer(options);
     //,"play","pause" //很奇怪，树莓派会不停的触发这两个事件
-    ["ready","time","start","stop","status","finished"].forEach((eventName)=>{
-        this.mplayer.on(eventName,(...args)=>{
-            if(eventName!="time"){
-                console.log("mplayer event "+eventName);
+    ["ready", "time", "start", "stop", "status", "finished"].forEach((eventName) => {
+        this.mplayer.on(eventName, (...args) => {
+            if (eventName != "time") {
+                console.log("mplayer event " + eventName);
             }
-            if(eventName=="status"){
-                this.currentStatus=args[0];
+            if (eventName == "status") {
+                this.currentStatus = args[0];
                 console.log(JSON.stringify(args));
             }
-            this.emit(eventName,...args);
+            this.emit(eventName, ...args);
         });
     });
 }
@@ -62,23 +62,23 @@ util.inherits(Player, EventEmitter);
 //adjustSubtitles(< Number > seconds) - adjust the subtitles timing by +/- seconds
 //adjustAudio(< Number > seconds) - adjust the audio timing by +/- seconds
 
-Player.prototype.isPlaying=function(){
-    if(this.currentStatus){
+Player.prototype.isPlaying = function() {
+    if (this.currentStatus) {
         return this.currentStatus['playing'];
     }
     return false;
 };
 
-["setOptions","openFile","play","pause","stop","next","previous","seek","seekPercent","volume","mute"].forEach((funcName)=>{
-    Player.prototype[funcName]=function(...args){
-        console.log("mplayer directive "+funcName);
-        if(funcName=="openFile"){
+["setOptions", "openFile", "play", "pause", "stop", "next", "previous", "seek", "seekPercent", "volume", "mute"].forEach((funcName) => {
+    Player.prototype[funcName] = function(...args) {
+        console.log("mplayer directive " + funcName);
+        if (funcName == "openFile") {
             console.log(JSON.stringify(args));
         }
-        if(funcName=="stop"){
-            this._status="stopping";
+        if (funcName == "stop") {
+            this._status = "stopping";
         }
         this.mplayer[funcName](...args);
     };
 });
-module.exports=Player;
+module.exports = Player;
