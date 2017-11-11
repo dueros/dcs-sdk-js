@@ -139,7 +139,7 @@ module.exports = {
 }
 if (require.main === module) {
     module.exports.start();
-    process.on('uncaughtException', () => {
-        console.log("uncaughtException");
+    process.on('uncaughtException', (e) => {
+        console.log(e);
     });
 }

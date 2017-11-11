@@ -1,5 +1,6 @@
 alias curl2=~/local/bin/curl
 
+node -e 'let c=require("./config").getAll();console.log(c);' > dcs_config.json
 ip=$(jq -r .ip dcs_config.json)
 oauth_token=$(jq -r .oauth_token dcs_config.json)
 directive_uri=$(jq -r .directive_uri dcs_config.json)
