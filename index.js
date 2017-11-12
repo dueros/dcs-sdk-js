@@ -93,7 +93,9 @@ function onWakeup(index, hotword, buffer) {
         controller.startRecognize();
     } else {
         var cmd = config.play_cmd + " -t wav '" + __dirname + "/nihao.wav'";
-        child_process.exec(cmd, () => {
+        child_process.exec(cmd,{
+            env: config.play_env,
+        }, () => {
             controller.startRecognize();
         });
     }

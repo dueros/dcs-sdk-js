@@ -16,12 +16,13 @@
 const BaseManager = require("./base_manager");
 const util = require('util');
 const Player = require("./player");
+const config = require("./config").getAll();
 const DcsProtocol = require("./dcs_protocol");
 
 function AudioPlayerManager(controller) {
     this.playlist = [];
     //  this.player=new Player({debug:1});
-    this.player = new Player();
+    this.player = new Player(config.mplayer_options);
     this.player.on("stop", () => {
         controller.emit("event",
             DcsProtocol.createEvent(this.NAMESPACE, "PlaybackStopped", controller.getContext(), {
