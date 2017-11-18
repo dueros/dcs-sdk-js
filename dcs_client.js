@@ -158,42 +158,45 @@ function pcm2adpcm(recorder) {
 }
 
 DcsClient.prototype.sendEvent = function(eventData) {
-    if (eventData) {
-        var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
-        console.log("event logid:" + logid);
-        let form_data=new FormData();
-        var headers = {
-            "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
-            "SAIYALOGID": logid,
-            "Authorization": "Bearer " + config.oauth_token,
-            "Dueros-Device-Id": config.device_id
-        };
-        if (config.event_header) {
-            Object.assign(headers, config.event_header);
-        }
-        form_data.append("metadata",JSON.stringify(eventData),{
-            "contentType":'application/json; charset=UTF-8'
-        });
-
-        var r = request({
-            http2session:this.downstream.http2session,
-            url: config.schema + config.ip + config.events_uri,
-            method: "post",
-            headers: headers
-        });
-        form_data.pipe(r);
-        var rWrap = processEventRequest.call(this, r);
-        /*
-        rWrap.pipe(fs.createWriteStream("test1.log", {
-            flags: 'w',
-            defaultEncoding: 'binary',
-            autoClose: true
-        }));
-        */
-        rWrap.on("error", (error) => {
-            console.log("event upload error");
-        });
+    if (!eventData) {
+        console.error("no send event data");
+        return;
     }
+    
+    let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
+    console.log("event logid:" + logid);
+    let form_data=new FormData();
+    let headers = {
+        "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
+        "SAIYALOGID": logid,
+        "Authorization": "Bearer " + config.oauth_token,
+        "Dueros-Device-Id": config.device_id
+    };
+    if (config.event_header) {
+        Object.assign(headers, config.event_header);
+    }
+    form_data.append("metadata",JSON.stringify(eventData),{
+        "contentType":'application/json; charset=UTF-8'
+    });
+
+    let r = request({
+        http2session:this.downstream.http2session,
+        url: config.schema + config.ip + config.events_uri,
+        method: "post",
+        headers: headers
+    });
+    form_data.pipe(r);
+    let rWrap = processEventRequest.call(this, r);
+    /*
+    rWrap.pipe(fs.createWriteStream("test1.log", {
+        flags: 'w',
+        defaultEncoding: 'binary',
+        autoClose: true
+    }));
+    */
+    rWrap.on("error", (error) => {
+        console.log("event upload error");
+    });
 };
 
 function processEventRequest(r) {
@@ -218,6 +221,7 @@ function processEventRequest(r) {
 			statusCode=response.statusCode;
 			headers=response.headers;
 		}
+        //console.log(headers,statusCode);
         if (statusCode == 204) {
             //server no response
             rWrap.removeAllListeners();
@@ -297,8 +301,7 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         return;
     }
     let form_data=new FormData();
-    var self = this;
-    var rec_stream = this.rec_stream = new RecorderWrapper({
+    let rec_stream = this.rec_stream = new RecorderWrapper({
         "highWaterMark": 200000,
         "beforePcm": wakeWordPcm,
         "recorder": this.recorder.start().out()
@@ -308,9 +311,9 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         defaultEncoding: 'binary',
         autoClose: true
     }));
-    var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
+    let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
     console.log("voice logid:" + logid);
-    var headers = {
+    let headers = {
         "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
         "SAIYALOGID": logid,
         "Authorization": "Bearer " + config.oauth_token,
@@ -325,7 +328,7 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
     form_data.append("audio",rec_stream,{
         "contentType":'application/octet-stream'
     });
-    var r = request({
+    let r = request({
         http2session:this.downstream.http2session,
         method: "post",
         "url": config.schema + config.ip + config.events_uri,
@@ -335,7 +338,7 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
     r.on("socket", (socket) => {
         socket.setNoDelay(true);
     });
-    var rWrap = processEventRequest.call(this, r);
+    let rWrap = processEventRequest.call(this, r);
     rWrap.on("error", (e) => {
         this.stopRecognize();
         console.log("re init downstream when recognizing error", e);
