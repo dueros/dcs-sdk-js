@@ -15,7 +15,8 @@
  */
 const EventEmitter = require("events");
 const util = require('util');
-const request = require("request");
+//const request = require("request");
+const request = require("./request_auto");
 const config = require("./config.js").getAll();
 var DownStream = require("./downstream_auto");
 const Readable = require('stream').Readable;
@@ -175,17 +176,20 @@ DcsClient.prototype.sendEvent = function(eventData) {
         });
 
         var r = request({
+            http2session:this.downstream.http2session,
             url: config.schema + config.ip + config.events_uri,
             method: "post",
             headers: headers
         });
         form_data.pipe(r);
         var rWrap = processEventRequest.call(this, r);
+        /*
         rWrap.pipe(fs.createWriteStream("test1.log", {
             flags: 'w',
             defaultEncoding: 'binary',
             autoClose: true
         }));
+        */
         rWrap.on("error", (error) => {
             console.log("event upload error");
         });
@@ -207,24 +211,31 @@ function processEventRequest(r) {
         rWrap.emit("error", new Error('not multi part'));
     });
     r.on('response', function(response) {
-        if (response.statusCode == 204) {
+		//process http2 response event
+		let headers=response;
+        let statusCode=headers[":status"];
+		if(response.headers && response.statusCode){
+			statusCode=response.statusCode;
+			headers=response.headers;
+		}
+        if (statusCode == 204) {
             //server no response
             rWrap.removeAllListeners();
             rWrap.on("error", () => {});
             rWrap.unpipe(d1);
             return;
         }
-        if (!response.headers['content-type']) {
+        if (!headers['content-type']) {
             //throw new Exception("server header error: no content-type");
             console.log("server header error: no content-type");
             return;
         }
-        var matches = response.headers['content-type'].match(/boundary=([^;]*)/);
+        var matches = headers['content-type'].match(/boundary=([^;]*)/);
         if (matches && matches[1]) {
             d1.setBoundary(matches[1]);
         } else {
             rWrap.unpipe(d1);
-            console.log("[ERROR] response error, not multipart, headers:" + JSON.stringify(response.headers));
+            console.log("[ERROR] response error, not multipart, headers:" + JSON.stringify(headers));
             rWrap.pipe(process.stderr);
             process.nextTick(() => {
                 rWrap.emit("error", new Error('not multi part'));
@@ -315,8 +326,8 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         "contentType":'application/octet-stream'
     });
     var r = request({
+        http2session:this.downstream.http2session,
         method: "post",
-        preambleCRLF: true,
         "url": config.schema + config.ip + config.events_uri,
         headers: headers
     });
