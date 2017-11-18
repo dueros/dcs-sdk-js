@@ -57,8 +57,10 @@ DownStream.prototype.init = async function() {
         });
     }
     console.log(config.oauth_token);
-    this.http2session = http2.connect("https://" + config.ip);
-
+    console.log("https://" + config.ip);
+    this.http2session = http2.connect("https://" + config.ip,{rejectUnauthorized:false});
+    this.http2session.socket.setNoDelay(true);
+    
     this.http2session.on("error", () => {
         this.state = "closed";
         console.log('downstream session error!!!!!!!!');
@@ -146,9 +148,10 @@ DownStream.prototype.init = async function() {
         }
         this.state = "connected";
         console.log("downstream created!");
-        this.emit("downstream_created");
+        this.emit("init");
         if (!headers['content-type']) {
-            throw new Exception("server header error: no content-type");
+            console.log(headers);
+            throw new Error("server header error: no content-type");
         }
         var matches = headers['content-type'].match(/boundary=([^;]*)/);
         if (matches && matches[1]) {

@@ -16,7 +16,7 @@ d.on("directive", (response) => {
 
 function test() {
     d.init();
-    d.once("downstream_created", () => {
+    d.once("init", () => {
         child = child_process.spawn("/bin/sh", ["dcs_test.sh"]);
         //child.stdout.pipe(process.stdout);
         //child.stderr.pipe(process.stderr);

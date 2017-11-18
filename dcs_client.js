@@ -20,6 +20,7 @@ const config = require("./config.js").getAll();
 var DownStream = require("./downstream_auto");
 const Readable = require('stream').Readable;
 const BufferManager = require("./wakeup/buffermanager").BufferManager;
+const FormData = require("form-data");
 
 const fs = require('fs');
 const Dicer = require('dicer');
@@ -159,9 +160,9 @@ DcsClient.prototype.sendEvent = function(eventData) {
     if (eventData) {
         var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
         console.log("event logid:" + logid);
+        let form_data=new FormData();
         var headers = {
-            "Content-Type": "multipart/form-data; boundary=" + config.boundary,
-            "Host": config.host,
+            "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
             "SAIYALOGID": logid,
             "Authorization": "Bearer " + config.oauth_token,
             "Dueros-Device-Id": config.device_id
@@ -169,23 +170,16 @@ DcsClient.prototype.sendEvent = function(eventData) {
         if (config.event_header) {
             Object.assign(headers, config.event_header);
         }
+        form_data.append("metadata",JSON.stringify(eventData),{
+            "contentType":'application/json; charset=UTF-8'
+        });
 
         var r = request({
-            postambleCRLF: true,
             url: config.schema + config.ip + config.events_uri,
             method: "post",
-            multipart: {
-                data: [{
-                    'Content-Disposition': 'form-data; name="metadata"',
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    "body": JSON.stringify(eventData)
-                }]
-            },
             headers: headers
-        }, (error, response, body) => {
-            //console.log("event response headers:"+JSON.stringify(response.headers,null,2));
-            //console.log("event response:"+body);
         });
+        form_data.pipe(r);
         var rWrap = processEventRequest.call(this, r);
         rWrap.pipe(fs.createWriteStream("test1.log", {
             flags: 'w',
@@ -291,6 +285,7 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         console.log("is recognizing");
         return;
     }
+    let form_data=new FormData();
     var self = this;
     var rec_stream = this.rec_stream = new RecorderWrapper({
         "highWaterMark": 200000,
@@ -305,40 +300,27 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
     var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
     console.log("voice logid:" + logid);
     var headers = {
-        "Content-Type": "multipart/form-data; boundary=" + config.boundary,
+        "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
         "SAIYALOGID": logid,
-        "Host": config.host,
         "Authorization": "Bearer " + config.oauth_token,
         "Dueros-Device-Id": config.device_id
     };
     if (config.event_header) {
         Object.assign(headers, config.event_header);
     }
-    var r = this.request = request({
-        multipart: {
-            chunked: true,
-            data: [{
-                    'Content-Disposition': 'form-data; name="metadata"',
-                    'Content-Type': 'application/json; charset=UTF-8',
-                    "body": JSON.stringify(eventData)
-                },
-                {
-                    'Content-Disposition': 'form-data; name="audio"',
-                    'Content-Type': 'application/octet-stream',
-                    //"body": pcm2adpcm(rec_stream),
-                    "body": rec_stream,
-                    //"body": fs.createReadStream("test.pcm")
-                    //"body": fs.readFileSync("test.pcm")
-                }
-            ]
-        },
+    form_data.append("metadata",JSON.stringify(eventData),{
+        "contentType":'application/json; charset=UTF-8'
+    });
+    form_data.append("audio",rec_stream,{
+        "contentType":'application/octet-stream'
+    });
+    var r = request({
         method: "post",
-        //preambleCRLF: true,
-        postambleCRLF: true,
+        preambleCRLF: true,
         "url": config.schema + config.ip + config.events_uri,
-        //"url":"http://cp01-feng.ecp.baidu.com:8998/v20160207/events" ,
         headers: headers
     });
+    form_data.pipe(r);
     r.on("socket", (socket) => {
         socket.setNoDelay(true);
     });
@@ -358,7 +340,6 @@ DcsClient.prototype.isRecognizing = function() {
 DcsClient.prototype.stopRecognize = function() {
     if (this._isRecognizing) {
         this.rec_stream.stopRecording();
-        this.request = null;
     }
     this._isRecognizing = false;
 };
