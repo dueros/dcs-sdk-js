@@ -85,6 +85,7 @@ snowboy.on("sound", (buffer) => {
 });
 
 function onWakeup(index, hotword, buffer) {
+    controller.stopRecognize();
     console.log("hotword " + index);
     bm.add(buffer);
     fs.writeFileSync("wake.pcm", bm.toBuffer());

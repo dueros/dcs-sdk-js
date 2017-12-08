@@ -27,7 +27,6 @@ const fs = require('fs');
 const Dicer = require('dicer');
 
 function DcsClient(options) {
-    this._isRecognizing = false;
     this.recorder = options.recorder;
     EventEmitter.call(this);
     this.downstream = new DownStream();
@@ -64,8 +63,10 @@ class RecorderWrapper extends Readable {
         var onData = this.onData = function(chunk) {
             // if push() returns false, then stop reading from source
             console.log("on record data:" + chunk.length);
-            if (!this.push(chunk)) {
-                this._source.removeListener("data", onData);
+            if (!this.onData || !this.push(chunk)) {
+                if(this._source){
+                    this._source.removeListener("data", onData);
+                }
             }
             //this.buffer_manager.add(chunk);
         }.bind(this);
@@ -296,10 +297,6 @@ function processEventRequest(r) {
     return rWrap;
 }
 DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
-    if (this._isRecognizing) {
-        console.log("is recognizing");
-        return;
-    }
     let form_data=new FormData();
     let rec_stream = this.rec_stream = new RecorderWrapper({
         "highWaterMark": 200000,
@@ -339,25 +336,32 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         socket.setNoDelay(true);
     });
     let rWrap = processEventRequest.call(this, r);
+    let dialog=new Dialog({
+        eventData,
+        req:r,
+        rec_stream
+    });
     rWrap.on("error", (e) => {
-        this.stopRecognize();
+        dialog.stop();
         console.log("re init downstream when recognizing error", e);
         this.downstream.init();
     });
-    this._isRecognizing = true;
+    return dialog;
 };
 
-DcsClient.prototype.isRecognizing = function() {
-    return this._isRecognizing;
-};
-
-DcsClient.prototype.stopRecognize = function() {
-    if (this._isRecognizing) {
+class Dialog{
+    constructor(options){
+        this.eventData=options.eventData;
+        this.req=options.req;
+        this.rec_stream=options.rec_stream;
+    }
+    stop(){
         this.rec_stream.stopRecording();
     }
-    this._isRecognizing = false;
-};
-
+    getDialogRequestId(){
+        return this.eventData.header.dialogRequestId;
+    }
+}
 
 
 module.exports = DcsClient;

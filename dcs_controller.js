@@ -49,6 +49,7 @@ function DcsController(options) {
     ];
     this._contents = {};
     this.queue = [];
+    this.dialogs=[];
 }
 util.inherits(DcsController, EventEmitter);
 
@@ -152,31 +153,31 @@ DcsController.prototype.stopPlay = function(directive) {
 };
 
 DcsController.prototype.startRecognize = function(options) {
-    this.stopPlay();
-    if (this.client) {
-        if (options && options.wakeWordPcm) {
-            var wakeWordPcm = options.wakeWordPcm;
-        }
-        eventData = DcsProtocol.createRecognizeEvent(options);
-        this.currentDialogRequestId = eventData.event.header.dialogRequestId;
-        this.queue = [];
-        eventData.clientContext = this.getContext();
-        this.emit("event", eventData);
-        return this.client.startRecognize(eventData, wakeWordPcm);
+    if (!this.client) {
+        return false;
     }
-    return false;
+    this.stopPlay();
+    if (options && options.wakeWordPcm) {
+        var wakeWordPcm = options.wakeWordPcm;
+    }
+    eventData = DcsProtocol.createRecognizeEvent(options);
+    this.currentDialogRequestId = eventData.event.header.dialogRequestId;
+    this.queue = [];
+    eventData.clientContext = this.getContext();
+    this.emit("event", eventData);
+    let dialog = this.client.startRecognize(eventData, wakeWordPcm);
+    this.dialogs.push(dialog);
+    return dialog;
 };
 DcsController.prototype.stopRecognize = function() {
-    if (this.client) {
-        return this.client.stopRecognize();
-    }
+    this.dialogs.forEach((dialog)=>{
+        dialog.stop();
+    });
+    this.dialogs=[];
     return false;
 };
 DcsController.prototype.isRecognizing = function() {
-    if (this.client) {
-        return this.client.isRecognizing();
-    }
-    return false;
+    return this.dialogs.length>0;
 };
 DcsController.prototype.processDirective = function(directive) {
     let promise = Promise.resolve();

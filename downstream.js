@@ -90,7 +90,7 @@ DownStream.prototype.init = function() {
     });
     //content-type: multipart/form-data; boundary=___dumi_avs_xuejuntao___
     d.on('part', function(p) {
-        console.log("on part");
+        //console.log("on part");
         var name = null;
         var jsonBody = new BufferManager();
         var response = null;
@@ -98,7 +98,7 @@ DownStream.prototype.init = function() {
             name = null;
             jsonBody.clear();
             response = null;
-            console.log(JSON.stringify(header, null, '  '));
+            //console.log(JSON.stringify(header, null, '  '));
             if (header["content-disposition"]) {
                 var matches;
                 if (matches = header["content-disposition"][0].match(/name="(\w+)"/)) {
@@ -107,7 +107,7 @@ DownStream.prototype.init = function() {
             }
             if (header['content-id']) {
                 var content_id = header["content-id"][0].replace(/[<>]/g, "");
-                console.log("content_id:" + content_id);
+                //console.log("content_id:" + content_id);
                 self.emit("content", content_id, p);
             }
         });
@@ -125,14 +125,14 @@ DownStream.prototype.init = function() {
                     self.emit("directive", response);
                 }
             }
-            console.log(JSON.stringify(response, null, '  '));
+            //console.log(JSON.stringify(response, null, '  '));
         });
         p.on('error', () => {
             console.log('downstream dicer error, event part error');
         });
     });
     d.on('finish', function() {
-        console.log('End of parts');
+        //console.log('End of parts');
     });
 
 }
