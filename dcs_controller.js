@@ -161,6 +161,15 @@ DcsController.prototype.startRecognize = function(options) {
         var wakeWordPcm = options.wakeWordPcm;
     }
     eventData = DcsProtocol.createRecognizeEvent(options);
+    if(this.currentDialogRequestId){
+        this.dialogs=this.dialogs.filter((dialog)=>{
+            if(dialog.getDialogRequestId()==this.currentDialogRequestId){
+                dialog.stopRecording();
+                return false;
+            }
+            return true;
+        });
+    }
     this.currentDialogRequestId = eventData.event.header.dialogRequestId;
     this.queue = [];
     eventData.clientContext = this.getContext();
@@ -171,7 +180,7 @@ DcsController.prototype.startRecognize = function(options) {
 };
 DcsController.prototype.stopRecognize = function() {
     this.dialogs.forEach((dialog)=>{
-        dialog.stop();
+        dialog.stopRecording();
     });
     this.dialogs=[];
     return false;

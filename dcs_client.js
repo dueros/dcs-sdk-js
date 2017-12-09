@@ -355,11 +355,11 @@ class Dialog{
         this.req=options.req;
         this.rec_stream=options.rec_stream;
     }
-    stop(){
+    stopRecording(){
         this.rec_stream.stopRecording();
     }
     getDialogRequestId(){
-        return this.eventData.header.dialogRequestId;
+        return this.eventData.event.header.dialogRequestId;
     }
 }
 

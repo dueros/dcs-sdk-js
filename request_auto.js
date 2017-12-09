@@ -9,17 +9,22 @@ function h2_request (options){
         headers:{},
     },options);
     let url=URL.parse((options.url));
-    let http2stream;
-    if(options.http2stream){
-        http2stream=options.http2stream;
+
+    let http2session;
+    if(options.http2session){
+        http2session=options.http2session
     }else{
-        http2stream=http2.connect(url.protocol + "//" + url.host,{rejectUnauthorized:false});
+        http2session=http2.connect(url.protocol + "//" + url.host,{rejectUnauthorized:false});
     }
+
     let headers=Object.assign({ 
         ':path': url.path,
         ":method":options.method.toUpperCase(),
     },options.headers);
-    let req=http2stream.request(headers);
+    let req=http2session.request(headers);
+
+    req.abort=req.rstWithCancel;
+
     return req;
     
 }
