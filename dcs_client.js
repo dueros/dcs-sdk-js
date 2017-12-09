@@ -349,11 +349,15 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
     return dialog;
 };
 
-class Dialog{
+class Dialog extends EventEmitter {
     constructor(options){
+        super();
         this.eventData=options.eventData;
         this.req=options.req;
         this.rec_stream=options.rec_stream;
+        this.rec_stream.on("end",()=>{
+            this.emit("requestSpeechFinished");
+        });
     }
     stopRecording(){
         this.rec_stream.stopRecording();

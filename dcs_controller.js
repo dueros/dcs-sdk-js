@@ -47,13 +47,13 @@ function DcsController(options) {
         this.screenManager,
         this.httpManager,
     ];
-    this.voiceOutputManager.ttsplayer.on("end",()=>{
-        if(this.audioPlayerManager.player.isPaused()){
-            this.audioPlayerManager.player.play();
+    this.voiceOutputManager.on("end",()=>{
+        if(this.audioPlayerManager.isPaused()){
+            this.audioPlayerManager.play();
         }
     });
-    this.voiceOutputManager.ttsplayer.on("start",()=>{
-        this.audioPlayerManager.player.pause();
+    this.voiceOutputManager.on("start",()=>{
+        this.audioPlayerManager.pause();
     });
     this._contents = {};
     this.queue = [];
@@ -183,6 +183,15 @@ DcsController.prototype.startRecognize = function(options) {
     eventData.clientContext = this.getContext();
     this.emit("event", eventData);
     let dialog = this.client.startRecognize(eventData, wakeWordPcm);
+    dialog.on("requestSpeechFinished",()=>{
+        if(this.audioPlayerManager.isPaused()){
+            setTimeout(()=>{
+                if(this.audioPlayerManager.isPaused() && !this.voiceOutputManager.isPlaying()){
+                    this.audioPlayerManager.play();
+                }
+            },1000);
+        }
+    });
     this.dialogs.push(dialog);
     return dialog;
 };

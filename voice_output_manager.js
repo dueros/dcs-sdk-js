@@ -25,6 +25,7 @@ function VoiceOutputManager(controller) {
         controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechStarted", controller.getContext(), {
             token: this.last_played_token
         }));
+        this.emit("start");
     });
     this.ttsplayer.on("end", () => {
         if (this.promise) {
@@ -33,6 +34,7 @@ function VoiceOutputManager(controller) {
         controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechFinished", controller.getContext(), {
             token: this.last_played_token
         }));
+        this.emit("end");
     });
     controller.on("content", (content_id, content) => {
         if (this.content_id = content_id) {
