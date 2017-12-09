@@ -47,6 +47,11 @@ function DcsController(options) {
         this.screenManager,
         this.httpManager,
     ];
+    this.voiceOutputManager.ttsplayer.on("end",()=>{
+        if(this.audioPlayerManager.player.isPaused()){
+            this.audioPlayerManager.player.play();
+        }
+    });
     this._contents = {};
     this.queue = [];
     this.dialogs=[];

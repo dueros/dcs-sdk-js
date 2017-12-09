@@ -22,6 +22,9 @@ function Player(options) {
     //,"play","pause" //很奇怪，树莓派会不停的触发这两个事件
     ["ready", "time", "start", "stop", "status", "finished"].forEach((eventName) => {
         this.mplayer.on(eventName, (...args) => {
+            if (["start","finished"].indexOf(eventName) != -1){
+                this._isPaused = false;
+            }
             if (eventName != "time") {
                 console.log("mplayer event " + eventName);
             }
@@ -69,14 +72,21 @@ Player.prototype.isPlaying = function() {
     return false;
 };
 
+Player.prototype.isPaused = function() {
+    return this._isPaused;
+};
+
 ["setOptions", "openFile", "play", "pause", "stop", "next", "previous", "seek", "seekPercent", "volume", "mute"].forEach((funcName) => {
     Player.prototype[funcName] = function(...args) {
+        if(funcName == "pause" && this.isPlaying()){
+            this._isPaused = true;
+        }
+        if(["play","stop","next","openFile"].indexOf(funcName)!=-1){
+            this._isPaused = false;
+        }
         console.log("mplayer directive " + funcName);
         if (funcName == "openFile") {
             console.log(JSON.stringify(args));
-        }
-        if (funcName == "stop") {
-            this._status = "stopping";
         }
         this.mplayer[funcName](...args);
     };

@@ -68,7 +68,7 @@ var handlers = {
         }
         if (directive.payload.clearBehavior == "CLEAR_ALL") {
             this.playlist = [];
-            this.stop();
+            this.player.stop();
         }
     },
     "Stop": function(directive) {
@@ -126,7 +126,7 @@ AudioPlayerManager.prototype.isPlaying = function() {
     return this.player.isPlaying();
 };
 AudioPlayerManager.prototype.stop = function() {
-    return this.player.stop();
+    return this.player.pause();
 };
 AudioPlayerManager.prototype.seekTo = function(offsetInMilliseconds) {
     if (this.player.isPlaying()) {
