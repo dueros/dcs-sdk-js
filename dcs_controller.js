@@ -206,7 +206,10 @@ DcsController.prototype.deQueue = function() {
     }
     var directive = response.directive;
     if ((directive.header.dialogRequestId && this.currentDialogRequestId) &&
-        directive.header.dialogRequestId != this.currentDialogRequestId) {
+        directive.header.dialogRequestId != this.currentDialogRequestId &&
+        !(directive.header.namespace=="ai.dueros.device_interface.voice_input" &&
+            directive.header.name=="StopListen")
+    ) {
         this.deQueue();
         return;
     }

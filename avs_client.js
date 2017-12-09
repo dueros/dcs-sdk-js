@@ -117,17 +117,11 @@ class AvsClient extends EventEmitter {
         if (!args[0]) {
             return;
         }
-        this.dcs_client.sendEvent.apply(this.dcs_client, args)
+        return this.dcs_client.sendEvent.apply(this.dcs_client, args)
     }
     startRecognize(...args) {
         args[0] = convertDcsEvent2AvsEvent(args[0]);
-        this.dcs_client.startRecognize.apply(this.dcs_client, args)
-    }
-    stopRecognize(...args) {
-        this.dcs_client.stopRecognize.apply(this.dcs_client, args)
-    }
-    isRecognizing(...args) {
-        this.dcs_client.isRecognizing.apply(this.dcs_client, args)
+        return this.dcs_client.startRecognize.apply(this.dcs_client, args)
     }
 }
 module.exports = AvsClient
