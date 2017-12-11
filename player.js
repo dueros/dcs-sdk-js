@@ -80,6 +80,9 @@ Player.prototype.isPaused = function() {
     Player.prototype[funcName] = function(...args) {
         if(funcName == "pause" && this.isPlaying()){
             this._isPaused = true;
+            process.nextTick(()=>{
+                this.emit("pause");
+            });
         }
         if(["play","stop","next","openFile"].indexOf(funcName)!=-1){
             this._isPaused = false;

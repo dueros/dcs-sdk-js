@@ -140,7 +140,12 @@ DcsController.prototype.handleResponse = function(response) {
         return;
     }
 
-    if (this.currentDialogRequestId && response.directive.header.dialogRequestId == this.currentDialogRequestId) {
+    if (
+        (this.currentDialogRequestId 
+            && response.directive.header.dialogRequestId == this.currentDialogRequestId)
+        //StopListen 无论如何都要执行
+        || (response.directive.header.namespace == "ai.dueros.device_interface.voice_input" && response.directive.header.name == "StopListen")
+    ) {
         this.queue.push(response);
         if (!this.processing) {
             this.deQueue();
@@ -148,6 +153,9 @@ DcsController.prototype.handleResponse = function(response) {
     }
 };
 
+DcsController.prototype.cancelCurrentDialog = function (){
+    this.currentDialogRequestId="";
+}
 
 DcsController.prototype.stopPlay = function(directive) {
     this.managers.forEach((manager) => {
