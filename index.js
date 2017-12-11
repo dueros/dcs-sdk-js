@@ -57,17 +57,6 @@ keypress(process.stdin);
 process.stdin.on("keypress", onKeypressed);
 
 
-if (config.respeaker_2mic_hat && config.respeaker_2mic_hat.led) {
-    const bind_led = require('./bind_led');
-    bind_led(controller);
-}
-
-
-if (config.respeaker_2mic_hat && config.respeaker_2mic_hat.button) {
-    const respeaker_btn = require('./respeaker_btn');
-    respeaker_btn.on("click", onKeypressed);
-}
-
 
 var unameAll = child_process.execSync("uname -a").toString();
 var isRaspberrypi = unameAll.match(/raspberrypi/);
@@ -76,29 +65,15 @@ var isRaspberrypi = unameAll.match(/raspberrypi/);
 
 let snowboy = require("./snowboy.js");
 const BufferManager = require("./wakeup/buffermanager").BufferManager;
-let bm = new BufferManager();
-snowboy.on("silence", () => {
-    bm.clear();
-});
-snowboy.on("sound", (buffer) => {
-    bm.add(buffer);
-});
 
 function onWakeup(index, hotword, buffer) {
     console.log("hotword " + index);
-    bm.add(buffer);
-    fs.writeFileSync("wake.pcm", bm.toBuffer());
-    bm.clear();
-    if (config.respeaker_2mic_hat && config.respeaker_2mic_hat.led) {
+    var cmd = config.play_cmd + " -t wav '" + __dirname + "/nihao.wav'";
+    child_process.exec(cmd,{
+        env: config.play_env,
+    }, () => {
         controller.startRecognize();
-    } else {
-        var cmd = config.play_cmd + " -t wav '" + __dirname + "/nihao.wav'";
-        child_process.exec(cmd,{
-            env: config.play_env,
-        }, () => {
-            controller.startRecognize();
-        });
-    }
+    });
 }
 snowboy.on("hotword", onWakeup);
 
