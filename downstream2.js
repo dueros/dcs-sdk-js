@@ -69,7 +69,7 @@ DownStream.prototype.init = async function() {
         this.state = "closed";
         this.emit("sessionClosed");
         console.log('downstream session closed!!!!!!!!');
-        //this.init();
+        this.init();
     });
     var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
     console.log("downstream logid:" + logid);
