@@ -342,7 +342,7 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         rec_stream
     });
     rWrap.on("error", (e) => {
-        dialog.stop();
+        dialog.stopRecording();
         console.log("re init downstream when recognizing error", e);
         this.downstream.init();
     });
