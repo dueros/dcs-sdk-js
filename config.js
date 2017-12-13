@@ -40,6 +40,9 @@ module.exports = {
             delete(config[key]);
         }
     },
+    setAll: function(options) {
+        config=Object.assign(config,options);
+    },
     save: function(key, value) {
         this.set(key, value);
         storage[key] = value;
