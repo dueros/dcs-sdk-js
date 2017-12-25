@@ -7,8 +7,9 @@ const fs = require('fs');
 const Dicer = require('dicer');
 const BufferManager = require("./wakeup/buffermanager").BufferManager;
 
-function DownStream() {
+function DownStream(options={}) {
     EventEmitter.call(this);
+    this.options=options;
     this.init();
 }
 
@@ -17,6 +18,7 @@ DownStream.prototype.isConnected = function() {
 };
 
 DownStream.prototype.init = function() {
+    let options=this.options;
     var self = this;
     if (this.req) {
         this.req.abort();
@@ -25,14 +27,24 @@ DownStream.prototype.init = function() {
     console.log(config.oauth_token);
     var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
     console.log("downstream logid:" + logid);
-    this.req = request.get({
-        "url": config.schema + config.ip + config.directive_uri,
-        headers: {
-            "SAIYALOGID": logid,
-            "Host": config.host,
-            "Authorization": "Bearer " + config.oauth_token,
-            "Dueros-Device-Id": config.device_id
-        }
+	let url= config.schema + config.ip + config.directive_uri;
+    let headers={
+        "SAIYALOGID": logid,
+        "Host": config.host,
+        "Authorization": "Bearer " + config.oauth_token,
+        "Dueros-Device-Id": config.device_id
+    };
+
+	if(options.url){
+		url = options.url + (options.path?options.path:"");
+	}
+    if(options.headers){
+        headers=Object.assign(headers,options.headers);
+    }
+    console.log("downstream url:"+url);
+    this.req = request({
+        "url":url,
+        headers: headers,
     });
     this.req.on("error", () => {
         this.init();
@@ -60,7 +72,7 @@ DownStream.prototype.init = function() {
     this.req.pipe(d);
     //content-type: multipart/form-data; boundary=___dumi_avs_xuejuntao___
     d.on('part', function(p) {
-        console.log("on part");
+        //console.log("on part");
         var name = null;
         var jsonBody = new BufferManager();
         var response = null;
@@ -68,10 +80,9 @@ DownStream.prototype.init = function() {
             name = null;
             jsonBody.clear();
             response = null;
-            console.log(JSON.stringify(header, null, '  '));
             if (header["content-disposition"]) {
                 var matches;
-                if (matches = header["content-disposition"][0].match(/name="(\w+)"/)) {
+                if (matches = header["content-disposition"][0].match(/name="?(\w+)"?/)) {
                     name = matches[1];
                 }
             }
@@ -82,12 +93,14 @@ DownStream.prototype.init = function() {
             }
         });
         p.on('data', function(data) {
+                //console.log(name,data);
             if (name == "metadata") {
                 jsonBody.add(data);
             }
         });
         p.on('end', function() {
             if (jsonBody) {
+                //console.log(jsonBody);
                 try {
                     response = JSON.parse(jsonBody.toBuffer().toString("utf8"));
                 } catch (e) {}
