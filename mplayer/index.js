@@ -33,6 +33,7 @@ var MPlayer = function(options) {
     }.bind(this));
 
     this.player.on('playstart', function() {
+        this.status.playing = true;
         if (options.verbose) {
             console.log('player.start');
         }
@@ -40,6 +41,7 @@ var MPlayer = function(options) {
     }.bind(this));
 
     this.player.on('playstop', function() {
+        this.status.playing = false;
         if (options.verbose) {
             console.log('player.stop');
         }
