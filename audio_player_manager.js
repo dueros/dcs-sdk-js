@@ -136,7 +136,7 @@ AudioPlayerManager.prototype.play= function() {
 };
 
 AudioPlayerManager.prototype.stop = function() {
-    return this.player.pause();
+    return this.player.stop();
 };
 AudioPlayerManager.prototype.seekTo = function(offsetInMilliseconds) {
     if (this.player.isPlaying()) {

@@ -139,6 +139,11 @@ DcsController.prototype.handleResponse = function(response) {
         this.processDirective(response.directive);
         return;
     }
+    
+    if ((response.directive.header.namespace == "ai.dueros.device_interface.audio_player" && response.directive.header.name == "Play" && response.directive.payload.playBehavior == "REPLACE_ALL")
+    ) {
+        this.audioPlayerManager.stop();
+    }
 
     if (
         (this.currentDialogRequestId 
