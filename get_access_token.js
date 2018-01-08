@@ -8,6 +8,8 @@ let device_id="wangpeng20_token_test_"+new Date();
 
 const child_process =require("child_process");
 const unameAll=child_process.execSync("uname -a").toString();
+const config=require("./config");
+
 function isUbuntu(){
     return unameAll.match(/Ubuntu/);
 }
@@ -41,8 +43,10 @@ request({
             }
 			//console.log("set access_token: "+json.access_token);
 			//dcs_controller.setAccessToken(json.access_token);
+            config.save("oauth_token",json.access_token);
 			console.log("access_token:",json.access_token);
 			clearInterval(device_code_interval_id);
 		});
 	},json.interval*1000);
 });
+
