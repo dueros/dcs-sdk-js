@@ -50,6 +50,8 @@ module.exports={
     "rec_cmd":"/usr/local/bin/rec",
     "play_cmd":"/usr/local/bin/play",
     "sox_cmd":"/usr/local/bin/sox",
+
+    "mplayer_options":{"args":"-cache 20000"},
     
     "oauth_token":""
 };
