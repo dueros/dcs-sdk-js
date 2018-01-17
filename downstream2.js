@@ -21,6 +21,13 @@ function DownStream() {
 DownStream.prototype.isConnected = function() {
     return this.state == "connected";
 };
+function sleep(sec){
+    return new Promise((resolve,reject)=>{
+        setTimeout(()=>{
+            resolve();
+        },sec*1000);
+    });
+}
 
 DownStream.prototype.init = async function() {
     var self = this;
@@ -65,13 +72,14 @@ DownStream.prototype.init = async function() {
         this.state = "closed";
         console.log('downstream session error!!!!!!!!');
     });
-    this.http2session.on("close", () => {
+    this.http2session.on("close", async () => {
         this.state = "closed";
         this.emit("sessionClosed");
         console.log('downstream session closed!!!!!!!!');
+        await sleep(1);
         this.init();
     });
-    var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
+    var logid = config.device_id + "_" + new Date().getTime()+(parseInt(Math.random()*100,10)) + "_monitor";
     console.log("downstream logid:" + logid);
     this.req = this.http2session.request({
         ":path": config.directive_uri,
@@ -85,7 +93,11 @@ DownStream.prototype.init = async function() {
     this.req.on("streamClosed", () => {
         this.emit("streamClosed");
         console.log('downstream closed');
-        this.init();
+        try {
+            this.http2session.shutdown({
+                graceful: true
+            });
+        } catch (e) {}
     });
     this.http2session.setTimeout(0, () => {
         console.log("downstream session timeout");
