@@ -37,7 +37,7 @@ DownStream.prototype.init = async function() {
 
     if (this.req) {
         try {
-            this.req.rstWithCancel();
+            this.req.close?this.req.close():this.req.rstWithCancel();
         } catch (e) {}
         this.req = null;
     }
@@ -46,7 +46,7 @@ DownStream.prototype.init = async function() {
         clearInterval(this.pingInterval);
         if (this.pingReq) {
             try {
-                this.pingReq.rstWithCancel();
+                this.pingReq.close?this.pingReq.close():this.pingReq.rstWithCancel();
             } catch (e) {}
             this.pingReq = null;
         }
@@ -125,10 +125,10 @@ DownStream.prototype.init = async function() {
         req.setTimeout(5000, () => {
             console.log("downstream ping timeout");
             if (!req.destroyed) {
-                req.rstWithCancel();
+                req.close?req.close():req.rstWithCancel();
             }
             if (this.req && !this.req.destroyed) {
-                this.req.rstWithCancel();
+                this.req.close?this.req.close():this.req.rstWithCancel();
             }
         });
         req.on("response", (headers) => {
@@ -140,7 +140,7 @@ DownStream.prototype.init = async function() {
         });
         setTimeout(() => {
             if (!req.destroyed) {
-                req.rstWithCancel();
+                req.close?req.close():req.rstWithCancel();
             }
         }, 5000);
         req.on("error", (e) => {
