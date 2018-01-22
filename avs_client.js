@@ -69,6 +69,7 @@ function convertDcsEvent2AvsEvent(dcs_request) {
 }
 
 function convertAvsDirective2DcsDirective(avs_response) {
+    console.log("avs response:",avs_response);
     let avs_directive = avs_response.directive;
     let dcs_directive;
     let directiveRules = require("./dcs_and_avs_directives.js");
