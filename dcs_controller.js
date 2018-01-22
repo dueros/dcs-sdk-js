@@ -48,9 +48,12 @@ function DcsController(options) {
         this.httpManager,
     ];
     this.voiceOutputManager.on("end",()=>{
-        if(this.audioPlayerManager.isPaused()){
-            this.audioPlayerManager.play();
-        }
+        setTimeout(()=>{
+            if(!this.voiceOutputManager.isPlaying() && this.audioPlayerManager.isPaused()){
+                console.log("resume player on voice end");
+                this.audioPlayerManager.play();
+            }
+        },500);
     });
     this.voiceOutputManager.on("start",()=>{
         this.audioPlayerManager.pause();
@@ -139,7 +142,7 @@ DcsController.prototype.handleResponse = function(response) {
         this.processDirective(response.directive);
         return;
     }
-    
+
     if ((response.directive.header.namespace == "ai.dueros.device_interface.audio_player" && response.directive.header.name == "Play" && response.directive.payload.playBehavior == "REPLACE_ALL")
     ) {
         this.audioPlayerManager.stop();
@@ -177,7 +180,11 @@ DcsController.prototype.startRecognize = function(options) {
     if (!this.client) {
         return false;
     }
-    this.stopPlay();
+    this.audioPlayerManager.pause();
+    if(this.voiceOutputManager.isPlaying()){
+        this.voiceOutputManager.stop();
+    }
+
     if (options && options.wakeWordPcm) {
         var wakeWordPcm = options.wakeWordPcm;
     }
@@ -200,6 +207,8 @@ DcsController.prototype.startRecognize = function(options) {
         if(this.audioPlayerManager.isPaused()){
             setTimeout(()=>{
                 if(this.audioPlayerManager.isPaused() && !this.voiceOutputManager.isPlaying()){
+
+                    console.log("resume player");
                     this.audioPlayerManager.play();
                 }
             },1000);

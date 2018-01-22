@@ -269,7 +269,8 @@ function processEventRequest(r) {
                     defaultEncoding: 'binary',
                     autoClose: true
                 });
-                this.emit("content", content_id, p);
+                //用RecorderWrapper包一下，是因为怕播放指令执行的时候，管道已经输出了一点东西了，复用一下RecorderWrapper的缓存功能
+                this.emit("content", content_id, new RecorderWrapper({recorder: p}));
                 p.pipe(file);
             }
         });
