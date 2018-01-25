@@ -94,9 +94,7 @@ DownStream.prototype.init = async function() {
         this.emit("streamClosed");
         console.log('downstream closed');
         try {
-            this.http2session.shutdown({
-                graceful: true
-            });
+            this.http2session.destroy();
         } catch (e) {}
     });
     this.http2session.setTimeout(0, () => {
