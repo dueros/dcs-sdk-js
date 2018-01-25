@@ -16,6 +16,17 @@
 const EventEmitter = require("events");
 const util = require('util');
 const MPlayer = require('./mplayer/index.js');
+const config = require("./config").getAll();
+
+
+const httpProxy = require('./mplayer_proxy');
+if(config.mplayer_proxy){
+    httpProxy.listen(config.mplayer_proxy.port,"127.0.0.1",()=>{
+        console.log("player proxy created");
+    });
+}
+
+
 
 function Player(options) {
     this.mplayer = new MPlayer(options);
@@ -89,6 +100,9 @@ Player.prototype.isPaused = function() {
         }
         console.log("mplayer directive " + funcName);
         if (funcName == "openFile") {
+            if(config.mplayer_proxy){
+                args[0]="http_proxy://127.0.0.1:"+config.mplayer_proxy.port+"/"+args[0];
+            }
             console.log(JSON.stringify(args));
         }
         this.mplayer[funcName](...args);

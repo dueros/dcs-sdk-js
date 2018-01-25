@@ -8,6 +8,10 @@ module.exports={
 
     "host":"dueros-h2.baidu.com",
     "ip":"dueros-h2.baidu.com",
+    
+    "mplayer_proxy":{
+        "port":8765,
+    },
 
     "avs_protocol":true,
     "avs_directive_uri":"/dcs/avs-compatible-v20160207/directives",
