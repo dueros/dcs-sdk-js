@@ -79,7 +79,7 @@ module.exports = {
     "play_cmd":"/usr/bin/play",
     "sox_cmd":"/usr/bin/sox",
     */
-    "mplayer_options":{"args":"-cache 20000"},
+    "mplayer_options":{"args":"-cache 20000 -vo null"},
 
     "oauth_token": ""
 };

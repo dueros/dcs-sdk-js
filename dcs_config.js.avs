@@ -55,7 +55,7 @@ module.exports={
     "play_cmd":"/usr/local/bin/play",
     "sox_cmd":"/usr/local/bin/sox",
 
-    "mplayer_options":{"args":"-cache 20000"},
+    "mplayer_options":{"args":"-cache 20000 -vo null"},
     
     "oauth_token":""
 };
