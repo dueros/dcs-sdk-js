@@ -5,7 +5,7 @@ module.exports = {
     "ping_uri": "/dcs/v1/ping",
     "device_id": "wangpeng20_default",
 
-
+    //给mplayer加个资源的反向代理，是为了解决部分资源的兼容问题。会占用127.0.0.1的某个端口
     "mplayer_proxy":{
         "port":8765,
     },
