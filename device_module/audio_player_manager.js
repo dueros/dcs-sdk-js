@@ -22,7 +22,7 @@ const ROOT_PATH = path.resolve(__dirname + "/..");
 const config = require(ROOT_PATH + "/config.js").getAll();
 
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
-class AudioPlayerManager extends BaseManager{
+class AudioPlayerManager extends BaseManager {
     constructor(controller) {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.audio_player";
@@ -65,7 +65,7 @@ class AudioPlayerManager extends BaseManager{
             this.offset_ms = parseInt(sec * 1000, 10);
         });
     }
-    
+
     ClearQueueDirective(directive) {
         if (directive.payload.clearBehavior == "CLEAR_ENQUEUED") {
             this.playlist = [];
@@ -147,7 +147,7 @@ class AudioPlayerManager extends BaseManager{
         }
     }
 
-    getContext () {
+    getContext() {
         return {
             "header": {
                 "namespace": this.NAMESPACE,

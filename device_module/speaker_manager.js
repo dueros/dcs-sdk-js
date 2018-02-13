@@ -21,14 +21,14 @@ const util = require('util');
 const child_process = require('child_process');
 const system = require(ROOT_PATH + '/lib/system');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
-class SpeakerManager extends BaseManager{
+class SpeakerManager extends BaseManager {
     constructor() {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.speaker_controller";
         this.logicVolume = this.getCurrentVolume();
         this.isMute = false;
     }
-    SetVolumeDirective(directive){
+    SetVolumeDirective(directive) {
         this.logicVolume = directive.payload.volume;
         if (this.logicVolume < 0) {
             this.logicVolume = 0;
@@ -40,7 +40,7 @@ class SpeakerManager extends BaseManager{
             this.setVolume(directive.payload.volume);
         }
     }
-    AdjustVolumeDirective(directive){
+    AdjustVolumeDirective(directive) {
         /*
         let currentVolume=this.getCurrentVolume();
         if(currentVolume>0){
@@ -58,7 +58,7 @@ class SpeakerManager extends BaseManager{
             this.setVolume(this.logicVolume);
         }
     }
-    SetMuteDirective(directive){
+    SetMuteDirective(directive) {
         this.isMute = directive.payload.mute;
         if (this.isMute) {
             this.setVolume(0);
@@ -83,8 +83,8 @@ class SpeakerManager extends BaseManager{
     }
 
     handleDirective(directive, controller) {
-        let ret = super.handleDirective(directive,controller);
-        if(ret){
+        let ret = super.handleDirective(directive, controller);
+        if (ret) {
             let volume = this.getCurrentVolume();
             setTimeout(() => {
                 controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "VolumeChanged", controller.getContext(), {

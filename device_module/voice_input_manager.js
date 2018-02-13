@@ -15,7 +15,7 @@
  */
 const BaseManager = require("./base_manager");
 const util = require('util');
-class VoiceInputManager extends BaseManager{
+class VoiceInputManager extends BaseManager {
     constructor() {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.voice_input";

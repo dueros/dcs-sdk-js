@@ -28,7 +28,7 @@ const ScreenManager = require("./device_module/screen_manager");
 const configModule = require("./config.js");
 const config = configModule.getAll();
 
-class DcsController extends EventEmitter{
+class DcsController extends EventEmitter {
     constructor(options) {
         super();
         this.locationManager = new LocationManager(this);
@@ -65,16 +65,16 @@ class DcsController extends EventEmitter{
         this.dialogs = [];
     }
 
-    isPlaying () {
+    isPlaying() {
         return (this.audioPlayerManager.isPlaying() || this.voiceOutputManager.isPlaying() || this.alertManager.isActive());
 
     }
 
-    addDeviceModule (manager) {
+    addDeviceModule(manager) {
         this.managers.push(manager);
     }
 
-    getContext (namespace) {
+    getContext(namespace) {
         var contexts = [];
         this.managers.forEach((manager) => {
             let context = manager.getContext();
@@ -101,7 +101,7 @@ class DcsController extends EventEmitter{
         return contexts;
     }
 
-    setClient (client) {
+    setClient(client) {
         this.client = client;
         client.on("directive", (response) => {
             this.handleResponse(response);
@@ -131,7 +131,7 @@ class DcsController extends EventEmitter{
         });
     }
 
-    handleResponse (response) {
+    handleResponse(response) {
         if (!response || !response.directive) {
             return;
         }
@@ -158,11 +158,11 @@ class DcsController extends EventEmitter{
         }
     }
 
-    cancelCurrentDialog () {
+    cancelCurrentDialog() {
         this.currentDialogRequestId = "";
     }
 
-    stopPlay (directive) {
+    stopPlay(directive) {
         this.managers.forEach((manager) => {
             manager.stop();
         });
@@ -173,7 +173,7 @@ class DcsController extends EventEmitter{
         */
     }
 
-    startRecognize (options) {
+    startRecognize(options) {
         if (!this.client) {
             return false;
         }
@@ -214,17 +214,17 @@ class DcsController extends EventEmitter{
         this.dialogs.push(dialog);
         return dialog;
     }
-    stopRecognize () {
+    stopRecognize() {
         this.dialogs.forEach((dialog) => {
             dialog.stopRecording();
         });
         this.dialogs = [];
         return false;
     }
-    isRecognizing () {
+    isRecognizing() {
         return this.dialogs.length > 0;
     }
-    processDirective (directive) {
+    processDirective(directive) {
         let promise = Promise.resolve();
         this.managers.forEach((manager) => {
             promise = promise.then(() => {

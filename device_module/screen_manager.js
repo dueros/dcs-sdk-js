@@ -21,7 +21,7 @@ const child_process = require('child_process');
 const system = require(ROOT_PATH + '/lib/system');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 
-class ScreenManager extends BaseManager{
+class ScreenManager extends BaseManager {
     constructor(dcsController) {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.screen";
@@ -34,22 +34,22 @@ class ScreenManager extends BaseManager{
             }
         });
     }
-    HtmlViewDirective(directive){
+    HtmlViewDirective(directive) {
         //TODO
     }
-    RenderCardDirective(directive){
+    RenderCardDirective(directive) {
         //TODO
     }
-    RenderPlayerInfoDirective(directive){
+    RenderPlayerInfoDirective(directive) {
         this.last_player_info = directive.payload;
     }
-    RenderAudioListDirective(directive){
+    RenderAudioListDirective(directive) {
         this.last_player_list = directive.payload;
     }
-    RenderVoiceInputTextDirective(directive){
+    RenderVoiceInputTextDirective(directive) {
         //TODO
     }
-    RenderHintDirective(directive){
+    RenderHintDirective(directive) {
         //TODO
     }
     getContext() {
@@ -94,13 +94,13 @@ class ScreenManager extends BaseManager{
         ) {
             return;
         }
-        
+
         this.last_token = directive.payload.token;
 
         let name = directive.header.name;
-        console.log(typeof this[name+"Directive"]);
-        if (typeof this[name+"Directive"] === "function") {
-            this[name+"Directive"](directive);
+        console.log(typeof this[name + "Directive"]);
+        if (typeof this[name + "Directive"] === "function") {
+            this[name + "Directive"](directive);
         }
     }
 

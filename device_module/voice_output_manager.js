@@ -21,7 +21,7 @@ const BaseManager = require("./base_manager");
 const util = require('util');
 const DataStreamPlayer = require("./system_impl/data_stream_player");
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
-class VoiceOutputManager extends BaseManager{
+class VoiceOutputManager extends BaseManager {
     constructor(controller) {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.voice_output";

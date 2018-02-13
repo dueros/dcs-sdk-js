@@ -23,8 +23,8 @@ const fs = require('fs');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 const config = require(ROOT_PATH + "/config").getAll();
 const child_process = require("child_process");
-class AlertManager extends BaseManager{
-    
+class AlertManager extends BaseManager {
+
     constructor(controller) {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.alerts";
@@ -54,7 +54,7 @@ class AlertManager extends BaseManager{
         });
 
     }
-    
+
     SetAlertDirective(directive) {
         this.setAlert({
             token: directive.payload.token,
@@ -75,7 +75,7 @@ class AlertManager extends BaseManager{
             token: directive.payload.token
         }));
     }
-    
+
 
     save() {
         if (this.alertsData) {
@@ -144,7 +144,7 @@ class AlertManager extends BaseManager{
         });
 
     }
-    stop () {
+    stop() {
         if (this.player_process) {
             this.player_process.kill("SIGKILL");
             this.player_process = null;

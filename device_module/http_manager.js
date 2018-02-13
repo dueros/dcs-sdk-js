@@ -19,12 +19,12 @@ const BaseManager = require("./base_manager");
 const util = require('util');
 const request = require('request');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
-class HttpManager extends BaseManager{
+class HttpManager extends BaseManager {
     constructor() {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.http";
     }
-    
+
     DoHttpRequestDirective(directive, controller) {
         let params = {};
         let token = directive.payload.token;

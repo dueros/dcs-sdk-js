@@ -28,7 +28,7 @@ const FormData = require("form-data");
 
 const fs = require('fs');
 const Dicer = require('dicer');
-class DcsClient extends EventEmitter{
+class DcsClient extends EventEmitter {
     constructor(options) {
         super();
         this.recorder = options.recorder;

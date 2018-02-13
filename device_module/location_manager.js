@@ -20,7 +20,7 @@ const util = require('util');
 const child_process = require('child_process');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 
-class LocationManager extends BaseManager{
+class LocationManager extends BaseManager {
     constructor() {
         super();
         this.NAMESPACE = "ai.dueros.device_interface.location";
