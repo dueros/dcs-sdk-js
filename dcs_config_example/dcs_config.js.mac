@@ -1,0 +1,40 @@
+module.exports = {
+    "boundary": "___dumi_avs_client_wangpeng20___",
+    "directive_uri": "/dcs/v1/directives",
+    "events_uri": "/dcs/v1/events",
+    "ping_uri": "/dcs/v1/ping",
+    "device_id": "wangpeng20_default",
+
+
+    "mplayer_proxy":{
+        "port":8765,
+    },
+
+    "host": "dueros-h2.baidu.com",
+    "ip": "dueros-h2.baidu.com",
+    "downstream_protocol": "http2",
+
+    "schema": "https://",
+    "protocol": "http2",
+
+    "event_header": {
+    },
+
+
+    "rec_env": {},
+    "play_env": {},
+
+
+    "rec_sample_rate": "44100",
+    "rec_bits": "32",
+    "rec_channel": "2",
+
+    "rec_cmd": "/usr/local/bin/rec",
+    "play_cmd": "/usr/local/bin/play",
+    "sox_cmd": "/usr/local/bin/sox",
+
+
+    "mplayer_options":{"args":"-cache 20000 -vo null"},
+
+    "oauth_token": "{{TODO}}"
+};

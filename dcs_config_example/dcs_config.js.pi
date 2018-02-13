@@ -1,4 +1,4 @@
-{
+module.exports={
     "boundary":"___dumi_dcs_client_wangpeng20___",
     "directive_uri":"/dcs/v1/directives",
     "events_uri":"/dcs/v1/events",
@@ -12,19 +12,12 @@
     "protocol":"http",
     "downstream_protocol":"http2",
     
-    "event_header":{
-    },
-    
-    "rec_env":{},
-    "play_env":{},
+    "rec_env":{"AUDIODEV":"hw:1,0"},
+    "play_env":{"AUDIODEV":"hw:0,0"},
 
-    "rec_cmd":"/usr/local/bin/rec",
-    "play_cmd":"/usr/local/bin/play",
-    "sox_cmd":"/usr/local/bin/sox",
-    "mplayer_options":{"args":"-cache 20000 -vo null"},
-    "mplayer_proxy":{
-        "port":8765
-    },
+    "rec_cmd":"/usr/bin/rec",
+    "play_cmd":"/usr/bin/play",
+    "sox_cmd":"/usr/bin/sox",
     
     "oauth_token":"{{TODO}}"
-}
+};

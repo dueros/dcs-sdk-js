@@ -1,0 +1,87 @@
+module.exports = {
+    "boundary": "___dumi_avs_client_wangpeng20___",
+    "directive_uri": "/dcs/v1/directives",
+    "events_uri": "/dcs/v1/events",
+    "ping_uri": "/dcs/v1/ping",
+    "device_id": "wangpeng20_default",
+
+
+    "mplayer_proxy":{
+        "port":8765,
+    },
+
+
+    //http头里的host，http2方式下就没用了
+    "host": "dueros-h2.baidu.com",
+
+    //发dcs请求的目标网址
+    "ip": "dueros-h2.baidu.com",
+
+    //downstream请求使用的协议, 可选http2/http
+    "downstream_protocol": "http2",
+
+    //请求地址的schema，公开网址都应该使用https
+    "schema": "https://",
+
+    //event请求使用的协议,可选http2/http
+    "protocol": "http2",
+
+    //这是一个测试环境
+    //"host":"dueros-h2-debug.baidu.com",
+    //"ip":"dueros-h2-debug.baidu.com",
+    
+
+
+
+
+    //如果使用avs服务，打开以下四个选项。客户端会有一层mapping，mapping成dcs协议处理
+    //"avs_protocol":true,
+    //"avs_directive_uri":"/dcs/avs-compatible-v20160207/directives",
+    //"avs_events_uri":"/dcs/avs-compatible-v20160207/events",
+    //"avs_ping_uri":"/dcs/v1/ping",
+
+
+
+
+
+
+    //event请求的http header
+    "event_header": {
+        //这个头可以制定测试环境的ui地址
+        //"debug_boss":"host.baidu.com:8888",
+    },
+
+    //调用rec命令（用于录音）时的环境变量
+    "rec_env": {
+        //可以指定录音设备
+        //"AUDIODEV":"hw:1,0"
+    },
+    //调用play命令（用于tts播放）时的环境变量
+    "play_env": {
+        //可以指定播放设备
+        //"AUDIODEV":"hw:1,0"
+    },
+
+    //调用rec命令时，指定采样率（有些设备只支持44100或者48000，指定无效，内部会用sox转换成需要的，看看控制台输出）
+    "rec_sample_rate": "44100",
+    //调用rec命令时，指定采样精度bits率（有些设备只支持32或者16，指定无效，内部会用sox转换成需要的，看看控制台输出）
+    "rec_bits": "32",
+    //调用rec命令时，指定声道数（有些设备只支持2，指定无效，内部会用sox转换成需要的，看看控制台输出）
+    "rec_channel": "2",
+
+
+    //以下是sox命令行的路径。brew安装的是/usr/local/bin/，ubuntu下apt安装的是/usr/bin
+    "rec_cmd": "/usr/local/bin/rec",
+    //如果只是测试，不想播放，可以使用/bin/cat来输出
+    "play_cmd": "/usr/local/bin/play",
+    "sox_cmd": "/usr/local/bin/sox",
+
+
+    //调用mplayer的参数
+    //cache调大，是为了一次把音乐缓冲完，因为很多cdn服务器会限制连接保持的时长
+    //-vo null是为了云端下发视频地址时，只是播放音乐
+    "mplayer_options":{"args":"-cache 20000 -vo null"},
+    
+    //此处可以填写一个手动获得的oauth access_token。也会使用storage.json里的access_token，storage.json是自动获得并保存下来的access_token
+    "oauth_token": "{{TODO}}"
+};

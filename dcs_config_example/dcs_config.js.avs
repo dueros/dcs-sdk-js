@@ -30,22 +30,8 @@ module.exports={
     "play_env":{},
     
 
-    "desc":"这个debug_boss是测试音乐用的服务，去掉下面的 '111' 再执行 'cp dcs_config.json dcs-sdk-js' 可以生效",
     "event_header":{
-        "from_mac":"1",
-        //"debug_boss":"cq02-ps-spider01.cq02.baidu.com:8984"
     },
-
-//    "debug": {
-//        // 增加参数
-//        "bot": {
-//            // 你bot的id
-//            "id": "82425e9b-eb93-ad15-c087-5a7d22af70c3"
-//        },
-//        // 固定
-//        "simulator": true
-//    }
-    
 
     "rec_sample_rate":"44100",
     "rec_bits":"32",
