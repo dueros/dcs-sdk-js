@@ -21,50 +21,50 @@ const BaseManager = require("./base_manager");
 const util = require('util');
 const DataStreamPlayer = require("./system_impl/data_stream_player");
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
+class VoiceOutputManager extends BaseManager{
+    constructor(controller) {
+        super();
+        this.NAMESPACE = "ai.dueros.device_interface.voice_output";
+        this.ttsplayer = new DataStreamPlayer();
 
-function VoiceOutputManager(controller) {
-    this.ttsplayer = new DataStreamPlayer();
+        this.ttsplayer.on("start", () => {
+            //改了下逻辑：开始执行speak指令的时候，才算是tts 正在播放
+            /*
+            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechStarted", controller.getContext(), {
+                token: this.last_played_token
+            }));
+            this.emit("start");
+            */
+        });
+        this.ttsplayer.on("end", () => {
+            if (this.promise) {
+                this.promise.resolve();
+            }
+            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechFinished", controller.getContext(), {
+                token: this.last_played_token
+            }));
+            this.emit("end");
+        });
+        controller.on("content", (content_id, content) => {
+            //console.log("on controller content",this.waiting_content_id,content_id);
+            if (this.waiting_content_id == content_id) {
+                this.ttsplayer.play(content);
+                this.content_cache = null;
+                this.waiting_content_id = null;
+            } else {
+                this.content_cache = [content_id, content];
+                setTimeout(() => {
+                    if (this.content_cache && this.content_cache[0] == content_id) {
+                        console.error("content timeout, no speak directive");
+                        this.content_cache = null;
+                    }
+                }, 2000);
+            }
+        });
 
-    this.ttsplayer.on("start", () => {
-        //改了下逻辑：开始执行speak指令的时候，才算是tts 正在播放
-        /*
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechStarted", controller.getContext(), {
-            token: this.last_played_token
-        }));
-        this.emit("start");
-        */
-    });
-    this.ttsplayer.on("end", () => {
-        if (this.promise) {
-            this.promise.resolve();
-        }
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechFinished", controller.getContext(), {
-            token: this.last_played_token
-        }));
-        this.emit("end");
-    });
-    controller.on("content", (content_id, content) => {
-        //console.log("on controller content",this.waiting_content_id,content_id);
-        if (this.waiting_content_id == content_id) {
-            this.ttsplayer.play(content);
-            this.content_cache = null;
-            this.waiting_content_id = null;
-        } else {
-            this.content_cache = [content_id, content];
-            setTimeout(() => {
-                if (this.content_cache && this.content_cache[0] == content_id) {
-                    console.error("content timeout, no speak directive");
-                    this.content_cache = null;
-                }
-            }, 2000);
-        }
-    });
+    }
 
-}
-util.inherits(VoiceOutputManager, BaseManager);
-VoiceOutputManager.prototype.NAMESPACE = "ai.dueros.device_interface.voice_output";
-var handlers = {
-    "Speak": function(directive, controller) {
+    SpeakDirective(directive, controller) {
         this.last_played_token = directive.payload.token;
         var url = directive.payload.url;
         if (!url) {
@@ -103,38 +103,28 @@ var handlers = {
             };
         });
     }
-};
-VoiceOutputManager.prototype.getContext = function() {
-    return {
-        "header": {
-            "namespace": this.NAMESPACE,
-            "name": "SpeechState"
-        },
-        "payload": {
-            "token": this.last_played_token,
-            ///TODO get how long was played, in sox.play.stderr?
-            "offsetInMilliseconds": 0,
-            "playerActivity": this.ttsplayer.isPlaying() ? "PLAYING" : "IDLE"
+    getContext() {
+        return {
+            "header": {
+                "namespace": this.NAMESPACE,
+                "name": "SpeechState"
+            },
+            "payload": {
+                "token": this.last_played_token,
+                ///TODO get how long was played, in sox.play.stderr?
+                "offsetInMilliseconds": 0,
+                "playerActivity": this.ttsplayer.isPlaying() ? "PLAYING" : "IDLE"
+            }
+        };
+    }
+    isPlaying() {
+        if (this.waiting_content_id) {
+            return true;
         }
-    };
-};
-VoiceOutputManager.prototype.isPlaying = function() {
-    if (this.waiting_content_id) {
-        return true;
+        return this.ttsplayer.isPlaying();
     }
-    return this.ttsplayer.isPlaying();
-};
-VoiceOutputManager.prototype.stop = function() {
-    return this.ttsplayer.stop();
-};
-VoiceOutputManager.prototype.handleDirective = function(directive, controller) {
-
-    if (directive.header.namespace != this.NAMESPACE) {
-        return;
-    }
-    var name = directive.header.name;
-    if (handlers[name]) {
-        return handlers[name].call(this, directive, controller);
+    stop() {
+        return this.ttsplayer.stop();
     }
 }
 

@@ -22,51 +22,51 @@ const ROOT_PATH = path.resolve(__dirname + "/..");
 const config = require(ROOT_PATH + "/config.js").getAll();
 
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
-
-function AudioPlayerManager(controller) {
-    this.playlist = [];
-    //  this.player=new Player({debug:1});
-    this.player = new Player(config.mplayer_options);
-    this.player.on("stop", () => {
-        controller.emit("event",
-            DcsProtocol.createEvent(this.NAMESPACE, "PlaybackStopped", controller.getContext(), {
+class AudioPlayerManager extends BaseManager{
+    constructor(controller) {
+        super();
+        this.NAMESPACE = "ai.dueros.device_interface.audio_player";
+        this.playlist = [];
+        //  this.player=new Player({debug:1});
+        this.player = new Player(config.mplayer_options);
+        this.player.on("stop", () => {
+            controller.emit("event",
+                DcsProtocol.createEvent(this.NAMESPACE, "PlaybackStopped", controller.getContext(), {
+                    token: this.last_played_token,
+                    offsetInMilliseconds: this.offset_ms
+                })
+            );
+            this.offset_ms = 0;
+        });
+        this.player.on("pause", () => {
+            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackPaused", controller.getContext(), {
                 token: this.last_played_token,
                 offsetInMilliseconds: this.offset_ms
-            })
-        );
-        this.offset_ms = 0;
-    });
-    this.player.on("pause", () => {
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackPaused", controller.getContext(), {
-            token: this.last_played_token,
-            offsetInMilliseconds: this.offset_ms
-        }));
-    });
-    this.player.on("start", () => {
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackStarted", controller.getContext(), {
-            token: this.last_played_token,
-            offsetInMilliseconds: this.offset_ms
-        }));
-    });
-    this.player.on("finished", () => {
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackNearlyFinished", controller.getContext(), {
-            token: this.last_played_token,
-            offsetInMilliseconds: this.offset_ms
-        }));
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackFinished", controller.getContext(), {
-            token: this.last_played_token,
-            offsetInMilliseconds: this.offset_ms
-        }));
-        this.playNext();
-    });
-    this.player.on("time", (sec) => {
-        this.offset_ms = parseInt(sec * 1000, 10);
-    });
-}
-util.inherits(AudioPlayerManager, BaseManager);
-AudioPlayerManager.prototype.NAMESPACE = "ai.dueros.device_interface.audio_player";
-var handlers = {
-    "ClearQueue": function(directive) {
+            }));
+        });
+        this.player.on("start", () => {
+            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackStarted", controller.getContext(), {
+                token: this.last_played_token,
+                offsetInMilliseconds: this.offset_ms
+            }));
+        });
+        this.player.on("finished", () => {
+            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackNearlyFinished", controller.getContext(), {
+                token: this.last_played_token,
+                offsetInMilliseconds: this.offset_ms
+            }));
+            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "PlaybackFinished", controller.getContext(), {
+                token: this.last_played_token,
+                offsetInMilliseconds: this.offset_ms
+            }));
+            this.playNext();
+        });
+        this.player.on("time", (sec) => {
+            this.offset_ms = parseInt(sec * 1000, 10);
+        });
+    }
+    
+    ClearQueueDirective(directive) {
         if (directive.payload.clearBehavior == "CLEAR_ENQUEUED") {
             this.playlist = [];
         }
@@ -74,12 +74,11 @@ var handlers = {
             this.playlist = [];
             this.player.stop();
         }
-    },
-    "Stop": function(directive) {
+    }
+    StopDirective(directive) {
         this.player.stop();
-    },
-    "Play": function(directive) {
-
+    }
+    PlayDirective(directive) {
         //    - REPLACE_ALL: 停止当前的播放（如有必要，发送PlaybackStopped事件）并清除播放列表，立即播放本stream；
         //    - ENQUEUE: 把本stream加到播放队列末尾
         //    - REPLACE_ENQUEUED: 清除当前播放列表，把本stream放到播放列表；不影响当前正在播放的stream
@@ -116,61 +115,51 @@ var handlers = {
             }
         }
     }
-};
-AudioPlayerManager.prototype.playNext = function() {
-    if (this.playlist.length > 0) {
-        let playitem = this.playlist.shift();
-        this.player.openFile(playitem.url);
-        this.last_played_token = playitem.token;
-        this.offset_ms = 0;
-        this.player.play();
-    }
-};
-AudioPlayerManager.prototype.isPlaying = function() {
-    return this.player.isPlaying();
-};
-AudioPlayerManager.prototype.pause = function() {
-    return this.player.pause();
-};
-AudioPlayerManager.prototype.isPaused = function() {
-    return this.player.isPaused();
-};
-AudioPlayerManager.prototype.play = function() {
-    return this.player.play();
-};
-
-AudioPlayerManager.prototype.stop = function() {
-    return this.player.stop();
-};
-AudioPlayerManager.prototype.seekTo = function(offsetInMilliseconds) {
-    if (this.player.isPlaying()) {
-        this.offset_ms = parseInt(offsetInMilliseconds, 10);
-        this.player.seek(parseInt(offsetInMilliseconds / 1000));
-    }
-};
-
-AudioPlayerManager.prototype.getContext = function() {
-    return {
-        "header": {
-            "namespace": this.NAMESPACE,
-            "name": "PlaybackState"
-        },
-        "payload": {
-            "token": this.last_played_token,
-            "offsetInMilliseconds": this.offset_ms,
-            "playerActivity": this.isPlaying() ? "PLAYING" : "IDLE"
+    playNext() {
+        if (this.playlist.length > 0) {
+            let playitem = this.playlist.shift();
+            this.player.openFile(playitem.url);
+            this.last_played_token = playitem.token;
+            this.offset_ms = 0;
+            this.player.play();
         }
     };
-
-};
-AudioPlayerManager.prototype.handleDirective = function(directive) {
-    if (directive.header.namespace != this.NAMESPACE) {
-        return;
+    isPlaying() {
+        return this.player.isPlaying();
     }
-    var name = directive.header.name;
-    if (handlers[name]) {
-        handlers[name].call(this, directive);
+    pause() {
+        return this.player.pause();
+    }
+    isPaused() {
+        return this.player.isPaused();
+    }
+    play() {
+        return this.player.play();
+    }
+
+    stop() {
+        return this.player.stop();
+    }
+    seekTo(offsetInMilliseconds) {
+        if (this.player.isPlaying()) {
+            this.offset_ms = parseInt(offsetInMilliseconds, 10);
+            this.player.seek(parseInt(offsetInMilliseconds / 1000));
+        }
+    }
+
+    getContext () {
+        return {
+            "header": {
+                "namespace": this.NAMESPACE,
+                "name": "PlaybackState"
+            },
+            "payload": {
+                "token": this.last_played_token,
+                "offsetInMilliseconds": this.offset_ms,
+                "playerActivity": this.isPlaying() ? "PLAYING" : "IDLE"
+            }
+        };
+
     }
 }
-
 module.exports = AudioPlayerManager;

@@ -19,11 +19,13 @@ const BaseManager = require("./base_manager");
 const util = require('util');
 const request = require('request');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
-
-function HttpManager() {}
-util.inherits(HttpManager, BaseManager);
-var handlers = {
-    "DoHttpRequest": function(directive, controller) {
+class HttpManager extends BaseManager{
+    constructor() {
+        super();
+        this.NAMESPACE = "ai.dueros.device_interface.http";
+    }
+    
+    DoHttpRequestDirective(directive, controller) {
         let params = {};
         let token = directive.payload.token;
         params.url = directive.payload.url;
@@ -57,19 +59,6 @@ var handlers = {
                 }
             }));
         });
-    },
-};
-HttpManager.prototype.getContext = function() {
-    return;
-};
-HttpManager.prototype.NAMESPACE = "ai.dueros.device_interface.http";
-HttpManager.prototype.handleDirective = function(directive, controller) {
-    if (directive.header.namespace != this.NAMESPACE) {
-        return;
-    }
-    var name = directive.header.name;
-    if (handlers[name]) {
-        handlers[name].call(this, directive, controller);
     }
 }
 

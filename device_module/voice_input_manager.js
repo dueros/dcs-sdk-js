@@ -15,38 +15,28 @@
  */
 const BaseManager = require("./base_manager");
 const util = require('util');
-
-function VoiceInputManager() {}
-util.inherits(VoiceInputManager, BaseManager);
-VoiceInputManager.prototype.NAMESPACE = "ai.dueros.device_interface.voice_input";
-var handlers = {
-    "Listen": function(directive, controller) {
+class VoiceInputManager extends BaseManager{
+    constructor() {
+        super();
+        this.NAMESPACE = "ai.dueros.device_interface.voice_input";
+    }
+    ListenDirective(directive, controller) {
         controller.startRecognize();
-    },
-    "StopListen": function(directive, controller) {
+    }
+    StopListenDirective(directive, controller) {
         console.log("exec directive StopListen");
         controller.stopRecognize();
     }
-};
-VoiceInputManager.prototype.getContext = function() {
-    return {
-        "header": {
-            "namespace": this.NAMESPACE,
-            "name": "ListenState"
-        },
-        "payload": {
-            "wakeword": "小度小度"
-        }
-    };
-};
-VoiceInputManager.prototype.handleDirective = function(directive, controller) {
-
-    if (directive.header.namespace != this.NAMESPACE) {
-        return;
-    }
-    var name = directive.header.name;
-    if (handlers[name]) {
-        handlers[name].call(this, directive, controller);
+    getContext() {
+        return {
+            "header": {
+                "namespace": this.NAMESPACE,
+                "name": "ListenState"
+            },
+            "payload": {
+                "wakeword": "小度小度"
+            }
+        };
     }
 }
 

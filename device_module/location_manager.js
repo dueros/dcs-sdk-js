@@ -20,49 +20,44 @@ const util = require('util');
 const child_process = require('child_process');
 const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 
-function LocationManager() {
-    this.loc = {
-        "longitude": 0,
-        "latitude": 0,
-        "geoCoordinateSystem": "WGS84"
-    };
-    this.handlers = {};
-}
-util.inherits(LocationManager, BaseManager);
-LocationManager.prototype.NAMESPACE = "ai.dueros.device_interface.location";
-LocationManager.prototype.getContext = function() {
-    if (!this.loc) {
-        return;
+class LocationManager extends BaseManager{
+    constructor() {
+        super();
+        this.NAMESPACE = "ai.dueros.device_interface.location";
+        this.loc = {
+            "longitude": 0,
+            "latitude": 0,
+            "geoCoordinateSystem": "WGS84"
+        };
+        this.handlers = {};
     }
-    return {
-        "header": {
-            "namespace": this.NAMESPACE,
-            "name": "GpsState"
-        },
-        "payload": {
-            "longitude": this.loc.longitude,
-            "latitude": this.loc.latitude,
-            "geoCoordinateSystem": this.loc.geoCoordinateSystem
+    getContext() {
+        if (!this.loc) {
+            return;
         }
-    };
-};
-LocationManager.prototype.setLocation = function(loc) {
-    if (loc.longitude && loc.latitude) {
-        if (!loc.geoCoordinateSystem) {
-            loc.geoCoordinateSystem = "WGS84";
+        return {
+            "header": {
+                "namespace": this.NAMESPACE,
+                "name": "GpsState"
+            },
+            "payload": {
+                "longitude": this.loc.longitude,
+                "latitude": this.loc.latitude,
+                "geoCoordinateSystem": this.loc.geoCoordinateSystem
+            }
+        };
+    }
+    setLocation(loc) {
+        if (loc.longitude && loc.latitude) {
+            if (!loc.geoCoordinateSystem) {
+                loc.geoCoordinateSystem = "WGS84";
+            }
+            this.loc = loc;
         }
-        this.loc = loc;
+        //"longitude": {{DOUBLE}},
+        //"latitude": {{DOUBLE}},
+        //"geoCoordinateSystem": "{{STRING}}"
     }
-    //"longitude": {{DOUBLE}},
-    //"latitude": {{DOUBLE}},
-    //"geoCoordinateSystem": "{{STRING}}"
-};
 
-LocationManager.prototype.handleDirective = function(directive, controller) {
-    if (directive.header.namespace != this.NAMESPACE) {
-        return;
-    }
-    //NONE
 }
-
 module.exports = LocationManager;
