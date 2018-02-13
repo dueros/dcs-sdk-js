@@ -28,25 +28,118 @@ const FormData = require("form-data");
 
 const fs = require('fs');
 const Dicer = require('dicer');
+class DcsClient extends EventEmitter{
+    constructor(options) {
+        super();
+        this.recorder = options.recorder;
+        this.downstream = new DownStream();
+        this.downstream.on("directive", (response) => {
+            //"namespace": "ai.dueros.device_interface.voice_input",
+            //"name": "StopListen",
+            this.emit("directive", response);
+        });
+        this.downstream.on("content", (content_id, readable) => {
+            this.emit("content", content_id, readable);
+        });
+        this.downstream.on("init", () => {
+            this.emit("downstream_init");
+        });
+    }
+    sendEvent(eventData) {
+        if (!eventData) {
+            console.error("no send event data");
+            return;
+        }
 
-function DcsClient(options) {
-    this.recorder = options.recorder;
-    EventEmitter.call(this);
-    this.downstream = new DownStream();
-    this.downstream.on("directive", (response) => {
-        //"namespace": "ai.dueros.device_interface.voice_input",
-        //"name": "StopListen",
-        this.emit("directive", response);
-    });
-    this.downstream.on("content", (content_id, readable) => {
-        this.emit("content", content_id, readable);
-    });
-    this.downstream.on("init", () => {
-        this.emit("downstream_init");
-    });
+        let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
+        console.log("event logid:" + logid);
+        let form_data = new FormData();
+        let headers = {
+            "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
+            "SAIYALOGID": logid,
+            "Authorization": "Bearer " + config.oauth_token,
+            "Dueros-Device-Id": config.device_id
+        };
+        if (config.event_header) {
+            Object.assign(headers, config.event_header);
+        }
+        form_data.append("metadata", JSON.stringify(eventData), {
+            "contentType": 'application/json; charset=UTF-8'
+        });
+
+        let r = request({
+            http2session: this.downstream.http2session,
+            url: config.schema + config.ip + config.events_uri,
+            method: "post",
+            headers: headers
+        });
+        form_data.pipe(r);
+        let rWrap = processEventRequest.call(this, r);
+        /*
+        rWrap.pipe(fs.createWriteStream("test1.log", {
+            flags: 'w',
+            defaultEncoding: 'binary',
+            autoClose: true
+        }));
+        */
+        rWrap.on("error", (error) => {
+            console.log("event upload error");
+        });
+    }
+    startRecognize(eventData, wakeWordPcm) {
+        let form_data = new FormData();
+        let rec_stream = this.rec_stream = new RecorderWrapper({
+            "highWaterMark": 200000,
+            "beforePcm": wakeWordPcm,
+            "recorder": this.recorder.start().out()
+        });
+        rec_stream.pipe(fs.createWriteStream(ROOT_PATH + "/recorder.pcm", {
+            flags: 'w',
+            defaultEncoding: 'binary',
+            autoClose: true
+        }));
+        let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
+        console.log("voice logid:" + logid);
+        let headers = {
+            "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
+            "SAIYALOGID": logid,
+            "Authorization": "Bearer " + config.oauth_token,
+            "Dueros-Device-Id": config.device_id
+        };
+        if (config.event_header) {
+            Object.assign(headers, config.event_header);
+        }
+        form_data.append("metadata", JSON.stringify(eventData), {
+            "contentType": 'application/json; charset=UTF-8'
+        });
+        form_data.append("audio", rec_stream, {
+            "contentType": 'application/octet-stream'
+        });
+        let r = request({
+            http2session: this.downstream.http2session,
+            method: "post",
+            "url": config.schema + config.ip + config.events_uri,
+            headers: headers
+        });
+        form_data.pipe(r);
+        r.on("socket", (socket) => {
+            socket.setNoDelay(true);
+        });
+        let rWrap = processEventRequest.call(this, r);
+        let dialog = new Dialog({
+            eventData,
+            req: r,
+            rec_stream
+        });
+        rWrap.on("error", (e) => {
+            //dialog.stopRecording();
+            console.log("re init downstream when recognizing error", e);
+            this.downstream.init();
+        });
+        return dialog;
+    }
 }
 
-util.inherits(DcsClient, EventEmitter);
 class RecorderWrapper extends Readable {
     constructor(options) {
         super(options);
@@ -161,47 +254,6 @@ function pcm2adpcm(recorder) {
     //return convert_process.stdout;
 }
 
-DcsClient.prototype.sendEvent = function(eventData) {
-    if (!eventData) {
-        console.error("no send event data");
-        return;
-    }
-
-    let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
-    console.log("event logid:" + logid);
-    let form_data = new FormData();
-    let headers = {
-        "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
-        "SAIYALOGID": logid,
-        "Authorization": "Bearer " + config.oauth_token,
-        "Dueros-Device-Id": config.device_id
-    };
-    if (config.event_header) {
-        Object.assign(headers, config.event_header);
-    }
-    form_data.append("metadata", JSON.stringify(eventData), {
-        "contentType": 'application/json; charset=UTF-8'
-    });
-
-    let r = request({
-        http2session: this.downstream.http2session,
-        url: config.schema + config.ip + config.events_uri,
-        method: "post",
-        headers: headers
-    });
-    form_data.pipe(r);
-    let rWrap = processEventRequest.call(this, r);
-    /*
-    rWrap.pipe(fs.createWriteStream("test1.log", {
-        flags: 'w',
-        defaultEncoding: 'binary',
-        autoClose: true
-    }));
-    */
-    rWrap.on("error", (error) => {
-        console.log("event upload error");
-    });
-};
 
 function processEventRequest(r) {
     let rWrap = new Readable().wrap(r);
@@ -302,58 +354,6 @@ function processEventRequest(r) {
     rWrap.pipe(d1);
     return rWrap;
 }
-DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
-    let form_data = new FormData();
-    let rec_stream = this.rec_stream = new RecorderWrapper({
-        "highWaterMark": 200000,
-        "beforePcm": wakeWordPcm,
-        "recorder": this.recorder.start().out()
-    });
-    rec_stream.pipe(fs.createWriteStream(ROOT_PATH + "/recorder.pcm", {
-        flags: 'w',
-        defaultEncoding: 'binary',
-        autoClose: true
-    }));
-    let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
-    console.log("voice logid:" + logid);
-    let headers = {
-        "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
-        "SAIYALOGID": logid,
-        "Authorization": "Bearer " + config.oauth_token,
-        "Dueros-Device-Id": config.device_id
-    };
-    if (config.event_header) {
-        Object.assign(headers, config.event_header);
-    }
-    form_data.append("metadata", JSON.stringify(eventData), {
-        "contentType": 'application/json; charset=UTF-8'
-    });
-    form_data.append("audio", rec_stream, {
-        "contentType": 'application/octet-stream'
-    });
-    let r = request({
-        http2session: this.downstream.http2session,
-        method: "post",
-        "url": config.schema + config.ip + config.events_uri,
-        headers: headers
-    });
-    form_data.pipe(r);
-    r.on("socket", (socket) => {
-        socket.setNoDelay(true);
-    });
-    let rWrap = processEventRequest.call(this, r);
-    let dialog = new Dialog({
-        eventData,
-        req: r,
-        rec_stream
-    });
-    rWrap.on("error", (e) => {
-        //dialog.stopRecording();
-        console.log("re init downstream when recognizing error", e);
-        this.downstream.init();
-    });
-    return dialog;
-};
 
 class Dialog extends EventEmitter {
     constructor(options) {
