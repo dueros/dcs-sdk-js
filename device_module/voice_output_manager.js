@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+
 const BaseManager = require("./base_manager");
 const util = require('util');
-const DataStreamPlayer = require("./data_stream_player");
-const DcsProtocol = require("./dcs_protocol");
+const DataStreamPlayer = require("./system_impl/data_stream_player");
+const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 
 function VoiceOutputManager(controller) {
     this.ttsplayer = new DataStreamPlayer();

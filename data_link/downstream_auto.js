@@ -1,4 +1,7 @@
-const config = require("./config.js").getAll();
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+
+const config = require(ROOT_PATH+"/config.js").getAll();
 
 var DownStream;
 

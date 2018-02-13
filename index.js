@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const DcsClient = require("./dcs_client");
-const AvsClient = require("./avs_client");
+const DcsClient = require("./data_link/dcs_client");
+const AvsClient = require("./data_link/avs_client");
 const DcsController = require("./dcs_controller");
-const Recorder = require("./recorder");
+const Recorder = require("./device_module/system_impl/recorder");
 const configModule = require("./config.js");
 const config = configModule.getAll();
 const child_process = require("child_process");
-const fs = require('fs');
 var recorder = new Recorder();
 
 let controller = new DcsController();
@@ -63,8 +62,8 @@ var isRaspberrypi = unameAll.match(/raspberrypi/);
 
 
 
-let snowboy = require("./snowboy.js");
-const BufferManager = require("./wakeup/buffermanager").BufferManager;
+let snowboy = require("./snowboy/snowboy.js");
+const BufferManager = require("./lib/buffermanager").BufferManager;
 
 function onWakeup(index, hotword, buffer) {
     console.log("hotword " + index);

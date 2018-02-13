@@ -13,12 +13,21 @@ models.add({
   hotwords : 'snowboy'
 });
 */
+/*
+models.add({
+  //file: __dirname+'/resources/snowboy.umdl',
+  //file: __dirname+'/resources/alexa.umdl',
+  file:  __dirname+'/snowboy/resources/xiaoduxiaodu_xiaoyuxiaoyu_large.umdl',
+  sensitivity: '0.9,0.9',
+  hotwords : ['小度小度',"小度小度"]
+});
+*/
 models.add({
     //file: __dirname+'/resources/snowboy.umdl',
     //file: __dirname+'/resources/alexa.umdl',
     file: __dirname + '/resources/xiaoduxiaodu.umdl',
     sensitivity: '0.35,0.35,0.45',
-    hotwords: ['小度小度']
+    hotwords: ['小度小度', "小度小度", "小度小度"]
 });
 
 const detector = new Detector({
@@ -28,13 +37,13 @@ const detector = new Detector({
 });
 
 detector.on('silence', function() {
-    console.log('snowboy silence');
+    //console.log('snowboy silence');
 });
 
 detector.on('sound', function(buffer) {
     // <buffer> contains the last chunk of the audio that triggers the "sound"
     // event. It could be written to a wav stream.
-    console.log('snowboy sound');
+    //console.log('snowboy sound');
 });
 
 detector.on('error', function() {

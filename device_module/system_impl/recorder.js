@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const config = require("./config").getAll();
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/../..");
+const config = require(ROOT_PATH+"/config").getAll();
 let child_process = require("child_process");
-const BufferManager = require("./wakeup/buffermanager").BufferManager;
+const BufferManager = require(ROOT_PATH+"/lib/buffermanager").BufferManager;
 let rec_bits = config.rec_bits ? config.rec_bits : "32";
 let rec_sample_rate = config.rec_sample_rate ? config.rec_sample_rate : "44100";
 let rec_channel = config.rec_channel ? config.rec_channel : "1";

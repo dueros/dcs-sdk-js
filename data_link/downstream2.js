@@ -2,12 +2,14 @@
 const EventEmitter = require("events");
 const util = require('util');
 const request = require("request");
-const config = require("./config.js").getAll();
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+const config = require(ROOT_PATH+"/config.js").getAll();
 const Readable = require('stream').Readable;
 const http2 = require("http2");
 const fs = require('fs');
 const Dicer = require('dicer');
-const BufferManager = require("./wakeup/buffermanager").BufferManager;
+const BufferManager = require(ROOT_PATH+"/lib/buffermanager").BufferManager;
 
 function DownStream() {
     EventEmitter.call(this);
@@ -171,7 +173,7 @@ DownStream.prototype.init = async function() {
             //console.log(data.toString());
         });
         let rWrap = new Readable().wrap(this.req);
-        rWrap.pipe(fs.createWriteStream(__dirname + "/tmp/ds" + logid, {
+        rWrap.pipe(fs.createWriteStream(ROOT_PATH + "/tmp/ds" + logid, {
             flags: 'w',
             defaultEncoding: 'binary',
             autoClose: true

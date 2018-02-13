@@ -1,5 +1,6 @@
 const URL = require('url');
-const config = require("./config.js").getAll();
+const path = require("path");
+const config = require("../config.js").getAll();
 const h1_request = require("request");
 const http2=require("http2");
 const fs=require("fs");

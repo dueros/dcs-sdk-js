@@ -15,9 +15,13 @@
  */
 const BaseManager = require("./base_manager");
 const util = require('util');
-const Player = require("./player");
-const config = require("./config").getAll();
-const DcsProtocol = require("./dcs_protocol");
+const Player = require("./system_impl/player");
+
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+const config = require(ROOT_PATH+"/config.js").getAll();
+
+const DcsProtocol = require(ROOT_PATH+"/dcs_protocol");
 
 function AudioPlayerManager(controller) {
     this.playlist = [];

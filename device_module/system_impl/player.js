@@ -16,7 +16,9 @@
 const EventEmitter = require("events");
 const util = require('util');
 const MPlayer = require('./mplayer/index.js');
-const config = require("./config").getAll();
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/../..");
+const config = require(ROOT_PATH+"/config.js").getAll();
 
 
 const httpProxy = require('./mplayer_proxy');

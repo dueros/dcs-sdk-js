@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+
 const EventEmitter = require("events");
 const util = require('util');
 //const request = require("request");
 const request = require("./request_auto");
-const config = require("./config.js").getAll();
+const config = require(ROOT_PATH + "/config.js").getAll();
 var DownStream = require("./downstream_auto");
 const Readable = require('stream').Readable;
-const BufferManager = require("./wakeup/buffermanager").BufferManager;
+const BufferManager = require(ROOT_PATH + "/lib/buffermanager").BufferManager;
 const FormData = require("form-data");
 
 const fs = require('fs');
@@ -141,9 +144,9 @@ function wavHeader() {
 function pcm2adpcm(recorder) {
 
     let child_process = require("child_process");
-    let convert_process = child_process.spawn(__dirname + "/adpcm/Wav2Adpcm", ["-l"]);
+    let convert_process = child_process.spawn(ROOT_PATH + "/adpcm/Wav2Adpcm", ["-l"]);
     recorder.pipe(convert_process.stdin);
-    convert_process.stdout.pipe(fs.createWriteStream(__dirname + "/recorder.adpcm", {
+    convert_process.stdout.pipe(fs.createWriteStream(ROOT_PATH + "/recorder.adpcm", {
         flags: 'w',
         defaultEncoding: 'binary',
         autoClose: true
@@ -264,7 +267,7 @@ function processEventRequest(r) {
             if (header["content-id"] && header["content-id"][0]) {
                 content_id = header["content-id"][0].replace(/[<>]/g, "");
                 console.log("content_id:" + content_id);
-                var file = fs.createWriteStream(__dirname + "/tmp/" + content_id, {
+                var file = fs.createWriteStream(ROOT_PATH + "/tmp/" + content_id, {
                     flags: 'w',
                     defaultEncoding: 'binary',
                     autoClose: true
@@ -304,7 +307,7 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         "beforePcm": wakeWordPcm,
         "recorder": this.recorder.start().out()
     });
-    rec_stream.pipe(fs.createWriteStream(__dirname + "/recorder.pcm", {
+    rec_stream.pipe(fs.createWriteStream(ROOT_PATH + "/recorder.pcm", {
         flags: 'w',
         defaultEncoding: 'binary',
         autoClose: true

@@ -13,11 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+
+
 const BaseManager = require("./base_manager");
 const util = require('util');
 const fs = require('fs');
-const DcsProtocol = require("./dcs_protocol");
-const config = require("./config").getAll();
+const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
+const config = require(ROOT_PATH + "/config").getAll();
 const child_process = require("child_process");
 
 function AlertManager(controller) {
@@ -73,7 +77,7 @@ AlertManager.prototype.NAMESPACE = "ai.dueros.device_interface.alerts";
 
 AlertManager.prototype.save = function() {
     if (this.alertsData) {
-        fs.writeFileSync(__dirname + "/alerts.json", JSON.stringify(this.alertsData, null, 2));
+        fs.writeFileSync(ROOT_PATH + "/alerts.json", JSON.stringify(this.alertsData, null, 2));
     }
 };
 

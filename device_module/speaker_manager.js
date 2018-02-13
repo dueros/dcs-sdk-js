@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/..");
+
 const BaseManager = require("./base_manager");
 const util = require('util');
 const child_process = require('child_process');
-const system = require('./system');
-const DcsProtocol = require("./dcs_protocol");
+const system = require(ROOT_PATH+'/lib/system');
+const DcsProtocol = require(ROOT_PATH+"/dcs_protocol");
 
 function SpeakerManager() {
     this.logicVolume = this.getCurrentVolume();

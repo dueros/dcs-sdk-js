@@ -19,7 +19,9 @@
 const util = require('util');
 const EventEmitter = require("events");
 let child_process = require("child_process");
-const config = require("./config").getAll();
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname+"/../..");
+const config = require(ROOT_PATH+"/config.js").getAll();
 
 function DataStreamPlayer() {
     //let play_cmd='mpg123 -';
