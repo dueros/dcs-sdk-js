@@ -13,32 +13,12 @@ brew install sox mplayer python
 
 ### 树莓派linux下
 ```shell
-sudo apt-get install sox
+sudo apt-get install sox mplayer2
 sudo apt-get install libsox-fmt-mp3
 sudo apt-get install libasound2 libasound2-dev alsa-utils
 sudo apt-get install python
 sudo apt-get install libatlas-base-dev
 sudo apt-get install libatlas-dev
-
-
-#### build mplayer, raspberrypi的仓库里面没有
-sudo apt-get install libmpg123-dev
-wget http://www.mplayerhq.hu/MPlayer/releases/MPlayer-1.3.0.tar.xz
-tar xvf MPlayer-1.3.0.tar.xz
-cd MPlayer-1.3.0
-./configure;
-make
-sudo make install
-cd -
-
-#### build libiconv, raspberrypi的仓库里没有
-wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz
-tar xzvf libiconv-1.15.tar.gz
-cd libiconv-1.15
-./configure --prefix=/usr
-make
-sudo make install
-cd -
 
 
 #### 使用nvm 安装node
@@ -84,26 +64,20 @@ node-pre-gyp build
 树莓派 + DuerOS个人版录音套件，请执行
 
 ```shell
-cp dcs_config.json.pi dcs_config.json
-```
-
-树莓派 + ReSpeaker 2-Mics，请执行
-
-```shell
-cp dcs_config.json.pi.respeaker dcs_config.json
+cp dcs_config_example/dcs_config.js.pi dcs_config.js
 ```
 
 macos环境下，请执行
 ```shell
-cp dcs_config.json.mac dcs_config.json
+cp dcs_config_example/dcs_config.js.mac dcs_config.js
 ```
 
 ### 需要单独修改的配置项
-* 修改dcs_config.json中的access_token（oauth登录信息）
-* 修改dcs_config.json中的device_id为代表本机id的字符串 （设备id）
+* ~~修改dcs_config.js中的oauth_token（oauth登录信息）~~以下方法可以自动拿大access_token，无需手动获得
+* 修改dcs_config.js中的device_id为代表本机id的字符串 （设备id）
 
 
-### 拿到access_token的方法：
+### 自动拿到access_token的方法
 
 用一个度秘开放平台合法的client_id
 
