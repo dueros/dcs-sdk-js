@@ -18,10 +18,10 @@ const util = require('util');
 const Player = require("./system_impl/player");
 
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
-const config = require(ROOT_PATH+"/config.js").getAll();
+const ROOT_PATH = path.resolve(__dirname + "/..");
+const config = require(ROOT_PATH + "/config.js").getAll();
 
-const DcsProtocol = require(ROOT_PATH+"/dcs_protocol");
+const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 
 function AudioPlayerManager(controller) {
     this.playlist = [];
@@ -129,13 +129,13 @@ AudioPlayerManager.prototype.playNext = function() {
 AudioPlayerManager.prototype.isPlaying = function() {
     return this.player.isPlaying();
 };
-AudioPlayerManager.prototype.pause= function() {
+AudioPlayerManager.prototype.pause = function() {
     return this.player.pause();
 };
-AudioPlayerManager.prototype.isPaused= function() {
+AudioPlayerManager.prototype.isPaused = function() {
     return this.player.isPaused();
 };
-AudioPlayerManager.prototype.play= function() {
+AudioPlayerManager.prototype.play = function() {
     return this.player.play();
 };
 

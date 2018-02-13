@@ -17,13 +17,13 @@ const EventEmitter = require("events");
 const util = require('util');
 const MPlayer = require('./mplayer/index.js');
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/../..");
-const config = require(ROOT_PATH+"/config.js").getAll();
+const ROOT_PATH = path.resolve(__dirname + "/../..");
+const config = require(ROOT_PATH + "/config.js").getAll();
 
 
 const httpProxy = require('./mplayer_proxy');
-if(config.mplayer_proxy){
-    httpProxy.listen(config.mplayer_proxy.port,"127.0.0.1",()=>{
+if (config.mplayer_proxy) {
+    httpProxy.listen(config.mplayer_proxy.port, "127.0.0.1", () => {
         console.log("player proxy created");
     });
 }
@@ -35,7 +35,7 @@ function Player(options) {
     //,"play","pause" //很奇怪，树莓派会不停的触发这两个事件
     ["ready", "time", "start", "stop", "status", "finished"].forEach((eventName) => {
         this.mplayer.on(eventName, (...args) => {
-            if (["start","finished"].indexOf(eventName) != -1){
+            if (["start", "finished"].indexOf(eventName) != -1) {
                 this._isPaused = false;
             }
             if (eventName != "time") {
@@ -91,19 +91,19 @@ Player.prototype.isPaused = function() {
 
 ["setOptions", "openFile", "play", "pause", "stop", "next", "previous", "seek", "seekPercent", "volume", "mute"].forEach((funcName) => {
     Player.prototype[funcName] = function(...args) {
-        if(funcName == "pause" && this.isPlaying()){
+        if (funcName == "pause" && this.isPlaying()) {
             this._isPaused = true;
-            process.nextTick(()=>{
+            process.nextTick(() => {
                 this.emit("pause");
             });
         }
-        if(["play","stop","next","openFile"].indexOf(funcName)!=-1){
+        if (["play", "stop", "next", "openFile"].indexOf(funcName) != -1) {
             this._isPaused = false;
         }
         console.log("mplayer directive " + funcName);
         if (funcName == "openFile") {
-            if(config.mplayer_proxy){
-                args[0]="http_proxy://127.0.0.1:"+config.mplayer_proxy.port+"/"+args[0];
+            if (config.mplayer_proxy) {
+                args[0] = "http_proxy://127.0.0.1:" + config.mplayer_proxy.port + "/" + args[0];
             }
             console.log(JSON.stringify(args));
         }

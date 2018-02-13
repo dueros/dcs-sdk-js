@@ -125,13 +125,13 @@ AudioPlayerManager.prototype.playNext = function() {
 AudioPlayerManager.prototype.isPlaying = function() {
     return this.player.isPlaying();
 };
-AudioPlayerManager.prototype.pause= function() {
+AudioPlayerManager.prototype.pause = function() {
     return this.player.pause();
 };
-AudioPlayerManager.prototype.isPaused= function() {
+AudioPlayerManager.prototype.isPaused = function() {
     return this.player.isPaused();
 };
-AudioPlayerManager.prototype.play= function() {
+AudioPlayerManager.prototype.play = function() {
     return this.player.play();
 };
 
@@ -177,7 +177,7 @@ AudioPlayerManager.prototype.getContext = function() {
                 "name": "PlaybackState"
             },
             "payload": {
-                "playerActivity":"PLAYING",
+                "playerActivity": "PLAYING",
                 //"status": "FOREGROUND",
                 "status": "BACKGROUND",
                 "playerName": "BLUETOOTH"

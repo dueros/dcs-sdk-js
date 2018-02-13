@@ -68,8 +68,8 @@ module.exports = [{
     {
         avs_namespace: "TemplateRuntime",
         avs_name: "RenderTemplate",
-        func:(avs_directive)=>{
-            if(avs_directive.payload.type=="BodyTemplate1"){
+        func: (avs_directive) => {
+            if (avs_directive.payload.type == "BodyTemplate1") {
                 return {
                     "header": {
                         "namespace": "ai.dueros.device_interface.screen",
@@ -84,7 +84,7 @@ module.exports = [{
                     }
                 };
             }
-            if(avs_directive.payload.type=="BodyTemplate2"){
+            if (avs_directive.payload.type == "BodyTemplate2") {
                 return {
                     "header": {
                         "namespace": "ai.dueros.device_interface.screen",
@@ -97,12 +97,12 @@ module.exports = [{
                         "type": "StandardCard",
                         "content": avs_directive.payload.textField,
                         "image": {
-                            "src":avs_directive.payload.image.sources[0].url ? avs_directive.payload.image.sources[0].url: avs_directive.payload.image.sources[0].src,
+                            "src": avs_directive.payload.image.sources[0].url ? avs_directive.payload.image.sources[0].url : avs_directive.payload.image.sources[0].src,
                         }
                     }
                 };
             }
-            if(avs_directive.payload.type=="ListTemplate1"){
+            if (avs_directive.payload.type == "ListTemplate1") {
                 return {
                     "header": {
                         "namespace": "ai.dueros.device_interface.screen",
@@ -113,8 +113,8 @@ module.exports = [{
                     "payload": {
                         "token": avs_directive.payload.token,
                         "type": "ListCard",
-                        "title" : avs_directive.payload.title.mainTitle, 
-                        "list": avs_directive.payload.listItems.map((item)=>{
+                        "title": avs_directive.payload.title.mainTitle,
+                        "list": avs_directive.payload.listItems.map((item) => {
                             return {
                                 "title": item.leftTextField,
                                 "content": item.rightTextField

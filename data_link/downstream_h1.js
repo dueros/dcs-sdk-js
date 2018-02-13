@@ -2,17 +2,17 @@ const EventEmitter = require("events");
 const util = require('util');
 const request = require("request");
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
-const config = require(ROOT_PATH+"/config.js").getAll();
+const ROOT_PATH = path.resolve(__dirname + "/..");
+const config = require(ROOT_PATH + "/config.js").getAll();
 
 const Readable = require('stream').Readable;
 const fs = require('fs');
 const Dicer = require('dicer');
-const BufferManager = require(ROOT_PATH+"/lib/buffermanager").BufferManager;
+const BufferManager = require(ROOT_PATH + "/lib/buffermanager").BufferManager;
 
-function DownStream(options={}) {
+function DownStream(options = {}) {
     EventEmitter.call(this);
-    this.options=options;
+    this.options = options;
     this.init();
 }
 
@@ -21,7 +21,7 @@ DownStream.prototype.isConnected = function() {
 };
 
 DownStream.prototype.init = function() {
-    let options=this.options;
+    let options = this.options;
     var self = this;
     if (this.req) {
         this.req.abort();
@@ -30,23 +30,23 @@ DownStream.prototype.init = function() {
     console.log(config.oauth_token);
     var logid = config.device_id + "_" + new Date().getTime() + "_monitor";
     console.log("downstream logid:" + logid);
-	let url= config.schema + config.ip + config.directive_uri;
-    let headers={
+    let url = config.schema + config.ip + config.directive_uri;
+    let headers = {
         "SAIYALOGID": logid,
         "Host": config.host,
         "Authorization": "Bearer " + config.oauth_token,
         "Dueros-Device-Id": config.device_id
     };
 
-	if(options.url){
-		url = options.url + (options.path?options.path:"");
-	}
-    if(options.headers){
-        headers=Object.assign(headers,options.headers);
+    if (options.url) {
+        url = options.url + (options.path ? options.path : "");
     }
-    console.log("downstream url:"+url);
+    if (options.headers) {
+        headers = Object.assign(headers, options.headers);
+    }
+    console.log("downstream url:" + url);
     this.req = request({
-        "url":url,
+        "url": url,
         headers: headers,
     });
     this.req.on("error", () => {
@@ -96,7 +96,7 @@ DownStream.prototype.init = function() {
             }
         });
         p.on('data', function(data) {
-                //console.log(name,data);
+            //console.log(name,data);
             if (name == "metadata") {
                 jsonBody.add(data);
             }

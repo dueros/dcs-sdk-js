@@ -15,7 +15,7 @@
  */
 
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
+const ROOT_PATH = path.resolve(__dirname + "/..");
 
 const BaseManager = require("./base_manager");
 const util = require('util');
@@ -47,16 +47,16 @@ function VoiceOutputManager(controller) {
         //console.log("on controller content",this.waiting_content_id,content_id);
         if (this.waiting_content_id == content_id) {
             this.ttsplayer.play(content);
-            this.content_cache=null;
-            this.waiting_content_id=null;
+            this.content_cache = null;
+            this.waiting_content_id = null;
         } else {
             this.content_cache = [content_id, content];
-            setTimeout(()=>{
-                if(this.content_cache && this.content_cache[0]==content_id){
+            setTimeout(() => {
+                if (this.content_cache && this.content_cache[0] == content_id) {
                     console.error("content timeout, no speak directive");
-                    this.content_cache=null;
+                    this.content_cache = null;
                 }
-            },2000);
+            }, 2000);
         }
     });
 
@@ -88,12 +88,12 @@ var handlers = {
         return new Promise((resolve, reject) => {
             if (this.content_cache && this.content_cache[0] == cid) {
                 this.ttsplayer.play(this.content_cache[1]);
-                this.content_cache=null;
-                this.waiting_content_id=null;
-            }else{
+                this.content_cache = null;
+                this.waiting_content_id = null;
+            } else {
                 this.waiting_content_id = cid;
             }
-            
+
             if (this.promise) {
                 this.promise.reject();
             }
@@ -119,7 +119,7 @@ VoiceOutputManager.prototype.getContext = function() {
     };
 };
 VoiceOutputManager.prototype.isPlaying = function() {
-    if(this.waiting_content_id){
+    if (this.waiting_content_id) {
         return true;
     }
     return this.ttsplayer.isPlaying();

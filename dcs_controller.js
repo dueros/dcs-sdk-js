@@ -47,20 +47,20 @@ function DcsController(options) {
         this.screenManager,
         this.httpManager,
     ];
-    this.voiceOutputManager.on("end",()=>{
-        setTimeout(()=>{
-            if(!this.voiceOutputManager.isPlaying() && this.audioPlayerManager.isPaused()){
+    this.voiceOutputManager.on("end", () => {
+        setTimeout(() => {
+            if (!this.voiceOutputManager.isPlaying() && this.audioPlayerManager.isPaused()) {
                 console.log("resume player on voice end");
                 this.audioPlayerManager.play();
             }
-        },500);
+        }, 500);
     });
-    this.voiceOutputManager.on("start",()=>{
+    this.voiceOutputManager.on("start", () => {
         this.audioPlayerManager.pause();
     });
     this._contents = {};
     this.queue = [];
-    this.dialogs=[];
+    this.dialogs = [];
 }
 util.inherits(DcsController, EventEmitter);
 
@@ -143,16 +143,16 @@ DcsController.prototype.handleResponse = function(response) {
         return;
     }
 
-    if ((response.directive.header.namespace == "ai.dueros.device_interface.audio_player" && response.directive.header.name == "Play" && response.directive.payload.playBehavior == "REPLACE_ALL")
-    ) {
+    if ((response.directive.header.namespace == "ai.dueros.device_interface.audio_player" && response.directive.header.name == "Play" && response.directive.payload.playBehavior == "REPLACE_ALL")) {
         this.audioPlayerManager.stop();
     }
 
     if (
-        (this.currentDialogRequestId 
-            && response.directive.header.dialogRequestId == this.currentDialogRequestId)
+        (this.currentDialogRequestId &&
+            response.directive.header.dialogRequestId == this.currentDialogRequestId)
         //StopListen 无论如何都要执行
-        || (response.directive.header.namespace == "ai.dueros.device_interface.voice_input" && response.directive.header.name == "StopListen")
+        ||
+        (response.directive.header.namespace == "ai.dueros.device_interface.voice_input" && response.directive.header.name == "StopListen")
     ) {
         this.queue.push(response);
         if (!this.processing) {
@@ -161,8 +161,8 @@ DcsController.prototype.handleResponse = function(response) {
     }
 };
 
-DcsController.prototype.cancelCurrentDialog = function (){
-    this.currentDialogRequestId="";
+DcsController.prototype.cancelCurrentDialog = function() {
+    this.currentDialogRequestId = "";
 }
 
 DcsController.prototype.stopPlay = function(directive) {
@@ -181,7 +181,7 @@ DcsController.prototype.startRecognize = function(options) {
         return false;
     }
     this.audioPlayerManager.pause();
-    if(this.voiceOutputManager.isPlaying()){
+    if (this.voiceOutputManager.isPlaying()) {
         this.voiceOutputManager.stop();
     }
 
@@ -189,9 +189,9 @@ DcsController.prototype.startRecognize = function(options) {
         var wakeWordPcm = options.wakeWordPcm;
     }
     eventData = DcsProtocol.createRecognizeEvent(options);
-    if(this.currentDialogRequestId){
-        this.dialogs=this.dialogs.filter((dialog)=>{
-            if(dialog.getDialogRequestId()==this.currentDialogRequestId){
+    if (this.currentDialogRequestId) {
+        this.dialogs = this.dialogs.filter((dialog) => {
+            if (dialog.getDialogRequestId() == this.currentDialogRequestId) {
                 dialog.stopRecording();
                 return false;
             }
@@ -203,29 +203,29 @@ DcsController.prototype.startRecognize = function(options) {
     eventData.clientContext = this.getContext();
     this.emit("event", eventData);
     let dialog = this.client.startRecognize(eventData, wakeWordPcm);
-    dialog.on("requestSpeechFinished",()=>{
-        if(this.audioPlayerManager.isPaused()){
-            setTimeout(()=>{
-                if(this.audioPlayerManager.isPaused() && !this.voiceOutputManager.isPlaying()){
+    dialog.on("requestSpeechFinished", () => {
+        if (this.audioPlayerManager.isPaused()) {
+            setTimeout(() => {
+                if (this.audioPlayerManager.isPaused() && !this.voiceOutputManager.isPlaying()) {
 
                     console.log("resume player");
                     this.audioPlayerManager.play();
                 }
-            },1000);
+            }, 1000);
         }
     });
     this.dialogs.push(dialog);
     return dialog;
 };
 DcsController.prototype.stopRecognize = function() {
-    this.dialogs.forEach((dialog)=>{
+    this.dialogs.forEach((dialog) => {
         dialog.stopRecording();
     });
-    this.dialogs=[];
+    this.dialogs = [];
     return false;
 };
 DcsController.prototype.isRecognizing = function() {
-    return this.dialogs.length>0;
+    return this.dialogs.length > 0;
 };
 DcsController.prototype.processDirective = function(directive) {
     let promise = Promise.resolve();
@@ -255,8 +255,8 @@ DcsController.prototype.deQueue = function() {
     var directive = response.directive;
     if ((directive.header.dialogRequestId && this.currentDialogRequestId) &&
         directive.header.dialogRequestId != this.currentDialogRequestId &&
-        !(directive.header.namespace=="ai.dueros.device_interface.voice_input" &&
-            directive.header.name=="StopListen")
+        !(directive.header.namespace == "ai.dueros.device_interface.voice_input" &&
+            directive.header.name == "StopListen")
     ) {
         this.deQueue();
         return;

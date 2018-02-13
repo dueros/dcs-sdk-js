@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
+const ROOT_PATH = path.resolve(__dirname + "/..");
 
 
 const BaseManager = require("./base_manager");

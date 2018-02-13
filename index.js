@@ -20,7 +20,7 @@ const Recorder = require("./device_module/system_impl/recorder");
 const configModule = require("./config.js");
 const config = configModule.getAll();
 const child_process = require("child_process");
-var recorder = new Recorder();
+let recorder = new Recorder();
 
 let controller = new DcsController();
 
@@ -68,7 +68,7 @@ const BufferManager = require("./lib/buffermanager").BufferManager;
 function onWakeup(index, hotword, buffer) {
     console.log("hotword " + index);
     var cmd = config.play_cmd + " -t wav '" + __dirname + "/nihao.wav'";
-    child_process.exec(cmd,{
+    child_process.exec(cmd, {
         env: config.play_env,
     }, () => {
         controller.startRecognize();

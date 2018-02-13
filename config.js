@@ -41,7 +41,7 @@ module.exports = {
         }
     },
     setAll: function(options) {
-        config=Object.assign(config,options);
+        config = Object.assign(config, options);
     },
     save: function(key, value) {
         this.set(key, value);

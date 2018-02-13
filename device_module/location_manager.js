@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
+const ROOT_PATH = path.resolve(__dirname + "/..");
 const BaseManager = require("./base_manager");
 const util = require('util');
 const child_process = require('child_process');
-const DcsProtocol = require(ROOT_PATH+"/dcs_protocol");
+const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 
 function LocationManager() {
     this.loc = {

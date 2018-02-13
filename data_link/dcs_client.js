@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
+const ROOT_PATH = path.resolve(__dirname + "/..");
 
 const EventEmitter = require("events");
 const util = require('util');
@@ -67,7 +67,7 @@ class RecorderWrapper extends Readable {
             // if push() returns false, then stop reading from source
             console.log("on record data:" + chunk.length);
             if (!this.onData || !this.push(chunk)) {
-                if(this._source){
+                if (this._source) {
                     this._source.removeListener("data", onData);
                 }
             }
@@ -166,10 +166,10 @@ DcsClient.prototype.sendEvent = function(eventData) {
         console.error("no send event data");
         return;
     }
-    
+
     let logid = config.device_id + "_" + new Date().getTime() + "_monitor";
     console.log("event logid:" + logid);
-    let form_data=new FormData();
+    let form_data = new FormData();
     let headers = {
         "Content-Type": "multipart/form-data; boundary=" + form_data.getBoundary(),
         "SAIYALOGID": logid,
@@ -179,12 +179,12 @@ DcsClient.prototype.sendEvent = function(eventData) {
     if (config.event_header) {
         Object.assign(headers, config.event_header);
     }
-    form_data.append("metadata",JSON.stringify(eventData),{
-        "contentType":'application/json; charset=UTF-8'
+    form_data.append("metadata", JSON.stringify(eventData), {
+        "contentType": 'application/json; charset=UTF-8'
     });
 
     let r = request({
-        http2session:this.downstream.http2session,
+        http2session: this.downstream.http2session,
         url: config.schema + config.ip + config.events_uri,
         method: "post",
         headers: headers
@@ -218,13 +218,13 @@ function processEventRequest(r) {
         rWrap.emit("error", new Error('not multi part'));
     });
     r.on('response', function(response) {
-		//process http2 response event
-		let headers=response;
-        let statusCode=headers[":status"];
-		if(response.headers && response.statusCode){
-			statusCode=response.statusCode;
-			headers=response.headers;
-		}
+        //process http2 response event
+        let headers = response;
+        let statusCode = headers[":status"];
+        if (response.headers && response.statusCode) {
+            statusCode = response.statusCode;
+            headers = response.headers;
+        }
         //console.log(headers,statusCode);
         if (statusCode == 204) {
             //server no response
@@ -273,7 +273,9 @@ function processEventRequest(r) {
                     autoClose: true
                 });
                 //用RecorderWrapper包一下，是因为怕播放指令执行的时候，管道已经输出了一点东西了，复用一下RecorderWrapper的缓存功能
-                this.emit("content", content_id, new RecorderWrapper({recorder: p}));
+                this.emit("content", content_id, new RecorderWrapper({
+                    recorder: p
+                }));
                 p.pipe(file);
             }
         });
@@ -301,7 +303,7 @@ function processEventRequest(r) {
     return rWrap;
 }
 DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
-    let form_data=new FormData();
+    let form_data = new FormData();
     let rec_stream = this.rec_stream = new RecorderWrapper({
         "highWaterMark": 200000,
         "beforePcm": wakeWordPcm,
@@ -323,14 +325,14 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
     if (config.event_header) {
         Object.assign(headers, config.event_header);
     }
-    form_data.append("metadata",JSON.stringify(eventData),{
-        "contentType":'application/json; charset=UTF-8'
+    form_data.append("metadata", JSON.stringify(eventData), {
+        "contentType": 'application/json; charset=UTF-8'
     });
-    form_data.append("audio",rec_stream,{
-        "contentType":'application/octet-stream'
+    form_data.append("audio", rec_stream, {
+        "contentType": 'application/octet-stream'
     });
     let r = request({
-        http2session:this.downstream.http2session,
+        http2session: this.downstream.http2session,
         method: "post",
         "url": config.schema + config.ip + config.events_uri,
         headers: headers
@@ -340,9 +342,9 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
         socket.setNoDelay(true);
     });
     let rWrap = processEventRequest.call(this, r);
-    let dialog=new Dialog({
+    let dialog = new Dialog({
         eventData,
-        req:r,
+        req: r,
         rec_stream
     });
     rWrap.on("error", (e) => {
@@ -354,19 +356,19 @@ DcsClient.prototype.startRecognize = function(eventData, wakeWordPcm) {
 };
 
 class Dialog extends EventEmitter {
-    constructor(options){
+    constructor(options) {
         super();
-        this.eventData=options.eventData;
-        this.req=options.req;
-        this.rec_stream=options.rec_stream;
-        this.rec_stream.on("end",()=>{
+        this.eventData = options.eventData;
+        this.req = options.req;
+        this.rec_stream = options.rec_stream;
+        this.rec_stream.on("end", () => {
             this.emit("requestSpeechFinished");
         });
     }
-    stopRecording(){
+    stopRecording() {
         this.rec_stream.stopRecording();
     }
-    getDialogRequestId(){
+    getDialogRequestId() {
         return this.eventData.event.header.dialogRequestId;
     }
 }

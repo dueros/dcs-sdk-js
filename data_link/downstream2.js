@@ -3,13 +3,13 @@ const EventEmitter = require("events");
 const util = require('util');
 const request = require("request");
 const path = require("path");
-const ROOT_PATH = path.resolve(__dirname+"/..");
-const config = require(ROOT_PATH+"/config.js").getAll();
+const ROOT_PATH = path.resolve(__dirname + "/..");
+const config = require(ROOT_PATH + "/config.js").getAll();
 const Readable = require('stream').Readable;
 const http2 = require("http2");
 const fs = require('fs');
 const Dicer = require('dicer');
-const BufferManager = require(ROOT_PATH+"/lib/buffermanager").BufferManager;
+const BufferManager = require(ROOT_PATH + "/lib/buffermanager").BufferManager;
 
 function DownStream() {
     EventEmitter.call(this);
@@ -23,11 +23,12 @@ function DownStream() {
 DownStream.prototype.isConnected = function() {
     return this.state == "connected";
 };
-function sleep(sec){
-    return new Promise((resolve,reject)=>{
-        setTimeout(()=>{
+
+function sleep(sec) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
             resolve();
-        },sec*1000);
+        }, sec * 1000);
     });
 }
 
@@ -39,7 +40,7 @@ DownStream.prototype.init = async function() {
 
     if (this.req) {
         try {
-            this.req.close?this.req.close():this.req.rstWithCancel();
+            this.req.close ? this.req.close() : this.req.rstWithCancel();
         } catch (e) {}
         this.req = null;
     }
@@ -48,7 +49,7 @@ DownStream.prototype.init = async function() {
         clearInterval(this.pingInterval);
         if (this.pingReq) {
             try {
-                this.pingReq.close?this.pingReq.close():this.pingReq.rstWithCancel();
+                this.pingReq.close ? this.pingReq.close() : this.pingReq.rstWithCancel();
             } catch (e) {}
             this.pingReq = null;
         }
@@ -67,9 +68,11 @@ DownStream.prototype.init = async function() {
     }
     console.log(config.oauth_token);
     console.log("https://" + config.ip);
-    this.http2session = http2.connect("https://" + config.ip,{rejectUnauthorized:false});
+    this.http2session = http2.connect("https://" + config.ip, {
+        rejectUnauthorized: false
+    });
     this.http2session.socket.setNoDelay(true);
-    
+
     this.http2session.on("error", () => {
         this.state = "closed";
         console.log('downstream session error!!!!!!!!');
@@ -81,7 +84,7 @@ DownStream.prototype.init = async function() {
         await sleep(1);
         this.init();
     });
-    var logid = config.device_id + "_" + new Date().getTime()+(parseInt(Math.random()*100,10)) + "_monitor";
+    var logid = config.device_id + "_" + new Date().getTime() + (parseInt(Math.random() * 100, 10)) + "_monitor";
     console.log("downstream logid:" + logid);
     this.req = this.http2session.request({
         ":path": config.directive_uri,
@@ -125,10 +128,10 @@ DownStream.prototype.init = async function() {
         req.setTimeout(5000, () => {
             console.log("downstream ping timeout");
             if (!req.destroyed) {
-                req.close?req.close():req.rstWithCancel();
+                req.close ? req.close() : req.rstWithCancel();
             }
             if (this.req && !this.req.destroyed) {
-                this.req.close?this.req.close():this.req.rstWithCancel();
+                this.req.close ? this.req.close() : this.req.rstWithCancel();
             }
         });
         req.on("response", (headers) => {
@@ -140,7 +143,7 @@ DownStream.prototype.init = async function() {
         });
         setTimeout(() => {
             if (!req.destroyed) {
-                req.close?req.close():req.rstWithCancel();
+                req.close ? req.close() : req.rstWithCancel();
             }
         }, 5000);
         req.on("error", (e) => {
