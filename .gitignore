@@ -1,6 +1,8 @@
 # GIT-NPM common
 # --------------
 # All projects
+
+**/.DS_Store
 logs
 *.log
 npm-debug.log*
@@ -13,8 +15,20 @@ node_modules
 /.nyc_tmp
 *.sublime-project
 *.sublime-workspace
+tmp/*
+*.swp
 
 # Project-specific
+
+alerts.json
+storage.json
+package-lock.json
+recorder.pcm
+snowboy/build
+snowboy/lib/node/binding/Release/
+test.wav
+dcs_config.js
+wake.pcm
 
 
 # GIT-specific
