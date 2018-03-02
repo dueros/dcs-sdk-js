@@ -6,10 +6,10 @@ const path = require("path");
 const ROOT_PATH = path.resolve(__dirname + "/..");
 const config = require(ROOT_PATH + "/config.js").getAll();
 const Readable = require('stream').Readable;
-const http2 = require("./node_modules/http2");
+const http2 = require(ROOT_PATH + "/node_modules/http2");
 const fs = require('fs');
 const Dicer = require('dicer');
-const BufferManager = require("./wakeup/buffermanager").BufferManager;
+const BufferManager = require(ROOT_PATH + "/lib/buffermanager").BufferManager;
 
 function DownStream() {
     EventEmitter.call(this);
