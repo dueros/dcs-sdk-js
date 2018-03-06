@@ -47,7 +47,7 @@ class AlertManager extends BaseManager {
         });
 
         this.on("playend", (token) => {
-            controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "AlertStopped", controller.getContext(), {
+            this.dcs_controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "AlertStopped", this.dcs_controller.getContext(), {
                 token: token
             }));
 
@@ -63,7 +63,7 @@ class AlertManager extends BaseManager {
             notify: false,
             payload: directive.payload
         });
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SetAlertSucceeded", controller.getContext(), {
+        this.dcs_controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SetAlertSucceeded", this.dcs_controller.getContext(), {
             token: directive.payload.token
         }));
     }
@@ -71,7 +71,7 @@ class AlertManager extends BaseManager {
     DeleteAlertDirective(directive) {
         this.alertsData = this.alertsData.filter(_alertData => directive.payload.token != _alertData.token);
 
-        controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "DeleteAlertSucceeded", controller.getContext(), {
+        this.dcs_controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "DeleteAlertSucceeded", this.dcs_controller.getContext(), {
             token: directive.payload.token
         }));
     }
