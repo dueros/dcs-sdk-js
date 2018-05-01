@@ -24,6 +24,8 @@ const DcsProtocol = require(ROOT_PATH + "/dcs_protocol");
 class VoiceOutputManager extends BaseManager {
     constructor(controller) {
         super();
+        this.content_cache=[];
+        this.waiting_content_id=null;
         this.NAMESPACE = "ai.dueros.device_interface.voice_output";
         this.ttsplayer = new DataStreamPlayer();
 
@@ -37,9 +39,6 @@ class VoiceOutputManager extends BaseManager {
             */
         });
         this.ttsplayer.on("end", () => {
-            if (this.promise) {
-                this.promise.resolve();
-            }
             controller.emit("event", DcsProtocol.createEvent(this.NAMESPACE, "SpeechFinished", controller.getContext(), {
                 token: this.last_played_token
             }));
@@ -49,15 +48,24 @@ class VoiceOutputManager extends BaseManager {
             //console.log("on controller content",this.waiting_content_id,content_id);
             if (this.waiting_content_id == content_id) {
                 this.ttsplayer.play(content);
-                this.content_cache = null;
+                this.content_cache = this.content_cache.reduce((results,item)=>{
+                    if(item[0] != content_id){
+                        results.push(item);
+                    }
+                    return results;
+                },[]);
                 this.waiting_content_id = null;
             } else {
-                this.content_cache = [content_id, content];
+                this.content_cache.push( [content_id, content]);
                 setTimeout(() => {
-                    if (this.content_cache && this.content_cache[0] == content_id) {
-                        console.error("content timeout, no speak directive");
-                        this.content_cache = null;
-                    }
+                    this.content_cache = this.content_cache.reduce((results,item)=>{
+                        if(item[0] == content_id){
+                            console.error("content timeout, no speak directive");
+                        }else{
+                            results.push(item);
+                        }
+                        return results;
+                    },[]);
                 }, 2000);
             }
         });
@@ -86,21 +94,30 @@ class VoiceOutputManager extends BaseManager {
         this.emit("start");
 
         return new Promise((resolve, reject) => {
-            if (this.content_cache && this.content_cache[0] == cid) {
-                this.ttsplayer.play(this.content_cache[1]);
-                this.content_cache = null;
+            let result=null;
+            this.content_cache = this.content_cache.reduce((results,item)=>{
+                if(item[0] == cid){
+                    result=item;
+                }else{
+                    results.push(item);
+                }
+                return results;
+            },[]);
+
+            if (result && result[0] == cid) {
+                this.ttsplayer.play(result[1]);
                 this.waiting_content_id = null;
             } else {
                 this.waiting_content_id = cid;
             }
 
-            if (this.promise) {
-                this.promise.reject();
-            }
-            this.promise = {
-                resolve: resolve,
-                reject: reject,
-            };
+            this.once("end",()=>{
+                console.log("resolve speak promise");
+                resolve();
+            });
+            setTimeout(()=>{
+                reject();
+            },50000);
         });
     }
     getContext() {

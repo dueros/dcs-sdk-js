@@ -8,8 +8,8 @@ class BaseManager extends EventEmitter {
         }
         let name = directive.header.name;
         if (typeof this[name + "Directive"] === "function") {
-            this[name + "Directive"](directive, controller);
-            return true;
+            return this[name + "Directive"](directive, controller);
+            //return true;
         }
         return false;
     }

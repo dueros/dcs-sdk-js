@@ -141,7 +141,7 @@ class DcsController extends EventEmitter {
         }
 
         if ((response.directive.header.namespace == "ai.dueros.device_interface.audio_player" && response.directive.header.name == "Play" && response.directive.payload.playBehavior == "REPLACE_ALL")) {
-            this.audioPlayerManager.stop();
+            //this.audioPlayerManager.stop();
         }
 
         if (
@@ -225,21 +225,19 @@ class DcsController extends EventEmitter {
         return this.dialogs.length > 0;
     }
     processDirective(directive) {
-        let promise = Promise.resolve();
-        this.managers.forEach((manager) => {
-            promise = promise.then(() => {
-                let tmpRet = manager.handleDirective(directive, this);
-                if (tmpRet) {
-                    return tmpRet;
-                } else {
-                    return Promise.resolve();
-                }
-            });
+        let promises = this.managers.map((manager) => {
+            let tmpRet = manager.handleDirective(directive, this);
+            if (tmpRet) {
+                return tmpRet;
+            } else {
+                return Promise.resolve();
+            }
         });
-        return promise;
+        return Promise.all(promises);
     }
 
     deQueue() {
+        //console.log("deQueue!!!!!!!!!!!!!!!!!!!!!!!"+this.queue.length);
         this.processing = true;
         if (this.queue.length == 0) {
             this.processing = false;
@@ -252,10 +250,11 @@ class DcsController extends EventEmitter {
         }
         var directive = response.directive;
         if ((directive.header.dialogRequestId && this.currentDialogRequestId) &&
-            directive.header.dialogRequestId != this.currentDialogRequestId &&
+            (directive.header.dialogRequestId != this.currentDialogRequestId) &&
             !(directive.header.namespace == "ai.dueros.device_interface.voice_input" &&
                 directive.header.name == "StopListen")
         ) {
+            //不是当前dialogRequestId的指令，就不要执行了
             this.deQueue();
             return;
         }
@@ -264,9 +263,11 @@ class DcsController extends EventEmitter {
         if (promise && promise.then) {
             promise
                 .then(() => {
+                    //console.log("finish process directive:",directive);
                     this.deQueue()
                 })
                 .catch(() => {
+                    //console.log("error process directive:",directive);
                     this.deQueue()
                 });
         } else {
