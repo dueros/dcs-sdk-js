@@ -67,6 +67,9 @@ function createRecognizeEvent(options) {
             }
         },
     };
+    if (config.enable_compression_bv){
+        ev.event.payload.format="AUDIO_L16_RATE_16000_CHANNELS_1_COMPRESSION_BV";
+    }
     if (config.debug) {
         ev.debug = config.debug;
     }

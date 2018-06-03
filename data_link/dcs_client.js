@@ -28,6 +28,12 @@ const FormData = require("form-data");
 
 const fs = require('fs');
 const Dicer = require('dicer');
+const bv32js=require(ROOT_PATH + "/pcm2bv_stream.js");
+if(config.enable_compression_bv){
+    bv32js.ready().then(()=>{
+        console.log("bv32js ready");
+    });
+}
 class DcsClient extends EventEmitter {
     constructor(options) {
         super();
@@ -92,6 +98,12 @@ class DcsClient extends EventEmitter {
             "highWaterMark": 200000,
             "beforePcm": wakeWordPcm,
             "recorder": this.recorder.start().out()
+        });
+        if(config.enable_compression_bv){
+            rec_stream=new bv32js.BV32RecorderWrapper({recorder:rec_stream});
+        }
+        rec_stream.on("data",(data)=>{
+            //console.log("rec_stream on data",data.length);
         });
         rec_stream.pipe(fs.createWriteStream(ROOT_PATH + "/recorder.pcm", {
             flags: 'w',
