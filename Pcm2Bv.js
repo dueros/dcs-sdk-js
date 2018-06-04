@@ -1454,7 +1454,7 @@ function integrateWasmJS() {
   var method = 'native-wasm';
 
   var wasmTextFile = 'Pcm2Bv.wast';
-  var wasmBinaryFile = './Pcm2Bv.wasm';
+  var wasmBinaryFile = __dirname+'/Pcm2Bv.wasm';
   var asmjsCodeFile = 'Pcm2Bv.temp.asm.js';
 
   if (typeof Module['locateFile'] === 'function') {

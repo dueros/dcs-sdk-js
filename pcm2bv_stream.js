@@ -1,6 +1,9 @@
 const m=require("./Pcm2BV.js");
 const Readable = require('stream').Readable;
-const BufferManager = require('./lib/buffermanager.js');
+const path = require("path");
+const ROOT_PATH = path.resolve(__dirname);
+
+const BufferManager = require(ROOT_PATH+'/lib/buffermanager.js').BufferManager;
 m.run();
 let cInBuf;
 let cOutBuf;
