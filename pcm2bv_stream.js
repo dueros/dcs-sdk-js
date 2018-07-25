@@ -40,7 +40,9 @@ class BV32RecorderWrapper extends Readable {
                 }
             }
         }.bind(this);
-        this._source.on("data", onData);
+        process.nextTick(()=>{
+            this._source.on("data", onData);
+        });
         // When the source ends, push the EOF-signaling `null` chunk
         this._source.on("end", () => {
             this.push(null);
@@ -71,11 +73,12 @@ class BV32RecorderWrapper extends Readable {
 function encode(buf){
     let arr = new Uint8Array(buf);
     m.writeArrayToMemory(arr,cInBuf);
-	let ret=m._encode(cInBuf,160,cOutBuf,160);
+	let ret=m._encode(cInBuf,160,cOutBuf,21);
     //console.log(ret);//should be 20
     let encoded=m.HEAPU8.subarray(cOutBuf, cOutBuf+ret)
     //console.log(Buffer.from(encoded));
-    return encoded;
+    return Buffer.from(encoded);
+    //return encoded;
     //console.log("hello world"); 
 
 }
@@ -86,9 +89,15 @@ module.exports.BV32RecorderWrapper=BV32RecorderWrapper;
 if(module === require.main) {
     module.exports.ready().then(()=>{
         const fs=require("fs");
-        let buf=fs.readFileSync("recorder.pcm");
-        let ret=encode(buf.slice(160));
-        console.log(ret);
+        let stream=fs.createReadStream("recorder1.pcm");
+        let wrapper=new BV32RecorderWrapper({recorder:stream});
+        wrapper.on("data",(data)=>{
+            console.log(data);
+        });
+
+
+        //let ret=encode(buf.slice(0,160));
+        //console.log(ret);
     
     });
 }
