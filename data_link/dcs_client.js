@@ -246,27 +246,6 @@ function wavHeader() {
 
 
 
-function pcm2adpcm(recorder) {
-
-    let child_process = require("child_process");
-    let convert_process = child_process.spawn(ROOT_PATH + "/adpcm/Wav2Adpcm", ["-l"]);
-    recorder.pipe(convert_process.stdin);
-    convert_process.stdout.pipe(fs.createWriteStream(ROOT_PATH + "/recorder.adpcm", {
-        flags: 'w',
-        defaultEncoding: 'binary',
-        autoClose: true
-    }));
-
-    return new RecorderWrapper({
-        "highWaterMark": 200000,
-        "beforePcm": wavHeader(),
-        "recorder": convert_process.stdout
-    });
-
-    //return convert_process.stdout;
-}
-
-
 function processEventRequest(r) {
     let rWrap = new Readable().wrap(r);
     rWrap.on("error", (e) => {

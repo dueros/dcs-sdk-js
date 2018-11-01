@@ -83,18 +83,63 @@ function encode(buf){
 
 }
 
+function decode(buf){
+    let arr = new Uint8Array(buf);
+    //console.log(arr);
+    m.writeArrayToMemory(arr,cInBuf);
+	let ret=m._decode(cInBuf,20,cOutBuf,160);
+    console.log(ret);//should be 160
+    let decoded=m.HEAPU8.subarray(cOutBuf, cOutBuf+ret)
+    //console.log(Buffer.from(encoded));
+    return Buffer.from(decoded);
+    //console.log("hello world"); 
+}
+
 module.exports.BV32RecorderWrapper=BV32RecorderWrapper;
 
 
 if(module === require.main) {
     module.exports.ready().then(()=>{
-        const fs=require("fs");
-        let stream=fs.createReadStream("recorder1.pcm");
-        let wrapper=new BV32RecorderWrapper({recorder:stream});
-        wrapper.on("data",(data)=>{
-            console.log(data);
-        });
+        //const fs=require("fs");
+        //let stream=fs.createReadStream("recorder1.pcm");
+        //let wrapper=new BV32RecorderWrapper({recorder:stream});
+        //wrapper.on("data",(data)=>{
+        //    console.log(data);
+        //});
 
+        const fs=require("fs");
+        let buf=fs.readFileSync("recorder1.pcm");
+        let bm=new BufferManager();
+        for(let i=0;true;i++){
+			if(buf.length >(i+1)*160){
+				let tmp=buf.slice(i*160,(i+1)*160);
+				console.log(tmp,i);
+				let ret=encode(tmp);
+                console.log(ret);
+                bm.add(ret);
+			}else{
+				break;
+			}
+        }
+		//fs.writeFileSync("test.bv",ret);
+
+        m._init();
+        let bm1=new BufferManager();
+        for(let i=0;true;i++){
+			if(bm.size()>(i+1)*20){
+				let tmp=bm.slice(i*20,(i+1)*20);
+				console.log(tmp,i);
+				let ret=decode(tmp);
+                console.log(ret);
+                bm1.add(ret);
+			}else{
+				break;
+			}
+        }
+        fs.writeFileSync("recorder1_bv.pcm",bm1.toBuffer());
+
+        //let decodeBuf=decode(ret);
+        //console.log(decodeBuf);
 
         //let ret=encode(buf.slice(0,160));
         //console.log(ret);

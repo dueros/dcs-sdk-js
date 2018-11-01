@@ -1,7 +1,6 @@
 ///base on node built-in http module
 const EventEmitter = require("events");
 const util = require('util');
-const request = require("request");
 const path = require("path");
 const ROOT_PATH = path.resolve(__dirname + "/..");
 const config = require(ROOT_PATH + "/config.js").getAll();
