@@ -72,7 +72,8 @@ class DownStream extends EventEmitter{
         this.http2session = http2.connect("https://" + config.ip, {
             rejectUnauthorized: false
         });
-        this.http2session.socket.setNoDelay(true);
+        // this is not support on node.js v8.14
+        //this.http2session.socket.setNoDelay(true);
 
         this.http2session.on("error", () => {
             this.state = "closed";
